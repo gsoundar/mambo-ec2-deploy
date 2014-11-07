@@ -50,6 +50,6 @@
   </property>
   <property>
     <name>mapreduce.jobtracker.address</name>
-    <value>scspr0016462001.gdl.englab.netapp.com:8021</value>
+    <value>10.0.0.10:8021</value>
   </property>
 </configuration>

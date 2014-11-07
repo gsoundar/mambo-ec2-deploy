@@ -6,6 +6,7 @@
    <value>/mnt/hadoop-temp/</value>
    <description>A base for other temporary directories.</description>
  </property>
+<!--tachyon
  <property>
    <name>fs.tachyon.impl</name>
    <value>tachyon.hadoop.TFS</value>
@@ -18,14 +19,13 @@
    <name>fs.nfs.mountdir</name>
    <value>/mamboroot</value>
  </property>
- <!--
-      <property>
+-->
+ <property>
    <name>fs.defaultFS</name>
-   <value>hdfs://scspr0016462001.gdl.englab.netapp.com:54310</value> 
+   <value>hdfs://10.0.0.10:54310</value> 
  </property>
- -->
- <!-- NFS -->
  <!-- Authentication flavor to use. For flamingo, use AUTH_NONE. For pepe, use AUTH_SYS. -->
+ <!-- NFS 
  <property>
    <name>fs.nfs.impl</name>
    <value>org.apache.hadoop.fs.nfs.NFSFileSystem</value>
@@ -50,5 +50,6 @@
    <name>fs.nfs.prefetch</name>
    <value>true</value>
  </property>
+-->
 </configuration>
 

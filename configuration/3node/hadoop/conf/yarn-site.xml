@@ -3,20 +3,20 @@
 <configuration>
   <property>
     <name>yarn.resourcemanager.hostname</name>
-    <value>scspr0016462001.gdl.englab.netapp.com</value>
+    <value>10.0.0.10</value>
     <description>The hostname of the RM.</description>
   </property>
   <property>
     <name>yarn.resourcemanager.address</name>  
-    <value>scspr0016462001.gdl.englab.netapp.com:8032</value>  
+    <value>10.0.0.10:8032</value>  
   </property>
   <property>
     <name>yarn.resourcemanager.scheduler.address</name>  
-    <value>scspr0016462001.gdl.englab.netapp.com:8030</value>  
+    <value>10.0.0.10:8030</value>  
   </property> 
   <property>
     <name>yarn.resourcemanager.resource-tracker.address</name>  
-    <value>scspr0016462001.gdl.englab.netapp.com:8031</value>  
+    <value>10.0.0.10:8031</value>  
   </property>
   <property>
     <name>yarn.scheduler.minimum-allocation-mb</name>

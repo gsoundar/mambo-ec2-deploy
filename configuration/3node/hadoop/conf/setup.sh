@@ -5,25 +5,16 @@ HADOOP_YARN_HOME=${HADOOP_PREFIX}
 HADOOP_CONF_DIR=${HADOOP_PREFIX}/conf/
 
 # Setup directories
-##for x in {1..3}; do ssh -t -t scspr001646200${x}.gdl.englab.netapp.com 'sudo mkdir /mnt/namenode'; done
-##for x in {1..3}; do ssh -t -t scspr001646200${x}.gdl.englab.netapp.com 'sudo mkdir /mnt/datanode'; done
-#for x in {10..20}; do ssh -t -t scspr00161340${x}.gdl.englab.netapp.com 'sudo mkdir /mnt/namenode'; done
-#for x in {10..20}; do ssh -t -t scspr00161340${x}.gdl.englab.netapp.com 'sudo mkdir /mnt/datanode'; done
-##for x in {1..3}; do ssh -t -t scspr001646200${x}.gdl.englab.netapp.com 'sudo mkdir /mnt/hadoop-temp'; done
-#for x in {10..20}; do ssh -t -t scspr00161340${x}.gdl.englab.netapp.com 'sudo mkdir /mnt/hadoop-temp'; done
+for x in {10..12}; do ssh -t -t 10.0.0.${x} 'sudo mkdir /mnt/namenode'; done
+for x in {10..12}; do ssh -t -t 10.0.0.${x} 'sudo mkdir /mnt/datanode'; done
+for x in {10..12}; do ssh -t -t 10.0.0.${x} 'sudo mkdir /mnt/hadoop-temp'; done
 
 # Change permissions
-##for x in {1..3}; do ssh -t -t scspr001646200${x}.gdl.englab.netapp.com 'sudo chown jingxin /mnt/namenode'; done
-##for x in {1..3}; do ssh -t -t scspr001646200${x}.gdl.englab.netapp.com 'sudo chown jingxin /mnt/datanode'; done
-#for x in {1..9}; do ssh -t -t scspr001613400${x}.gdl.englab.netapp.com 'sudo chown gokuls /mnt/datanode'; done
-#for x in {10..20}; do ssh -t -t scspr00161340${x}.gdl.englab.netapp.com 'sudo chown gokuls /mnt/namenode'; done
-#for x in {10..20}; do ssh -t -t scspr00161340${x}.gdl.englab.netapp.com 'sudo chown gokuls /mnt/datanode'; done
-#for x in {1..9}; do ssh -t -t scspr001613400${x}.gdl.englab.netapp.com 'sudo chown gokuls /mnt/hadoop-temp'; done
-##for x in {1..3}; do ssh -t -t scspr001646200${x}.gdl.englab.netapp.com 'sudo chown jingxin /mnt/hadoop-temp'; done
-#for x in {10..20}; do ssh -t -t scspr00161340${x}.gdl.englab.netapp.com 'sudo chown gokuls /mnt/hadoop-temp'; done
+for x in {10..12}; do ssh -t -t 10.0.0.${x} 'sudo chown ec2-user /mnt/namenode'; done
+for x in {10..12}; do ssh -t -t 10.0.0.${x} 'sudo chown ec2-user /mnt/datanode'; done
+for x in {10..12}; do ssh -t -t 10.0.0.${x} 'sudo chown ec2-user /mnt/hadoop-temp'; done
 
 # Namenode
-#echo "HADOOP_PREFIX=${HADOOP_PREFIX}"
 #ssh -t scspr0016462001.gdl.englab.netapp.com "bash -i -c \"${HADOOP_PREFIX}/sbin/hadoop-daemon.sh --config ${HADOOP_CONF_DIR} --script hdfs start namenode\""
 
 # Datanodes
