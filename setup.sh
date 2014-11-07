@@ -10,3 +10,7 @@ cp -rf packages/${HBASE_PACKAGE} hbase
 # Copy the configuration files
 mkdir /opt/mambo/mambo-ec2-deploy/hadoop/conf
 cp configuration/3node/hadoop/conf/* /opt/mambo/mambo-ec2-deploy/hadoop/conf
+
+# Setup keys
+cat configuration/3node/keys/mambo_id_rsa.pub >> ~/.ssh/authorized_keys
+cat configuration/3node/keys/ssh_conf >> ~/.ssh/config

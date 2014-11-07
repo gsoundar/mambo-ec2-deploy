@@ -1,0 +1,3 @@
+Hose 10.0.0.*
+    User ec2-user
+    IdentityFile ~/.ssh/mambo_id_rsa.pub

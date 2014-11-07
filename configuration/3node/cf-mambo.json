@@ -1,0 +1,502 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "Mambo using EC2 Hadoop Server with 3 nodes",
+	"Parameters" : {
+    	"SSHKeyName" : {
+      		"Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+      		"Type" : "String"
+    	}
+  	},
+	"Resources": {
+		"MamboVPC": {
+      		"Type": "AWS::EC2::VPC",
+      		"Properties": {
+        	"CidrBlock": "10.0.0.0/16",
+        	"InstanceTenancy": "default",
+        	"EnableDnsSupport": "true",
+        	"EnableDnsHostnames": "true",
+        	"Tags": [
+          		{
+            		"Key": "Name",
+            		"Value": "MamboVPC"
+          		}
+        		]
+      		}
+    	},
+    	"MamboSubnet": {
+      		"Type": "AWS::EC2::Subnet",
+      		"Properties": {
+        	"CidrBlock": "10.0.0.0/24",
+        	"AvailabilityZone": "us-west-2c",
+        	"VpcId": {
+          		"Ref": "MamboVPC"
+        	},
+        	"Tags": [
+          		{
+            		"Key": "Name",
+            		"Value": "MamboSubnet"
+          		}
+        		]
+      		}
+    	},
+    	"MamboNetworkAcl": {
+      		"Type": "AWS::EC2::NetworkAcl",
+      		"Properties": {
+        		"VpcId": {
+          			"Ref": "MamboVPC"
+        		}
+      		}
+    	},
+    	"MamboNetworkAclRule1": {
+      		"Type": "AWS::EC2::NetworkAclEntry",
+      		"Properties": {
+        		"CidrBlock": "0.0.0.0/0",
+        		"Egress": true,
+        		"Protocol": "-1",
+        		"RuleAction": "allow",
+        		"RuleNumber": "100",
+        		"NetworkAclId": {
+          			"Ref": "MamboNetworkAcl"
+        		}
+      		}
+    	},
+    	"MamboNetworkAclRule2": {
+      		"Type": "AWS::EC2::NetworkAclEntry",
+      		"Properties": {
+        		"CidrBlock": "0.0.0.0/0",
+        		"Protocol": "-1",
+        		"RuleAction": "allow",
+        		"RuleNumber": "100",
+        		"NetworkAclId": {
+          			"Ref": "MamboNetworkAcl"
+        		}
+      		}
+    	},
+    	"MamboSubnetAcl": {
+      		"Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      		"Properties": {
+        		"NetworkAclId": {
+          			"Ref": "MamboNetworkAcl"
+        		},
+        		"SubnetId": {
+          			"Ref": "MamboSubnet"
+        		}
+      		}
+    	},
+    	"MamboRouteTable": {
+      		"Type": "AWS::EC2::RouteTable",
+      		"Properties": {
+        			"VpcId": {
+          			"Ref": "MamboVPC"
+        		}
+      		}
+    	},
+    	"MamboInternetGateway": {
+      		"Type": "AWS::EC2::InternetGateway",
+      		"Properties": {
+      		}
+    	},
+    	"MamboDHCP": {
+      		"Type": "AWS::EC2::DHCPOptions",
+      		"Properties": {
+        		"DomainName": "us-west-2.compute.internal",
+        		"DomainNameServers": [
+         		 "AmazonProvidedDNS"
+        		]
+      		}
+    	},
+    	"MamboDHCPAttach": {
+      		"Type": "AWS::EC2::VPCDHCPOptionsAssociation",
+      		"Properties": {
+        		"VpcId": {
+          		"Ref": "MamboVPC"
+        		},
+        	"DhcpOptionsId": {
+          		"Ref": "MamboDHCP"
+        		}
+      		}
+    	},
+    	"MamboGatewayAttach": {
+      		"Type": "AWS::EC2::VPCGatewayAttachment",
+      		"Properties": {
+        		"VpcId": {
+          			"Ref": "MamboVPC"
+        		},
+        		"InternetGatewayId": {
+          			"Ref": "MamboInternetGateway"
+        		}
+      		}
+    	},
+    	"MamboSubnetroute": {
+      		"Type": "AWS::EC2::SubnetRouteTableAssociation",
+      		"Properties": {
+        		"RouteTableId": {
+          			"Ref": "MamboRouteTable"
+        		},
+       			 "SubnetId": {
+         			 "Ref": "MamboSubnet"
+        		}
+      		}
+    	},
+    	"MamboGatewayRoute": {
+      		"Type": "AWS::EC2::Route",
+      		"Properties": {
+        		"DestinationCidrBlock": "0.0.0.0/0",
+        		"RouteTableId": {
+          			"Ref": "MamboRouteTable"
+        		},
+        		"GatewayId": {
+          			"Ref": "MamboInternetGateway"
+        		}
+      		},
+      		"DependsOn": "MamboGatewayAttach"
+      	},
+    	"MamboSecurityGroup": {
+      		"Type": "AWS::EC2::SecurityGroup",
+      		"Properties": {
+      		    "GroupDescription":"Mambo allows all traffic within subnet",
+        		"VpcId": {
+          			"Ref": "MamboVPC"
+        		},
+				"SecurityGroupIngress": [
+					{
+					"IpProtocol": "tcp",
+					"FromPort": "22",
+					"ToPort": "22",
+					"CidrIp": "0.0.0.0/0"
+				},
+				{
+					"IpProtocol": "tcp",
+					"FromPort": "0",
+					"ToPort": "65535",
+					"CidrIp": "198.95.226.231/32"
+				},
+				{
+					"IpProtocol": "-1",
+					"CidrIp": "10.0.0.0/24"
+				}
+				],
+				"SecurityGroupEgress": [
+				{
+					"IpProtocol": "-1",
+					"CidrIp": "0.0.0.0/0"
+				}
+				]
+      		}
+    	},
+    	"MamboTrafficIngress1": {
+      		"Type": "AWS::EC2::SecurityGroupIngress",
+      		"Properties": {
+        		"GroupId": {
+          			"Ref": "MamboSecurityGroup"
+        		},
+        		"IpProtocol": "tcp",
+        		"FromPort": "22",
+        		"ToPort": "22",
+        		"CidrIp": "0.0.0.0/0"
+      		}
+    	},
+    	"MamboTrafficIngress2": {
+      		"Type": "AWS::EC2::SecurityGroupIngress",
+      		"Properties": {
+        		"GroupId": {
+          			"Ref": "MamboSecurityGroup"
+        		},
+        		"IpProtocol": "-1",
+        		"CidrIp": "10.0.0.0/24"
+      		}
+    	},
+    	"MamboTrafficEgress1": {
+      		"Type": "AWS::EC2::SecurityGroupEgress",
+      		"Properties": {
+        		"GroupId": {
+          			"Ref": "MamboSecurityGroup"
+        		},
+        		"IpProtocol": "-1",
+        		"CidrIp": "0.0.0.0/0"
+      		}
+    	},
+    	"MamboNFSServer": {
+      		"Type": "AWS::EC2::Instance",
+      		"Properties": {
+        		"DisableApiTermination": "FALSE",
+        		"ImageId": "ami-b5a7ea85",
+        		"InstanceType": "c3.large",
+        		"KeyName": {"Ref" : "SSHKeyName"},
+        		"Tenancy": "default",
+        		"Monitoring": "false",
+        		"NetworkInterfaces": [
+          			{
+            			"DeleteOnTermination": "true",
+            			"Description": "Primary network interface",
+            			"DeviceIndex": 0,
+           	 			"SubnetId": {
+              				"Ref": "MamboSubnet"
+            			},
+            			"PrivateIpAddresses": [
+              			{
+                			"PrivateIpAddress": "10.0.0.61",
+                			"Primary": "true"
+              			}
+            			],
+            			"GroupSet": [
+              			{
+                			"Ref": "MamboSecurityGroup"
+              			}
+            			],
+            			"AssociatePublicIpAddress": "true"
+          			}
+        		],
+        		"BlockDeviceMappings": [
+        			{
+        				"DeviceName": "/dev/xvdb",
+        				"VirtualName": "ephemeral1" 
+        			}
+        		],
+        		"UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
+            			"#!/bin/bash -ex","\n",
+            			"yum -y install emacs rpcbind nfs-utils","\n",
+            			"mkfs.ext4 /dev/xvdb","\n",
+            			"mkdir /mnt/data","\n",
+            			"mount /dev/xvdb /mnt/data","\n",
+            			"service rpcbind start","\n",
+            			"service nfs start","\n",
+            			"exportfs -o rw,sec=sys,fsid=0,insecure,no_subtree_check,sync :/mnt/data","\n",
+            			"mkdir /mnt/test","\n",
+            			"mount 10.0.0.61:/mnt/data /mnt/test","\n",
+            			"curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
+                                                           "\"Reason\" : \"The NFS server is ready\",",
+                                                           "\"UniqueId\" : \"NFS\",",
+                                                           "\"Data\" : \"Done\"}' ",
+                  "\"", {"Ref" : "WaitForNFSInstanceWaitHandle"},"\"\n" ]]}
+                },
+        		"Tags": [
+          			{
+           			"Key": "Name",
+            		"Value": "MamboNFSServer"
+          		}
+        		]
+      		}
+    	},
+    	"WaitForNFSInstanceWaitHandle" : {
+      		"Type" : "AWS::CloudFormation::WaitConditionHandle",
+      		"Properties" : {
+      			}
+    	},
+    	"WaitForNFSInstance" : {
+      		"Type" : "AWS::CloudFormation::WaitCondition",
+      		"DependsOn" : "MamboNFSServer",
+      		"Properties" : {
+        		"Handle" : {"Ref" : "WaitForNFSInstanceWaitHandle"},
+        		"Timeout" : "600"
+      		}
+    	},
+    	"MamboHadoopSlave2": {
+      		"Type": "AWS::EC2::Instance",
+      		"Properties": {
+        		"DisableApiTermination": "FALSE",
+        		"ImageId": "ami-b5a7ea85",
+        		"InstanceType": "m3.large",
+        		"KeyName": {"Ref" : "SSHKeyName"},
+        		"Tenancy": "default",
+        		"Monitoring": "false",
+        		"NetworkInterfaces": [
+          			{
+            			"DeleteOnTermination": "true",
+            			"Description": "Primary network interface",
+            			"DeviceIndex": 0,
+           	 			"SubnetId": {
+              				"Ref": "MamboSubnet"
+            			},
+            			"PrivateIpAddresses": [
+              			{
+                			"PrivateIpAddress": "10.0.0.12",
+                			"Primary": "true"
+              			}
+            			],
+            			"GroupSet": [
+              			{
+                			"Ref": "MamboSecurityGroup"
+              			}
+            			],
+            			"AssociatePublicIpAddress": "true"
+          			}
+        		],
+        		"UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
+            			"#!/bin/bash -ex","\n",
+						"yum -y install git\n",
+						"mkdir /opt/mambo\n",
+						"cd /opt/mambo\n",
+						"git clone https://github.com/gsoundar/mambo-ec2-deploy.git\n",
+						"cd mambo-ec2-deploy\n",
+						"sh ./setup.sh\n",
+            			"curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
+                                                           "\"Reason\" : \"The Hadoop slave1 is ready\",",
+                                                           "\"UniqueId\" : \"hadoop-slave1\",",
+                                                           "\"Data\" : \"Done\"}' ",
+                  "\"", {"Ref" : "WaitForHadoopSlave2WaitHandle"},"\"\n" ]]}
+                },
+        		"Tags": [
+          			{
+           			"Key": "Name",
+            		"Value": "MamboHadoopSlave2"
+          		}
+        		]
+      		},
+			"DependsOn":"WaitForNFSInstance"
+    	},
+    	"WaitForHadoopSlave2WaitHandle" : {
+      		"Type" : "AWS::CloudFormation::WaitConditionHandle",
+      		"Properties" : {
+      			}
+    	},
+    	"WaitForHadoopSlave2Instance" : {
+      		"Type" : "AWS::CloudFormation::WaitCondition",
+      		"DependsOn" : "MamboHadoopSlave2",
+      		"Properties" : {
+        		"Handle" : {"Ref" : "WaitForHadoopSlave2WaitHandle"},
+        		"Timeout" : "600"
+      		}
+    	},
+    	"MamboHadoopSlave1": {
+      		"Type": "AWS::EC2::Instance",
+      		"Properties": {
+        		"DisableApiTermination": "FALSE",
+        		"ImageId": "ami-b5a7ea85",
+        		"InstanceType": "m3.large",
+        		"KeyName": {"Ref" : "SSHKeyName"},
+        		"Tenancy": "default",
+        		"Monitoring": "false",
+        		"NetworkInterfaces": [
+          			{
+            			"DeleteOnTermination": "true",
+            			"Description": "Primary network interface",
+            			"DeviceIndex": 0,
+           	 			"SubnetId": {
+              				"Ref": "MamboSubnet"
+            			},
+            			"PrivateIpAddresses": [
+              			{
+                			"PrivateIpAddress": "10.0.0.11",
+                			"Primary": "true"
+              			}
+            			],
+            			"GroupSet": [
+              			{
+                			"Ref": "MamboSecurityGroup"
+              			}
+            			],
+            			"AssociatePublicIpAddress": "true"
+          			}
+        		],
+        		"UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
+            			"#!/bin/bash -ex","\n",
+						"yum -y install git\n",
+						"mkdir /opt/mambo\n",
+						"cd /opt/mambo\n",
+						"git clone https://github.com/gsoundar/mambo-ec2-deploy.git\n",
+						"cd mambo-ec2-deploy\n",
+						"sh ./setup.sh\n",
+            			"curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
+                                                           "\"Reason\" : \"The Hadoop slave1 is ready\",",
+                                                           "\"UniqueId\" : \"hadoop-slave1\",",
+                                                           "\"Data\" : \"Done\"}' ",
+                  "\"", {"Ref" : "WaitForHadoopSlave1WaitHandle"},"\"\n" ]]}
+                },
+        		"Tags": [
+          			{
+           			"Key": "Name",
+            		"Value": "MamboHadoopSlave1"
+          		}
+        		]
+      		},
+			"DependsOn":"WaitForHadoopSlave2Instance"
+    	},
+    	"WaitForHadoopSlave1WaitHandle" : {
+      		"Type" : "AWS::CloudFormation::WaitConditionHandle",
+      		"Properties" : {
+      			}
+    	},
+    	"WaitForHadoopSlave1Instance" : {
+      		"Type" : "AWS::CloudFormation::WaitCondition",
+      		"DependsOn" : "MamboHadoopSlave1",
+      		"Properties" : {
+        		"Handle" : {"Ref" : "WaitForHadoopSlave1WaitHandle"},
+        		"Timeout" : "600"
+      		}
+    	},
+    	"MamboHadoopMaster": {
+      		"Type": "AWS::EC2::Instance",
+      		"Properties": {
+        		"DisableApiTermination": "FALSE",
+        		"ImageId": "ami-b5a7ea85",
+        		"InstanceType": "m3.large",
+        		"KeyName": {"Ref" : "SSHKeyName"},
+        		"Tenancy": "default",
+        		"Monitoring": "false",
+        		"NetworkInterfaces": [
+          			{
+            			"DeleteOnTermination": "true",
+            			"Description": "Primary network interface",
+            			"DeviceIndex": 0,
+           	 			"SubnetId": {
+              				"Ref": "MamboSubnet"
+            			},
+            			"PrivateIpAddresses": [
+              			{
+                			"PrivateIpAddress": "10.0.0.10",
+                			"Primary": "true"
+              			}
+            			],
+            			"GroupSet": [
+              			{
+                			"Ref": "MamboSecurityGroup"
+              			}
+            			],
+            			"AssociatePublicIpAddress": "true"
+          			}
+        		],
+        		"UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
+            			"#!/bin/bash -ex","\n",
+						"yum -y install git\n",
+						"mkdir /opt/mambo\n",
+						"cd /opt/mambo\n",
+						"git clone https://github.com/gsoundar/mambo-ec2-deploy.git\n",
+						"cd mambo-ec2-deploy\n",
+						"sh ./setup.sh\n",
+            			"curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
+                                                           "\"Reason\" : \"The Hadoop master is ready\",",
+                                                           "\"UniqueId\" : \"hadoop-master\",",
+                                                           "\"Data\" : \"Done\"}' ",
+                  "\"", {"Ref" : "WaitForHadoopMasterWaitHandle"},"\"\n" ]]}
+                },
+        		"Tags": [
+          			{
+           			"Key": "Name",
+            		"Value": "MamboHadoopMaster"
+          		}
+        		]
+      		},
+			"DependsOn":"WaitForHadoopSlave1Instance"
+    	},
+    	"WaitForHadoopMasterWaitHandle" : {
+      		"Type" : "AWS::CloudFormation::WaitConditionHandle",
+      		"Properties" : {
+      			}
+    	},
+    	"WaitForHadoopMasterInstance" : {
+      		"Type" : "AWS::CloudFormation::WaitCondition",
+      		"DependsOn" : "MamboHadoopMaster",
+      		"Properties" : {
+        		"Handle" : {"Ref" : "WaitForHadoopMasterWaitHandle"},
+        		"Timeout" : "600"
+      		}
+    	}
+	},
+	"Outputs" : {
+    	"MamboHadoopMasterHostname" : {
+      		"Description" : "Hostname of Hadoop master",
+      		"Value" : { "Fn::Join" : ["", [{ "Fn::GetAtt" : [ "MamboHadoopMaster", "PublicIp" ]} ]]}
+    	}
+  	}
+}
