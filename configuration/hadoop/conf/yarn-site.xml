@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+  <property>
+    <name>yarn.resourcemanager.hostname</name>
+    <value>scspr0016462001.gdl.englab.netapp.com</value>
+    <description>The hostname of the RM.</description>
+  </property>
+  <property>
+    <name>yarn.resourcemanager.address</name>  
+    <value>scspr0016462001.gdl.englab.netapp.com:8032</value>  
+  </property>
+  <property>
+    <name>yarn.resourcemanager.scheduler.address</name>  
+    <value>scspr0016462001.gdl.englab.netapp.com:8030</value>  
+  </property> 
+  <property>
+    <name>yarn.resourcemanager.resource-tracker.address</name>  
+    <value>scspr0016462001.gdl.englab.netapp.com:8031</value>  
+  </property>
+  <property>
+    <name>yarn.scheduler.minimum-allocation-mb</name>
+    <value>128</value>
+    <description>Minimum limit of memory to allocate to each container request at the Resource Manager.</description>
+  </property>
+  <property>
+    <name>yarn.scheduler.maximum-allocation-mb</name>
+    <value>4096</value>
+    <description>Maximum limit of memory to allocate to each container request at the Resource Manager.</description>
+  </property>
+  <property>
+    <name>yarn.scheduler.minimum-allocation-vcores</name>
+    <value>1</value>
+    <description>The minimum allocation for every container request at the RM, in terms of virtual CPU cores. Requests lower than this won't take effect, and the specified value will get allocated the minimum.</description>
+  </property>
+  <property>
+    <name>yarn.scheduler.maximum-allocation-vcores</name>
+    <value>2</value>
+    <description>The maximum allocation for every container request at the RM, in terms of virtual CPU cores. Requests higher than this won't take effect, and will get capped to this value.</description>
+  </property>
+  <property>
+    <name>yarn.nodemanager.resource.memory-mb</name>
+    <value>4096</value>
+    <description>Physical memory, in MB, to be made available to running containers</description>
+  </property>
+  <property>
+    <name>yarn.nodemanager.resource.cpu-vcores</name>
+    <value>4</value>
+    <description>Number of CPU cores that can be allocated for containers.</description>
+  </property>
+  <property>
+    <name>yarn.nodemanager.aux-services</name>
+    <value>mapreduce_shuffle</value>
+    <description>shuffle service that needs to be set for Map Reduce to run </description>
+  </property>
+</configuration>
