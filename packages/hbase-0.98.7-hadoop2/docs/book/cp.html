@@ -1,0 +1,73 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>Chapter&nbsp;13.&nbsp;Apache HBase Coprocessors</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="prev" href="thrift.html" title="Chapter&nbsp;12.&nbsp;Thrift API and Filter Language"><link rel="next" href="ch13s02.html" title="13.2.&nbsp;Examples"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;13.&nbsp;Apache HBase Coprocessors</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="thrift.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch13s02.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/cp.html';
+    </script><div class="chapter" title="Chapter&nbsp;13.&nbsp;Apache HBase Coprocessors"><div class="titlepage"><div><div><h2 class="title"><a name="cp"></a>Chapter&nbsp;13.&nbsp;Apache HBase Coprocessors</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="cp.html#d2802e13522">13.1. Coprocessor Framework</a></span></dt><dt><span class="section"><a href="ch13s02.html">13.2. Examples</a></span></dt><dt><span class="section"><a href="ch13s03.html">13.3. Building A Coprocessor</a></span></dt><dd><dl><dt><span class="section"><a href="ch13s03.html#d2802e13711">13.3.1. Load from Configuration</a></span></dt><dt><span class="section"><a href="ch13s03.html#d2802e13751">13.3.2. Load from the HBase Shell</a></span></dt></dl></dd><dt><span class="section"><a href="ch13s04.html">13.4. Check the Status of a Coprocessor</a></span></dt><dt><span class="section"><a href="ch13s05.html">13.5. Monitor Time Spent in Coprocessors</a></span></dt><dt><span class="section"><a href="ch13s06.html">13.6. Status of Coprocessors in HBase</a></span></dt></dl></div><p> HBase coprocessors are modeled after the coprocessors which are part of Google's BigTable
+      (<a class="link" href="http://www.scribd.com/doc/21631448/Dean-Keynote-Ladis2009" target="_top">http://www.scribd.com/doc/21631448/Dean-Keynote-Ladis2009</a>, pages
+    66-67.). Coprocessors function in a similar way to Linux kernel modules. They provide a way to
+    run server-level code against locally-stored data. The functionality they provide is very
+    powerful, but also carries great risk and can have adverse effects on the system, at the level
+    of the operating system. The information in this chapter is primarily sourced and heavily reused
+    from Mingjie Lai's blog post at <a class="link" href="https://blogs.apache.org/hbase/entry/coprocessor_introduction" target="_top">https://blogs.apache.org/hbase/entry/coprocessor_introduction</a>. </p><p> Coprocessors are not designed to be used by end users of HBase, but by HBase developers who
+    need to add specialized functionality to HBase. One example of the use of coprocessors is
+    pluggable compaction and scan policies, which are provided as coprocessors in <a class="link" href="HBASE-6427" target="_top">HBASE-6427</a>. </p><div class="section" title="13.1.&nbsp;Coprocessor Framework"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2802e13522"></a>13.1.&nbsp;Coprocessor Framework</h2></div></div></div><p>The implementation of HBase coprocessors diverges from the BigTable implementation. The
+      HBase framework provides a library and runtime environment for executing user code within the
+      HBase region server and master processes. </p><p> The framework API is provided in the <a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/coprocessor/package-summary.html" target="_top">coprocessor</a>
+      package.</p><p>Two different types of coprocessors are provided by the framework, based on their
+      scope.</p><div class="variablelist" title="Types of Coprocessors"><p class="title"><b>Types of Coprocessors</b></p><dl><dt><span class="term">System Coprocessors</span></dt><dd><p>System coprocessors are loaded globally on all tables and regions hosted by a region
+            server.</p></dd><dt><span class="term">Table Coprocessors</span></dt><dd><p>You can specify which coprocessors should be loaded on all regions for a table on a
+            per-table basis.</p></dd></dl></div><p>The framework provides two different aspects of extensions as well:
+        <em class="firstterm">observers</em> and <em class="firstterm">endpoints</em>.</p><div class="variablelist"><dl><dt><span class="term">Observers</span></dt><dd><p>Observers are analogous to triggers in conventional databases. They allow you to
+            insert user code by overriding upcall methods provided by the coprocessor framework.
+            Callback functions are executed from core HBase code when events occur. Callbacks are
+            handled by the framework, and the coprocessor itself only needs to insert the extended
+            or alternate functionality.</p><div class="variablelist" title="Provided Observer Interfaces"><p class="title"><b>Provided Observer Interfaces</b></p><dl><dt><span class="term"><a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/coprocessor/RegionObserver.html" target="_top">RegionObserver</a></span></dt><dd><p>A RegionObserver provides hooks for data manipulation events, such as Get,
+                  Put, Delete, Scan. An instance of a RegionObserver coprocessor exists for each
+                  table region. The scope of the observations a RegionObserver can make is
+                  constrained to that region. </p></dd><dt><span class="term"><a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/coprocessor/RegionServerObserver.html" target="_top">RegionServerObserver</a></span></dt><dd><p>A RegionServerObserver provides for operations related to the RegionServer,
+                  such as stopping the RegionServer and performing operations before or after
+                  merges, commits, or rollbacks.</p></dd><dt><span class="term"><a class="link" href="http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/coprocessor/WALObserver.html" target="_top">WALObserver</a></span></dt><dd><p>A WALObserver provides hooks for operations related to the write-ahead log
+                  (WAL). You can observe or intercept WAL writing and reconstruction events. A
+                  WALObserver runs in the context of WAL processing. A single WALObserver exists on
+                  a single region server.</p></dd><dt><span class="term"><a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/coprocessor/MasterObserver.html" target="_top">MasterObserver</a></span></dt><dd><p>A MasterObserver provides hooks for DDL-type operation, such as create,
+                  delete, modify table. The MasterObserver runs within the context of the HBase
+                  master. </p></dd></dl></div><p>More than one observer of a given type can be loaded at once. Multiple observers are
+            chained to execute sequentially by order of assigned priority. Nothing prevents a
+            coprocessor implementor from communicating internally among its installed
+            observers.</p><p>An observer of a higher priority can preempt lower-priority observers by throwing an
+            IOException or a subclass of IOException.</p></dd><dt><span class="term">Endpoints (HBase 0.96.x and later)</span></dt><dd><p>The implementation for endpoints changed significantly in HBase 0.96.x due to the
+            introduction of protocol buffers (protobufs) (<a class="link" href="https://issues.apache.org/jira/browse/HBASE-5448" target="_top">HBASE-5488</a>). If
+            you created endpoints before 0.96.x, you will need to rewrite them. Endpoints are now
+            defined and callable as protobuf services, rather than endpoint invocations passed
+            through as Writable blobs</p><p>Dynamic RPC endpoints resemble stored procedures. An endpoint can be invoked at any
+            time from the client. When it is invoked, it is executed remotely at the target region
+            or regions, and results of the executions are returned to the client.</p><p>The endpoint implementation is installed on the server and is invoked using HBase
+            RPC. The client library provides convenience methods for invoking these dynamic
+            interfaces. </p><p>An endpoint, like an observer, can communicate with any installed observers. This
+            allows you to plug new features into HBase without modifying or recompiling HBase
+            itself.</p><div class="itemizedlist" title="Steps to Implement an Endpoint"><p class="title"><b>Steps to Implement an Endpoint</b></p><ul class="itemizedlist" type="disc"><li class="listitem"><p>Define the coprocessor service and related messages in a <code class="filename">.proto</code> file</p></li><li class="listitem"><p>Run the <span class="command"><strong>protoc</strong></span> command to generate the code.</p></li><li class="listitem"><p>Write code to implement the following:</p><div class="itemizedlist"><ul class="itemizedlist" type="circle"><li class="listitem"><p>the generated protobuf Service interface</p></li><li class="listitem"><p>the new <a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/client/HTable.html#coprocessorService(byte[])" target="_top">org.apache.hadoop.hbase.coprocessor.CoprocessorService</a>
+                    interface (required for the <a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/regionserver/RegionCoprocessorHost.html" target="_top">RegionCoprocessorHost</a>
+                    to register the exposed service)</p></li></ul></div></li><li class="listitem"><p>The client calls the new HTable.coprocessorService() methods to perform the endpoint RPCs.</p></li></ul></div><p>For more information and examples, refer to the API documentation for the <a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/client/coprocessor/package-summary.html" target="_top">coprocessor</a>
+          package, as well as the included RowCount example in the
+            <code class="filename">/hbase-examples/src/test/java/org/apache/hadoop/hbase/coprocessor/example/</code>
+            of the HBase source.</p></dd><dt><span class="term">Endpoints (HBase 0.94.x and earlier)</span></dt><dd><p>Dynamic RPC endpoints resemble stored procedures. An endpoint can be invoked at any
+            time from the client. When it is invoked, it is executed remotely at the target region
+            or regions, and results of the executions are returned to the client.</p><p>The endpoint implementation is installed on the server and is invoked using HBase
+            RPC. The client library provides convenience methods for invoking these dynamic
+            interfaces. </p><p>An endpoint, like an observer, can communicate with any installed observers. This
+            allows you to plug new features into HBase without modifying or recompiling HBase
+            itself.</p><div class="itemizedlist" title="Steps to Implement an Endpoint"><p class="title"><b>Steps to Implement an Endpoint</b></p><ul class="itemizedlist" type="disc"><li class="listitem"><h3><a name="d2802e13670"></a>Server-Side</h3><div class="itemizedlist"><ul class="itemizedlist" type="circle"><li class="listitem"><p>Create new protocol interface which extends CoprocessorProtocol.</p></li><li class="listitem"><p>Implement the Endpoint interface. The implementation will be loaded into and
+                    executed from the region context.</p></li><li class="listitem"><p>Extend the abstract class BaseEndpointCoprocessor. This convenience class
+                    hides some internal details that the implementer does not need to be concerned
+                    about, &#710; such as coprocessor framework class loading.</p></li></ul></div></li><li class="listitem"><h3><a name="d2802e13683"></a>Client-Side</h3><p>Endpoint can be invoked by two new HBase client APIs:</p><div class="itemizedlist"><ul class="itemizedlist" type="circle"><li class="listitem"><p><code class="code">HTableInterface.coprocessorProxy(Class&lt;T&gt; protocol, byte[]
+                      row)</code> for executing against a single region</p></li><li class="listitem"><p><code class="code">HTableInterface.coprocessorExec(Class&lt;T&gt; protocol, byte[]
+                      startKey, byte[] endKey, Batch.Call&lt;T,R&gt; callable)</code> for executing
+                    over a range of regions</p></li></ul></div></li></ul></div></dd></dl></div></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="thrift.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch13s02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;12.&nbsp;Thrift API and Filter Language&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;13.2.&nbsp;Examples</td></tr></table></div></body></html>

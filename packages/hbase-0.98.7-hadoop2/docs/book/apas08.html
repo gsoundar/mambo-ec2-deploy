@@ -1,0 +1,22 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>A.8.&nbsp;Adding a New Chapter to the HBase Reference Guide</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="appendix_contributing_to_documentation.html" title="Appendix&nbsp;A.&nbsp;Contributing to Documentation"><link rel="prev" href="apas07.html" title="A.7.&nbsp;Images in the HBase Reference Guide"><link rel="next" href="apas09.html" title="A.9.&nbsp;Docbook Common Issues"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">A.8.&nbsp;Adding a New Chapter to the HBase Reference Guide</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="apas07.html">Prev</a>&nbsp;</td><th width="60%" align="center">Appendix&nbsp;A.&nbsp;Contributing to Documentation</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="apas09.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/.html';
+    </script><div class="section" title="A.8.&nbsp;Adding a New Chapter to the HBase Reference Guide"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2802e22337"></a>A.8.&nbsp;Adding a New Chapter to the HBase Reference Guide</h2></div></div></div><p>If you want to add a new chapter to the HBase Reference Guide, the easiest way is to
+            copy an existing chapter file, rename it, and change the ID and title elements near the
+            top of the file. Delete the existing content and create the new content. Then open the
+                <code class="filename">book.xml</code> file, which is the main file for the HBase Reference
+            Guide, and use an &lt;xi:include&gt; element to include your new chapter in the
+            appropriate location. Be sure to add your new file to your Git repository before
+            creating your patch. Note that the <code class="filename">book.xml</code> file currently contains
+            many chapters. You can only include a chapter at the same nesting levels as the other
+            chapters in the file. When in doubt, check to see how other files have been
+            included.</p></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="apas07.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="appendix_contributing_to_documentation.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="apas09.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">A.7.&nbsp;Images in the HBase Reference Guide&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;A.9.&nbsp;Docbook Common Issues</td></tr></table></div></body></html>

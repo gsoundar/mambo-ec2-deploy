@@ -1,0 +1,36 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>E.4.&nbsp;Enable Data Block Encoding</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="compression.html" title="Appendix&nbsp;E.&nbsp;Compression and Data Block Encoding In HBase"><link rel="prev" href="apes03.html" title="E.3.&nbsp;Compressor Configuration, Installation, and Use"><link rel="next" href="sql.html" title="Appendix&nbsp;F.&nbsp;SQL over HBase"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">E.4.&nbsp;Enable Data Block Encoding</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="apes03.html">Prev</a>&nbsp;</td><th width="60%" align="center">Appendix&nbsp;E.&nbsp;Compression and Data Block Encoding In
+          HBase</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="sql.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/data.block.encoding.enable.html';
+    </script><div class="section" title="E.4.&nbsp;Enable Data Block Encoding"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="data.block.encoding.enable"></a>E.4.&nbsp;Enable Data Block Encoding</h2></div></div></div><p>Codecs are built into HBase so no extra configuration is needed. Codecs are enabled on a
+        table by setting the <code class="code">DATA_BLOCK_ENCODING</code> property. Disable the table before
+        altering its DATA_BLOCK_ENCODING setting. Following is an example using HBase Shell:</p><div class="example"><a name="d2802e24200"></a><p class="title"><b>Example&nbsp;E.6.&nbsp;Enable Data Block Encoding On a Table</b></p><div class="example-contents"><pre class="screen">
+hbase&gt;  disable 'test'
+hbase&gt; alter 'test', { NAME =&gt; 'cf', DATA_BLOCK_ENCODING =&gt; 'FAST_DIFF' }
+Updating all regions with the new schema...
+0/1 regions updated.
+1/1 regions updated.
+Done.
+0 row(s) in 2.2820 seconds
+hbase&gt; enable 'test'
+0 row(s) in 0.1580 seconds          
+          </pre></div></div><br class="example-break"><div class="example"><a name="d2802e24205"></a><p class="title"><b>Example&nbsp;E.7.&nbsp;Verifying a ColumnFamily's Data Block Encoding</b></p><div class="example-contents"><pre class="screen">
+hbase&gt; describe 'test'
+DESCRIPTION                                          ENABLED
+ 'test', {NAME =&gt; 'cf', DATA_BLOCK_ENCODING =&gt; 'FAST true
+ _DIFF', BLOOMFILTER =&gt; 'ROW', REPLICATION_SCOPE =&gt;
+ '0', VERSIONS =&gt; '1', COMPRESSION =&gt; 'GZ', MIN_VERS
+ IONS =&gt; '0', TTL =&gt; 'FOREVER', KEEP_DELETED_CELLS =
+ &gt; 'false', BLOCKSIZE =&gt; '65536', IN_MEMORY =&gt; 'fals
+ e', BLOCKCACHE =&gt; 'true'}
+1 row(s) in 0.0650 seconds          
+        </pre></div></div><br class="example-break"></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="apes03.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="compression.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="sql.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">E.3.&nbsp;Compressor Configuration, Installation, and Use&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Appendix&nbsp;F.&nbsp;SQL over HBase</td></tr></table></div></body></html>

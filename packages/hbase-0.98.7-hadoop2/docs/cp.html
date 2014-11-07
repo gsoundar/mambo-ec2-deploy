@@ -1,0 +1,181 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>Chapter&nbsp;1.&nbsp;Apache HBase Coprocessors</title><link rel="stylesheet" type="text/css" href="css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/cp.html';
+    </script><div class="chapter" title="Chapter&nbsp;1.&nbsp;Apache HBase Coprocessors"><div class="titlepage"><div><div><h2 class="title"><a name="cp"></a>Chapter&nbsp;1.&nbsp;Apache HBase Coprocessors</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d473e16">1.1. Coprocessor Framework</a></span></dt><dt><span class="section"><a href="#d473e192">1.2. Examples</a></span></dt><dt><span class="section"><a href="#d473e200">1.3. Building A Coprocessor</a></span></dt><dd><dl><dt><span class="section"><a href="#d473e205">1.3.1. Load from Configuration</a></span></dt><dt><span class="section"><a href="#d473e245">1.3.2. Load from the HBase Shell</a></span></dt></dl></dd><dt><span class="section"><a href="#d473e314">1.4. Check the Status of a Coprocessor</a></span></dt><dt><span class="section"><a href="#d473e330">1.5. Monitor Time Spent in Coprocessors</a></span></dt><dt><span class="section"><a href="#d473e351">1.6. Status of Coprocessors in HBase</a></span></dt></dl></div><p> HBase coprocessors are modeled after the coprocessors which are part of Google's BigTable
+      (<a class="link" href="http://www.scribd.com/doc/21631448/Dean-Keynote-Ladis2009" target="_top">http://www.scribd.com/doc/21631448/Dean-Keynote-Ladis2009</a>, pages
+    66-67.). Coprocessors function in a similar way to Linux kernel modules. They provide a way to
+    run server-level code against locally-stored data. The functionality they provide is very
+    powerful, but also carries great risk and can have adverse effects on the system, at the level
+    of the operating system. The information in this chapter is primarily sourced and heavily reused
+    from Mingjie Lai's blog post at <a class="link" href="https://blogs.apache.org/hbase/entry/coprocessor_introduction" target="_top">https://blogs.apache.org/hbase/entry/coprocessor_introduction</a>. </p><p> Coprocessors are not designed to be used by end users of HBase, but by HBase developers who
+    need to add specialized functionality to HBase. One example of the use of coprocessors is
+    pluggable compaction and scan policies, which are provided as coprocessors in <a class="link" href="HBASE-6427" target="_top">HBASE-6427</a>. </p><div class="section" title="1.1.&nbsp;Coprocessor Framework"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d473e16"></a>1.1.&nbsp;Coprocessor Framework</h2></div></div></div><p>The implementation of HBase coprocessors diverges from the BigTable implementation. The
+      HBase framework provides a library and runtime environment for executing user code within the
+      HBase region server and master processes. </p><p> The framework API is provided in the <a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/coprocessor/package-summary.html" target="_top">coprocessor</a>
+      package.</p><p>Two different types of coprocessors are provided by the framework, based on their
+      scope.</p><div class="variablelist" title="Types of Coprocessors"><p class="title"><b>Types of Coprocessors</b></p><dl><dt><span class="term">System Coprocessors</span></dt><dd><p>System coprocessors are loaded globally on all tables and regions hosted by a region
+            server.</p></dd><dt><span class="term">Table Coprocessors</span></dt><dd><p>You can specify which coprocessors should be loaded on all regions for a table on a
+            per-table basis.</p></dd></dl></div><p>The framework provides two different aspects of extensions as well:
+        <em class="firstterm">observers</em> and <em class="firstterm">endpoints</em>.</p><div class="variablelist"><dl><dt><span class="term">Observers</span></dt><dd><p>Observers are analogous to triggers in conventional databases. They allow you to
+            insert user code by overriding upcall methods provided by the coprocessor framework.
+            Callback functions are executed from core HBase code when events occur. Callbacks are
+            handled by the framework, and the coprocessor itself only needs to insert the extended
+            or alternate functionality.</p><div class="variablelist" title="Provided Observer Interfaces"><p class="title"><b>Provided Observer Interfaces</b></p><dl><dt><span class="term"><a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/coprocessor/RegionObserver.html" target="_top">RegionObserver</a></span></dt><dd><p>A RegionObserver provides hooks for data manipulation events, such as Get,
+                  Put, Delete, Scan. An instance of a RegionObserver coprocessor exists for each
+                  table region. The scope of the observations a RegionObserver can make is
+                  constrained to that region. </p></dd><dt><span class="term"><a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/coprocessor/RegionServerObserver.html" target="_top">RegionServerObserver</a></span></dt><dd><p>A RegionServerObserver provides for operations related to the RegionServer,
+                  such as stopping the RegionServer and performing operations before or after
+                  merges, commits, or rollbacks.</p></dd><dt><span class="term"><a class="link" href="http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/coprocessor/WALObserver.html" target="_top">WALObserver</a></span></dt><dd><p>A WALObserver provides hooks for operations related to the write-ahead log
+                  (WAL). You can observe or intercept WAL writing and reconstruction events. A
+                  WALObserver runs in the context of WAL processing. A single WALObserver exists on
+                  a single region server.</p></dd><dt><span class="term"><a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/coprocessor/MasterObserver.html" target="_top">MasterObserver</a></span></dt><dd><p>A MasterObserver provides hooks for DDL-type operation, such as create,
+                  delete, modify table. The MasterObserver runs within the context of the HBase
+                  master. </p></dd></dl></div><p>More than one observer of a given type can be loaded at once. Multiple observers are
+            chained to execute sequentially by order of assigned priority. Nothing prevents a
+            coprocessor implementor from communicating internally among its installed
+            observers.</p><p>An observer of a higher priority can preempt lower-priority observers by throwing an
+            IOException or a subclass of IOException.</p></dd><dt><span class="term">Endpoints (HBase 0.96.x and later)</span></dt><dd><p>The implementation for endpoints changed significantly in HBase 0.96.x due to the
+            introduction of protocol buffers (protobufs) (<a class="link" href="https://issues.apache.org/jira/browse/HBASE-5448" target="_top">HBASE-5488</a>). If
+            you created endpoints before 0.96.x, you will need to rewrite them. Endpoints are now
+            defined and callable as protobuf services, rather than endpoint invocations passed
+            through as Writable blobs</p><p>Dynamic RPC endpoints resemble stored procedures. An endpoint can be invoked at any
+            time from the client. When it is invoked, it is executed remotely at the target region
+            or regions, and results of the executions are returned to the client.</p><p>The endpoint implementation is installed on the server and is invoked using HBase
+            RPC. The client library provides convenience methods for invoking these dynamic
+            interfaces. </p><p>An endpoint, like an observer, can communicate with any installed observers. This
+            allows you to plug new features into HBase without modifying or recompiling HBase
+            itself.</p><div class="itemizedlist" title="Steps to Implement an Endpoint"><p class="title"><b>Steps to Implement an Endpoint</b></p><ul class="itemizedlist" type="disc"><li class="listitem"><p>Define the coprocessor service and related messages in a <code class="filename">.proto</code> file</p></li><li class="listitem"><p>Run the <span class="command"><strong>protoc</strong></span> command to generate the code.</p></li><li class="listitem"><p>Write code to implement the following:</p><div class="itemizedlist"><ul class="itemizedlist" type="circle"><li class="listitem"><p>the generated protobuf Service interface</p></li><li class="listitem"><p>the new <a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/client/HTable.html#coprocessorService(byte[])" target="_top">org.apache.hadoop.hbase.coprocessor.CoprocessorService</a>
+                    interface (required for the <a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/regionserver/RegionCoprocessorHost.html" target="_top">RegionCoprocessorHost</a>
+                    to register the exposed service)</p></li></ul></div></li><li class="listitem"><p>The client calls the new HTable.coprocessorService() methods to perform the endpoint RPCs.</p></li></ul></div><p>For more information and examples, refer to the API documentation for the <a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/client/coprocessor/package-summary.html" target="_top">coprocessor</a>
+          package, as well as the included RowCount example in the
+            <code class="filename">/hbase-examples/src/test/java/org/apache/hadoop/hbase/coprocessor/example/</code>
+            of the HBase source.</p></dd><dt><span class="term">Endpoints (HBase 0.94.x and earlier)</span></dt><dd><p>Dynamic RPC endpoints resemble stored procedures. An endpoint can be invoked at any
+            time from the client. When it is invoked, it is executed remotely at the target region
+            or regions, and results of the executions are returned to the client.</p><p>The endpoint implementation is installed on the server and is invoked using HBase
+            RPC. The client library provides convenience methods for invoking these dynamic
+            interfaces. </p><p>An endpoint, like an observer, can communicate with any installed observers. This
+            allows you to plug new features into HBase without modifying or recompiling HBase
+            itself.</p><div class="itemizedlist" title="Steps to Implement an Endpoint"><p class="title"><b>Steps to Implement an Endpoint</b></p><ul class="itemizedlist" type="disc"><li class="listitem"><h3><a name="d473e164"></a>Server-Side</h3><div class="itemizedlist"><ul class="itemizedlist" type="circle"><li class="listitem"><p>Create new protocol interface which extends CoprocessorProtocol.</p></li><li class="listitem"><p>Implement the Endpoint interface. The implementation will be loaded into and
+                    executed from the region context.</p></li><li class="listitem"><p>Extend the abstract class BaseEndpointCoprocessor. This convenience class
+                    hides some internal details that the implementer does not need to be concerned
+                    about, &#710; such as coprocessor framework class loading.</p></li></ul></div></li><li class="listitem"><h3><a name="d473e177"></a>Client-Side</h3><p>Endpoint can be invoked by two new HBase client APIs:</p><div class="itemizedlist"><ul class="itemizedlist" type="circle"><li class="listitem"><p><code class="code">HTableInterface.coprocessorProxy(Class&lt;T&gt; protocol, byte[]
+                      row)</code> for executing against a single region</p></li><li class="listitem"><p><code class="code">HTableInterface.coprocessorExec(Class&lt;T&gt; protocol, byte[]
+                      startKey, byte[] endKey, Batch.Call&lt;T,R&gt; callable)</code> for executing
+                    over a range of regions</p></li></ul></div></li></ul></div></dd></dl></div></div><div class="section" title="1.2.&nbsp;Examples"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d473e192"></a>1.2.&nbsp;Examples</h2></div></div></div><p>An example of an observer is included in
+      <code class="filename">hbase-examples/src/test/java/org/apache/hadoop/hbase/coprocessor/example/TestZooKeeperScanPolicyObserver.java</code>.
+    Several endpoint examples are included in the same directory.</p></div><div class="section" title="1.3.&nbsp;Building A Coprocessor"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d473e200"></a>1.3.&nbsp;Building A Coprocessor</h2></div></div></div><p>Before you can build a processor, it must be developed, compiled, and packaged in a JAR
+      file. The next step is to configure the coprocessor framework to use your coprocessor. You can
+      load the coprocessor from your HBase configuration, so that the coprocessor starts with HBase,
+      or you can configure the coprocessor from the HBase shell, as a table attribute, so that it is
+      loaded dynamically when the table is opened or reopened.</p><div class="section" title="1.3.1.&nbsp;Load from Configuration"><div class="titlepage"><div><div><h3 class="title"><a name="d473e205"></a>1.3.1.&nbsp;Load from Configuration</h3></div></div></div><p> To configure a coprocessor to be loaded when HBase starts, modify the RegionServer's
+          <code class="filename">hbase-site.xml</code> and configure one of the following properties, based
+        on the type of observer you are configuring: </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><code class="code">hbase.coprocessor.region.classes</code>for RegionObservers and
+            Endpoints</p></li><li class="listitem"><p><code class="code">hbase.coprocessor.wal.classes</code>for WALObservers</p></li><li class="listitem"><p><code class="code">hbase.coprocessor.master.classes</code>for MasterObservers</p></li></ul></div><div class="example"><a name="d473e229"></a><p class="title"><b>Example&nbsp;1.1.&nbsp;Example RegionObserver Configuration</b></p><div class="example-contents"><p>In this example, one RegionObserver is configured for all the HBase tables.</p><pre class="screen">
+&lt;property&gt;
+    &lt;name&gt;hbase.coprocessor.region.classes&lt;/name&gt;
+    &lt;value&gt;org.apache.hadoop.hbase.coprocessor.AggregateImplementation&lt;/value&gt;
+ &lt;/property&gt;          
+        </pre></div></div><br class="example-break"><p> If multiple classes are specified for loading, the class names must be comma-separated.
+        The framework attempts to load all the configured classes using the default class loader.
+        Therefore, the jar file must reside on the server-side HBase classpath.</p><p>Coprocessors which are loaded in this way will be active on all regions of
+        all tables. These are the system coprocessor introduced earlier. The first listed
+        coprocessors will be assigned the priority <code class="literal">Coprocessor.Priority.SYSTEM</code>.
+        Each subsequent coprocessor in the list will have its priority value incremented by one
+        (which reduces its priority, because priorities have the natural sort order of Integers). </p><p>When calling out to registered observers, the framework executes their callbacks methods
+        in the sorted order of their priority. Ties are broken arbitrarily.</p></div><div class="section" title="1.3.2.&nbsp;Load from the HBase Shell"><div class="titlepage"><div><div><h3 class="title"><a name="d473e245"></a>1.3.2.&nbsp;Load from the HBase Shell</h3></div></div></div><p> You can load a coprocessor on a specific table via a table attribute. The following
+        example will load the <code class="systemitem">FooRegionObserver</code> observer when table
+          <code class="systemitem">t1</code> is read or re-read. </p><div class="example"><a name="d473e256"></a><p class="title"><b>Example&nbsp;1.2.&nbsp;Load a Coprocessor On a Table Using HBase Shell</b></p><div class="example-contents"><pre class="screen">
+hbase(main):005:0&gt;  <strong class="userinput"><code>alter 't1', METHOD =&gt; 'table_att', 
+  'coprocessor'=&gt;'hdfs:///foo.jar|com.foo.FooRegionObserver|1001|arg1=1,arg2=2'</code></strong>
+<code class="computeroutput">Updating all regions with the new schema...
+1/1 regions updated.
+Done.
+0 row(s) in 1.0730 seconds</code>
+
+hbase(main):006:0&gt; <strong class="userinput"><code>describe 't1'</code></strong>
+<code class="computeroutput">DESCRIPTION                                                        ENABLED                             
+ {NAME =&gt; 't1', coprocessor$1 =&gt; 'hdfs:///foo.jar|com.foo.FooRegio false                               
+ nObserver|1001|arg1=1,arg2=2', FAMILIES =&gt; [{NAME =&gt; 'c1', DATA_B                                     
+ LOCK_ENCODING =&gt; 'NONE', BLOOMFILTER =&gt; 'NONE', REPLICATION_SCOPE                                     
+  =&gt; '0', VERSIONS =&gt; '3', COMPRESSION =&gt; 'NONE', MIN_VERSIONS =&gt;                                      
+ '0', TTL =&gt; '2147483647', KEEP_DELETED_CELLS =&gt; 'false', BLOCKSIZ                                     
+ E =&gt; '65536', IN_MEMORY =&gt; 'false', ENCODE_ON_DISK =&gt; 'true', BLO                                     
+ CKCACHE =&gt; 'true'}, {NAME =&gt; 'f1', DATA_BLOCK_ENCODING =&gt; 'NONE',                                     
+  BLOOMFILTER =&gt; 'NONE', REPLICATION_SCOPE =&gt; '0', VERSIONS =&gt; '3'                                     
+ , COMPRESSION =&gt; 'NONE', MIN_VERSIONS =&gt; '0', TTL =&gt; '2147483647'                                     
+ , KEEP_DELETED_CELLS =&gt; 'false', BLOCKSIZE =&gt; '65536', IN_MEMORY                                      
+ =&gt; 'false', ENCODE_ON_DISK =&gt; 'true', BLOCKCACHE =&gt; 'true'}]}                                         
+1 row(s) in 0.0190 seconds</code>
+        </pre></div></div><br class="example-break"><p>The coprocessor framework will try to read the class information from the coprocessor
+        table attribute value. The value contains four pieces of information which are separated by
+        the <code class="literal">|</code> character.</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>File path: The jar file containing the coprocessor implementation must be in a
+            location where all region servers can read it. You could copy the file onto the local
+            disk on each region server, but it is recommended to store it in HDFS.</p></li><li class="listitem"><p>Class name: The full class name of the coprocessor.</p></li><li class="listitem"><p>Priority: An integer. The framework will determine the execution sequence of all
+            configured observers registered at the same hook using priorities. This field can be
+            left blank. In that case the framework will assign a default priority value.</p></li><li class="listitem"><p>Arguments: This field is passed to the coprocessor implementation.</p></li></ul></div><div class="example"><a name="d473e291"></a><p class="title"><b>Example&nbsp;1.3.&nbsp;Unload a Coprocessor From a Table Using HBase Shell</b></p><div class="example-contents"><pre class="screen">
+hbase(main):007:0&gt; <strong class="userinput"><code>alter 't1', METHOD =&gt; 'table_att_unset',</code></strong> 
+hbase(main):008:0*   <strong class="userinput"><code>NAME =&gt; 'coprocessor$1'</code></strong>
+<code class="computeroutput">Updating all regions with the new schema...
+1/1 regions updated.
+Done.
+0 row(s) in 1.1130 seconds</code>
+
+hbase(main):009:0&gt; <strong class="userinput"><code>describe 't1'</code></strong>
+<code class="computeroutput">DESCRIPTION                                                        ENABLED                             
+ {NAME =&gt; 't1', FAMILIES =&gt; [{NAME =&gt; 'c1', DATA_BLOCK_ENCODING =&gt; false                               
+  'NONE', BLOOMFILTER =&gt; 'NONE', REPLICATION_SCOPE =&gt; '0', VERSION                                     
+ S =&gt; '3', COMPRESSION =&gt; 'NONE', MIN_VERSIONS =&gt; '0', TTL =&gt; '214                                     
+ 7483647', KEEP_DELETED_CELLS =&gt; 'false', BLOCKSIZE =&gt; '65536', IN                                     
+ _MEMORY =&gt; 'false', ENCODE_ON_DISK =&gt; 'true', BLOCKCACHE =&gt; 'true                                     
+ '}, {NAME =&gt; 'f1', DATA_BLOCK_ENCODING =&gt; 'NONE', BLOOMFILTER =&gt;                                      
+ 'NONE', REPLICATION_SCOPE =&gt; '0', VERSIONS =&gt; '3', COMPRESSION =&gt;                                     
+  'NONE', MIN_VERSIONS =&gt; '0', TTL =&gt; '2147483647', KEEP_DELETED_C                                     
+ ELLS =&gt; 'false', BLOCKSIZE =&gt; '65536', IN_MEMORY =&gt; 'false', ENCO                                     
+ DE_ON_DISK =&gt; 'true', BLOCKCACHE =&gt; 'true'}]}                                                         
+1 row(s) in 0.0180 seconds          </code>
+        </pre></div></div><br class="example-break"><div class="warning" title="Warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Warning</h3><p>There is no guarantee that the framework will load a given coprocessor successfully.
+          For example, the shell command neither guarantees a jar file exists at a particular
+          location nor verifies whether the given class is actually contained in the jar file.
+        </p></div></div></div><div class="section" title="1.4.&nbsp;Check the Status of a Coprocessor"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d473e314"></a>1.4.&nbsp;Check the Status of a Coprocessor</h2></div></div></div><p>To check the status of a coprocessor after it has been configured, use the
+        <span class="command"><strong>status</strong></span> HBase Shell command.</p><pre class="screen">
+hbase(main):020:0&gt; <strong class="userinput"><code>status 'detailed'</code></strong>
+<code class="computeroutput">version 0.92-tm-6
+0 regionsInTransition
+master coprocessors: []
+1 live servers
+    localhost:52761 1328082515520
+        requestsPerSecond=3, numberOfOnlineRegions=3, usedHeapMB=32, maxHeapMB=995
+        -ROOT-,,0
+            numberOfStores=1, numberOfStorefiles=1, storefileUncompressedSizeMB=0, storefileSizeMB=0, memstoreSizeMB=0, 
+storefileIndexSizeMB=0, readRequestsCount=54, writeRequestsCount=1, rootIndexSizeKB=0, totalStaticIndexSizeKB=0, 
+totalStaticBloomSizeKB=0, totalCompactingKVs=0, currentCompactedKVs=0, compactionProgressPct=NaN, coprocessors=[]
+        .META.,,1
+            numberOfStores=1, numberOfStorefiles=0, storefileUncompressedSizeMB=0, storefileSizeMB=0, memstoreSizeMB=0, 
+storefileIndexSizeMB=0, readRequestsCount=97, writeRequestsCount=4, rootIndexSizeKB=0, totalStaticIndexSizeKB=0, 
+totalStaticBloomSizeKB=0, totalCompactingKVs=0, currentCompactedKVs=0, compactionProgressPct=NaN, coprocessors=[]
+        t1,,1328082575190.c0491168a27620ffe653ec6c04c9b4d1.
+            numberOfStores=2, numberOfStorefiles=1, storefileUncompressedSizeMB=0, storefileSizeMB=0, memstoreSizeMB=0, 
+storefileIndexSizeMB=0, readRequestsCount=0, writeRequestsCount=0, rootIndexSizeKB=0, totalStaticIndexSizeKB=0, 
+totalStaticBloomSizeKB=0, totalCompactingKVs=0, currentCompactedKVs=0, compactionProgressPct=NaN, 
+coprocessors=[AggregateImplementation]
+0 dead servers      </code>
+    </pre></div><div class="section" title="1.5.&nbsp;Monitor Time Spent in Coprocessors"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d473e330"></a>1.5.&nbsp;Monitor Time Spent in Coprocessors</h2></div></div></div><p>HBase 0.98.5 introduced the ability to monitor some statistics relating to the amount of
+      time spent executing a given coprocessor. You can see these statistics via the HBase Metrics
+      framework (see <a class="xref" href="#">???</a> or the Web UI for a given Region Server, via
+      the <span class="guilabel">Coprocessor Metrics</span> tab. These statistics are valuable for debugging
+      and benchmarking the performance impact of a given coprocessor on your cluster. Tracked
+      statistics include min, max, average, and 90th, 95th, and 99th percentile. All times are shown
+      in milliseconds. The statistics are calculated over coprocessor
+      execution samples recorded during the reporting interval, which is 10 seconds by default. The
+      metrics sampling rate as described in <a class="xref" href="#">???</a>.</p><div class="figure"><a name="d473e342"></a><p class="title"><b>Figure&nbsp;1.1.&nbsp;Coprocessor Metrics UI</b></p><div class="figure-contents"><div class="mediaobject"><table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0" width="100%"><tr><td><img src="images/coprocessor_stats.png" width="100%" alt="Coprocessor Metrics UI"></td></tr></table><div class="caption"><p>The Coprocessor Metrics UI shows statistics about time spent executing a given
+            coprocessor, including min, max, average, and 90th, 95th, and 99th percentile.</p></div></div></div></div><br class="figure-break"></div><div class="section" title="1.6.&nbsp;Status of Coprocessors in HBase"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d473e351"></a>1.6.&nbsp;Status of Coprocessors in HBase</h2></div></div></div><p> Coprocessors and the coprocessor framework are evolving rapidly and work is ongoing on
+      several different JIRAs. </p></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a></body></html>

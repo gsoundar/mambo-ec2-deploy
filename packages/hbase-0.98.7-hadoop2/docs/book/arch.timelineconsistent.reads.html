@@ -1,0 +1,172 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>9.10.&nbsp;Timeline-consistent High Available Reads</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="architecture.html" title="Chapter&nbsp;9.&nbsp;Architecture"><link rel="prev" href="arch.hdfs.html" title="9.9.&nbsp;HDFS"><link rel="next" href="hbase_apis.html" title="Chapter&nbsp;10.&nbsp;Apache HBase APIs"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">9.10.&nbsp;Timeline-consistent High Available Reads</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="arch.hdfs.html">Prev</a>&nbsp;</td><th width="60%" align="center">Chapter&nbsp;9.&nbsp;Architecture</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="hbase_apis.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/arch.timelineconsistent.reads.html';
+    </script><div class="section" title="9.10.&nbsp;Timeline-consistent High Available Reads"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="arch.timelineconsistent.reads"></a>9.10.&nbsp;Timeline-consistent High Available Reads</h2></div></div></div><div class="section" title="9.10.1.&nbsp;Introduction"><div class="titlepage"><div><div><h3 class="title"><a name="casestudies.timelineconsistent.intro"></a>9.10.1.&nbsp;Introduction</h3></div></div></div><p> 
+			HBase, architecturally, always had the strong consistency guarantee from the start. All reads and writes are routed through a single region server, which guarantees that all writes happen in an order, and all reads are seeing the most recent committed data. 
+	          </p><p>
+			However, because of this single homing of the reads to a single location, if the server becomes unavailable, the regions of the table that were hosted in the region server become unavailable for some time. There are three phases in the region recovery process - detection, assignment, and recovery. Of these, the detection is usually the longest and is presently in the order of 20-30 seconds depending on the zookeeper session timeout. During this time and before the recovery is complete, the clients will not be able to read the region data.
+	          </p><p>
+			However, for some use cases, either the data may be read-only, or doing reads againsts some stale data is acceptable. With timeline-consistent high available reads, HBase can be used for these kind of latency-sensitive use cases where the application can expect to have a time bound on the read completion. 
+	          </p><p>
+			For achieving high availability for reads, HBase provides a feature called &#8220;region replication&#8221;. In this model, for each region of a table, there will be multiple replicas that are opened in different region servers. By default, the region replication is set to 1, so only a single region replica is deployed and there will not be any changes from the original model. If region replication is set to 2 or more, than the master will assign replicas of the regions of the table. The Load Balancer ensures that the region replicas are not co-hosted in the same region servers and also in the same rack (if possible). 
+	          </p><p>
+			All of the replicas for a single region will have a unique replica_id, starting from 0. The region replica having replica_id==0 is called the primary region, and the others &#8220;secondary regions&#8221; or secondaries. Only the primary can accept writes from the client, and the primary will always contain the latest changes. Since all writes still have to go through the primary region, the writes are not highly-available (meaning they might block for some time if the region becomes unavailable). 
+	          </p><p>
+			The writes are asynchronously sent to the secondary region replicas using an &#8220;Async WAL replication&#8221; feature. This works similarly to HBase&#8217;s multi-datacenter replication, but instead the data from a region is replicated to the secondary regions. Each secondary replica always receives and observes the writes in the same order that the primary region committed them. This ensures that the secondaries won&#8217;t diverge from the primary regions data, but since the log replication is asnyc, the data might be stale in secondary regions. In some sense, this design can be thought of as &#8220;in-cluster replication&#8221;, where instead of replicating to a different datacenter, the data goes to a secondary region to keep secondary region&#8217;s in-memory state up to date. The data files are shared between the primary region and the other replicas, so that there is no extra storage overhead. However, the secondary regions will have recent non-flushed data in their memstores, which increases the memory overhead. 
+	         </p><p>
+	Async WAL replication feature is being implemented in Phase 2 of issue HBASE-10070. Before this, region replicas will only be updated with flushed data files from the primary (see hbase.regionserver.storefile.refresh.period below). It is also possible to use this without setting storefile.refresh.period for read only tables. 
+		     </p></div><div class="section" title="9.10.2.&nbsp;Timeline Consistency"><div class="titlepage"><div><div><h3 class="title"><a name="d2802e12542"></a>9.10.2.&nbsp;Timeline Consistency </h3></div></div></div><p>
+			With this feature, HBase introduces a Consistency definition, which can be provided per read operation (get or scan).
+	</p><pre class="programlisting">
+public enum Consistency {
+    STRONG,
+    TIMELINE
+}
+	</pre><p>
+			<code class="code">Consistency.STRONG</code> is the default consistency model provided by HBase. In case the table has region replication = 1, or in a table with region replicas but the reads are done with this consistency, the read is always performed by the primary regions, so that there will not be any change from the previous behaviour, and the client always observes the latest data. 
+	          </p><p>
+			In case a read is performed with <code class="code">Consistency.TIMELINE</code>, then the read RPC will be sent to the primary region server first. After a short interval (<code class="code">hbase.client.primaryCallTimeout.get</code>, 10ms by default), parallel RPC for secondary region replicas will also be sent if the primary does not respond back. After this, the result is returned from whichever RPC is finished first. If the response came back from the primary region replica, we can always know that the data is latest. For this Result.isStale() API has been added to inspect the staleness. If the result is from a secondary region, then Result.isStale() will be set to true. The user can then inspect this field to possibly reason about the data. 
+	          </p><p>
+			In terms of semantics, TIMELINE consistency as implemented by HBase differs from pure eventual
+			consistency in these respects: </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p> Single homed and ordered updates: Region replication or not, on the write side,
+                there is still only 1 defined replica (primary) which can accept writes. This
+                replica is responsible for ordering the edits and preventing conflicts. This
+                guarantees that two different writes are not committed at the same time by different
+                replicas and the data diverges. With this, there is no need to do read-repair or
+                last-timestamp-wins kind of conflict resolution. </p></li><li class="listitem"><p> The secondaries also apply the edits in the order that the primary committed
+                them. This way the secondaries will contain a snapshot of the primaries data at any
+                point in time. This is similar to RDBMS replications and even HBase&#8217;s own
+                multi-datacenter replication, however in a single cluster. </p></li><li class="listitem"><p> On the read side, the client can detect whether the read is coming from
+                up-to-date data or is stale data. Also, the client can issue reads with different
+                consistency requirements on a per-operation basis to ensure its own semantic
+                guarantees. </p></li><li class="listitem"><p> The client can still observe edits out-of-order, and can go back in time, if it
+                observes reads from one secondary replica first, then another secondary replica.
+                There is no stickiness to region replicas or a transaction-id based guarantee. If
+                required, this can be implemented later though. </p></li></ul></div><div class="figure"><a name="d2802e12576"></a><p class="title"><b>Figure&nbsp;9.2.&nbsp;HFile Version 1</b></p><div class="figure-contents"><div class="mediaobject" align="center"><table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0"><tr><td align="center" valign="middle"><img src="../images/timeline_consistency.png" align="middle" alt="HFile Version 1"></td></tr></table></div></div></div><br class="figure-break"><p>
+			To better understand the TIMELINE semantics, lets look at the above diagram. Lets say that there are two clients, and the first one writes x=1 at first, then x=2 and x=3 later. As above, all writes are handled by the primary region replica. The writes are saved in the write ahead log (WAL), and replicated to the other replicas asynchronously. In the above diagram, notice that replica_id=1 received 2 updates, and it&#8217;s data shows that x=2, while the replica_id=2 only received a single update, and its data shows that x=1. 
+		</p><p>
+			If client1 reads with STRONG consistency, it will only talk with the replica_id=0, and thus is guaranteed to observe the latest value of x=3. In case of a client issuing TIMELINE consistency reads, the RPC will go to all replicas (after primary timeout) and the result from the first response will be returned back. Thus the client can see either 1, 2 or 3 as the value of x. Let&#8217;s say that the primary region has failed and log replication cannot continue for some time. If the client does multiple reads with TIMELINE consistency, she can observe x=2 first, then x=1, and so on. 
+
+		</p></div><div class="section" title="9.10.3.&nbsp;Tradeoffs"><div class="titlepage"><div><div><h3 class="title"><a name="d2802e12589"></a>9.10.3.&nbsp;Tradeoffs</h3></div></div></div><p> Having secondary regions hosted for read availability comes with some tradeoffs which
+          should be carefully evaluated per use case. Following are advantages and
+          disadvantages.</p><div class="itemizedlist" title="Advantages"><p class="title"><b>Advantages</b></p><ul class="itemizedlist" type="disc"><li class="listitem"><p>High availability for read-only tables.</p></li><li class="listitem"><p>High availability for stale reads</p></li><li class="listitem"><p>Ability to do very low latency reads with very high percentile (99.9%+) latencies
+              for stale reads</p></li></ul></div><div class="itemizedlist" title="Disadvantages"><p class="title"><b>Disadvantages</b></p><ul class="itemizedlist" type="disc"><li class="listitem"><p>Double / Triple memstore usage (depending on region replication count) for tables
+              with region replication &gt; 1</p></li><li class="listitem"><p>Increased block cache usage</p></li><li class="listitem"><p>Extra network traffic for log replication </p></li><li class="listitem"><p>Extra backup RPCs for replicas</p></li></ul></div><p>To serve the region data from multiple replicas, HBase opens the regions in secondary
+          mode in the region servers. The regions opened in secondary mode will share the same data
+          files with the primary region replica, however each secondary region replica will have its
+          own memstore to keep the unflushed data (only primary region can do flushes). Also to
+          serve reads from secondary regions, the blocks of data files may be also cached in the
+          block caches for the secondary regions. </p></div><div class="section" title="9.10.4.&nbsp;Configuration properties"><div class="titlepage"><div><div><h3 class="title"><a name="d2802e12623"></a>9.10.4.&nbsp;Configuration properties</h3></div></div></div><p>
+	To use highly available reads, you should set the following properties in hbase-site.xml file. There is no specific configuration to enable or disable region replicas. Instead you can change the number of region replicas per table to increase or decrease at the table creation or with alter table. 
+		</p><div class="section" title="9.10.4.1.&nbsp;Server side properties"><div class="titlepage"><div><div><h4 class="title"><a name="d2802e12628"></a>9.10.4.1.&nbsp;Server side properties</h4></div></div></div><pre class="programlisting">
+&lt;property&gt;
+    &lt;name&gt;hbase.regionserver.storefile.refresh.period&lt;/name&gt;
+    &lt;value&gt;0&lt;/value&gt;
+    &lt;description&gt;
+      The period (in milliseconds) for refreshing the store files for the secondary regions. 0 means this feature is disabled. Secondary regions sees new files (from flushes and compactions) from primary once the secondary region refreshes the list of files in the region. But too frequent refreshes might cause extra Namenode pressure. If the files cannot be refreshed for longer than HFile TTL (hbase.master.hfilecleaner.ttl) the requests are rejected. Configuring HFile TTL to a larger value is also recommended with this setting.
+    &lt;/description&gt;
+&lt;/property&gt;
+</pre><p> One thing to keep in mind also is that, region replica placement policy is only
+            enforced by the <code class="code">StochasticLoadBalancer</code> which is the default balancer. If
+            you are using a custom load balancer property in hbase-site.xml
+              (<code class="code">hbase.master.loadbalancer.class</code>) replicas of regions might end up being
+            hosted in the same server.</p></div><div class="section" title="9.10.4.2.&nbsp;Client side properties"><div class="titlepage"><div><div><h4 class="title"><a name="d2802e12641"></a>9.10.4.2.&nbsp;Client side properties</h4></div></div></div><p> Ensure to set the following for all clients (and servers) that will use region
+            replicas. </p><pre class="programlisting">
+&lt;property&gt;
+    &lt;name&gt;hbase.ipc.client.allowsInterrupt&lt;/name&gt;
+    &lt;value&gt;true&lt;/value&gt;
+    &lt;description&gt;
+      Whether to enable interruption of RPC threads at the client side. This is required for region replicas with fallback RPC&#8217;s to secondary regions.
+    &lt;/description&gt;
+&lt;/property&gt;
+&lt;property&gt;
+    &lt;name&gt;hbase.client.primaryCallTimeout.get&lt;/name&gt;
+    &lt;value&gt;10000&lt;/value&gt;
+    &lt;description&gt;
+      The timeout (in microseconds), before secondary fallback RPC&#8217;s are submitted for get requests with Consistency.TIMELINE to the secondary replicas of the regions. Defaults to 10ms. Setting this lower will increase the number of RPC&#8217;s, but will lower the p99 latencies. 
+    &lt;/description&gt;
+&lt;/property&gt;
+&lt;property&gt;
+    &lt;name&gt;hbase.client.primaryCallTimeout.multiget&lt;/name&gt;
+    &lt;value&gt;10000&lt;/value&gt;
+    &lt;description&gt;
+      The timeout (in microseconds), before secondary fallback RPC&#8217;s are submitted for multi-get requests (HTable.get(List&lt;Get&gt;)) with Consistency.TIMELINE to the secondary replicas of the regions. Defaults to 10ms. Setting this lower will increase the number of RPC&#8217;s, but will lower the p99 latencies. 
+    &lt;/description&gt;
+&lt;/property&gt;
+&lt;property&gt;
+    &lt;name&gt;hbase.client.replicaCallTimeout.scan&lt;/name&gt;
+    &lt;value&gt;1000000&lt;/value&gt;
+    &lt;description&gt;
+      The timeout (in microseconds), before secondary fallback RPC&#8217;s are submitted for scan requests with Consistency.TIMELINE to the secondary replicas of the regions. Defaults to 1 sec. Setting this lower will increase the number of RPC&#8217;s, but will lower the p99 latencies. 
+    &lt;/description&gt;
+&lt;/property&gt;
+</pre></div></div><div class="section" title="9.10.5.&nbsp;Creating a table with region replication"><div class="titlepage"><div><div><h3 class="title"><a name="d2802e12648"></a>9.10.5.&nbsp;Creating a table with region replication</h3></div></div></div><p>
+		Region replication is a per-table property. All tables have REGION_REPLICATION = 1 by default, which means that there is only one replica per region. You can set and change the number of replicas per region of a table by supplying the REGION_REPLICATION property in the table descriptor. 
+	    </p><div class="section" title="9.10.5.1.&nbsp;Shell"><div class="titlepage"><div><div><h4 class="title"><a name="d2802e12653"></a>9.10.5.1.&nbsp;Shell</h4></div></div></div><pre class="programlisting">
+create 't1', 'f1', {REGION_REPLICATION =&gt; 2}
+
+describe 't1'
+for i in 1..100
+put 't1', "r#{i}", 'f1:c1', i
+end
+flush 't1'
+</pre></div><div class="section" title="9.10.5.2.&nbsp;Java"><div class="titlepage"><div><div><h4 class="title"><a name="d2802e12658"></a>9.10.5.2.&nbsp;Java</h4></div></div></div><pre class="programlisting">
+HTableDescriptor htd = new HTableDesctiptor(TableName.valueOf(&#8220;test_table&#8221;)); 
+htd.setRegionReplication(2);
+...
+admin.createTable(htd); 
+</pre><p>You can also use <code class="code">setRegionReplication()</code> and alter table to increase, decrease the
+            region replication for a table.</p></div></div><div class="section" title="9.10.6.&nbsp;Region splits and merges"><div class="titlepage"><div><div><h3 class="title"><a name="d2802e12668"></a>9.10.6.&nbsp;Region splits and merges</h3></div></div></div><p>Region splits and merges are not compatible with regions with replicas yet. So you
+          have to pre-split the table, and disable the region splits. Also you should not execute
+          region merges on tables with region replicas. To disable region splits you can use
+          DisabledRegionSplitPolicy as the split policy.</p></div><div class="section" title="9.10.7.&nbsp;User Interface"><div class="titlepage"><div><div><h3 class="title"><a name="d2802e12673"></a>9.10.7.&nbsp;User Interface</h3></div></div></div><p> In the masters user interface, the region replicas of a table are also shown together
+          with the primary regions. You can notice that the replicas of a region will share the same
+          start and end keys and the same region name prefix. The only difference would be the
+          appended replica_id (which is encoded as hex), and the region encoded name will be
+          different. You can also see the replica ids shown explicitly in the UI. </p></div><div class="section" title="9.10.8.&nbsp;API and Usage"><div class="titlepage"><div><div><h3 class="title"><a name="d2802e12678"></a>9.10.8.&nbsp;API and Usage</h3></div></div></div><div class="section" title="9.10.8.1.&nbsp;Shell"><div class="titlepage"><div><div><h4 class="title"><a name="d2802e12681"></a>9.10.8.1.&nbsp;Shell</h4></div></div></div><p> You can do reads in shell using a the Consistency.TIMELINE semantics as follows
+          </p><pre class="programlisting">
+hbase(main):001:0&gt; get 't1','r6', {CONSISTENCY =&gt; "TIMELINE"}
+</pre><p> You can simulate a region server pausing or becoming unavailable and do a read from
+            the secondary replica: </p><pre class="programlisting">
+$ kill -STOP &lt;pid or primary region server&gt;
+
+hbase(main):001:0&gt; get 't1','r6', {CONSISTENCY =&gt; "TIMELINE"}
+</pre><p> Using scans is also similar </p><pre class="programlisting">
+hbase&gt; scan 't1', {CONSISTENCY =&gt; 'TIMELINE'}
+</pre></div><div class="section" title="9.10.8.2.&nbsp;Java"><div class="titlepage"><div><div><h4 class="title"><a name="d2802e12696"></a>9.10.8.2.&nbsp;Java</h4></div></div></div><p>You can set set the consistency for Gets and Scans and do requests as
+            follows.</p><pre class="programlisting">
+Get get = new Get(row);
+get.setConsistency(Consistency.TIMELINE);
+...
+Result result = table.get(get); 
+</pre><p>You can also pass multiple gets: </p><pre class="programlisting">
+Get get1 = new Get(row);
+get1.setConsistency(Consistency.TIMELINE);
+...
+ArrayList&lt;Get&gt; gets = new ArrayList&lt;Get&gt;();
+gets.add(get1);
+...
+Result[] results = table.get(gets); 
+</pre><p>And Scans: </p><pre class="programlisting">
+Scan scan = new Scan();
+scan.setConsistency(Consistency.TIMELINE);
+...
+ResultScanner scanner = table.getScanner(scan);
+</pre><p>You can inspect whether the results are coming from primary region or not by calling
+            the Result.isStale() method: </p><pre class="programlisting">
+Result result = table.get(get); 
+if (result.isStale()) {
+  ...
+}
+</pre></div></div><div class="section" title="9.10.9.&nbsp;Resources"><div class="titlepage"><div><div><h3 class="title"><a name="d2802e12715"></a>9.10.9.&nbsp;Resources</h3></div></div></div><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>More information about the design and implementation can be found at the jira
+              issue: <a class="link" href="https://issues.apache.org/jira/browse/HBASE-10070" target="_top">HBASE-10070</a></p></li><li class="listitem"><p>HBaseCon 2014 <a class="link" href="http://hbasecon.com/sessions/#session15" target="_top">talk</a> also contains some
+              details and <a class="link" href="http://www.slideshare.net/enissoz/hbase-high-availability-for-reads-with-time" target="_top">slides</a>.</p></li></ol></div></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="arch.hdfs.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="architecture.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="hbase_apis.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">9.9.&nbsp;HDFS&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;10.&nbsp;Apache HBase APIs</td></tr></table></div></body></html>

@@ -1,0 +1,93 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>H.3.&nbsp;HBase File Format with Security Enhancements (version 3)</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="hfile_format.html" title="Appendix&nbsp;H.&nbsp;HFile format"><link rel="prev" href="hfilev2.html" title="H.2.&nbsp; HBase file format with inline blocks (version 2)"><link rel="next" href="other.info.html" title="Appendix&nbsp;I.&nbsp;Other Information About HBase"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">H.3.&nbsp;HBase File Format with Security Enhancements (version 3)</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="hfilev2.html">Prev</a>&nbsp;</td><th width="60%" align="center">Appendix&nbsp;H.&nbsp;HFile format</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="other.info.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/hfilev3.html';
+    </script><div class="section" title="H.3.&nbsp;HBase File Format with Security Enhancements (version 3)"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="hfilev3"></a>H.3.&nbsp;HBase File Format with Security Enhancements (version 3)</h2></div></div></div><p>Note: this feature was introduced in HBase 0.98</p><div class="section" title="H.3.1.&nbsp;Motivation"><div class="titlepage"><div><div><h3 class="title"><a name="hfilev3.motivation"></a>H.3.1.&nbsp;Motivation </h3></div></div></div><p>
+        Version 3 of HFile makes changes needed to ease management of encryption at rest and
+        cell-level metadata (which in turn is needed for cell-level ACLs and cell-level visibility
+        labels). For more information see <a class="xref" href="ch08s03.html#hbase.encryption.server" title="8.3.4.&nbsp;Transparent Encryption of Data At Rest">Section&nbsp;8.3.4, &#8220;Transparent Encryption of Data At Rest&#8221;</a>,
+        <a class="xref" href="ch08s03.html#hbase.tags" title="8.3.1.&nbsp;Tags">Section&nbsp;8.3.1, &#8220;Tags&#8221;</a>, <a class="xref" href="ch08s03.html#hbase.accesscontrol.configuration" title="8.3.2.&nbsp;Access Control Labels (ACLs)">Section&nbsp;8.3.2, &#8220;Access Control Labels (ACLs)&#8221;</a>, and
+        <a class="xref" href="">???</a>.
+      </p></div><div class="section" title="H.3.2.&nbsp;Overview"><div class="titlepage"><div><div><h3 class="title"><a name="hfilev3.overview"></a>H.3.2.&nbsp;Overview</h3></div></div></div><p>
+        The version of HBase introducing the above features reads HFiles in versions 1, 2, and 3 but
+        only writes version 3 HFiles. Version 3 HFiles are structured the same as version 2 HFiles.
+        For more information see <a class="xref" href="hfilev2.html#hfilev2.overview" title="H.2.2.&nbsp;Overview of Version 2">Section&nbsp;H.2.2, &#8220;Overview of Version 2&#8221;</a>.
+      </p></div><div class="section" title="H.3.3.&nbsp;File Info Block in Version 3"><div class="titlepage"><div><div><h3 class="title"><a name="hvilev3.infoblock"></a>H.3.3.&nbsp;File Info Block in Version 3</h3></div></div></div><p>
+        Version 3 added two additional pieces of information to the reserved keys in the file info
+        block.
+        </p><div class="informaltable"><table border="1"><colgroup><col><col></colgroup><tbody><tr><td>
+                    <p>hfile.MAX_TAGS_LEN</p>
+                 </td><td>
+                    <p>
+                      The maximum number of bytes needed to store the serialized tags for any single
+                      cell in this hfile (int)
+                    </p>
+                 </td></tr><tr><td>
+                    <p>hfile.TAGS_COMPRESSED</p>
+                 </td><td>
+                    <p>Does the block encoder for this hfile compress tags? (boolean)</p>
+                    <p>
+                      Should only be present if <code class="classname">hfile.MAX_TAGS_LEN</code> is also
+                      present.
+                    </p>
+                 </td></tr></tbody></table></div><p>
+      </p><p>
+        When reading a Version 3 HFile the presence of <code class="classname">MAX_TAGS_LEN</code> is used
+        to determine how to deserialize the cells within a data block. Therefore, consumers must
+        read the file's info block prior to reading any data blocks.
+      </p><p>
+        When writing a Version 3 HFile, HBase will always include <code class="classname">MAX_TAGS_LEN
+        </code> when flushing the memstore to underlying filesystem and when using prefix tree
+        encoding for data blocks, as described in <a class="xref" href="compression.html" title="Appendix&nbsp;E.&nbsp;Compression and Data Block Encoding In HBase">Appendix&nbsp;E, <i>Compression and Data Block Encoding In
+          HBase</i></a>. When compacting
+        extant files, the default writer will omit <code class="classname">MAX_TAGS_LEN</code> if all of the
+        files selected do not themselves contain any cells with tags. See
+        <a class="xref" href="regions.arch.html#compaction" title="9.7.7.7.&nbsp;Compaction">Section&nbsp;9.7.7.7, &#8220;Compaction&#8221;</a> for details on the compaction file selection algorithm.
+      </p></div><div class="section" title="H.3.4.&nbsp;Data Blocks in Version 3"><div class="titlepage"><div><div><h3 class="title"><a name="hfilev3.datablock"></a>H.3.4.&nbsp;Data Blocks in Version 3</h3></div></div></div><p>
+        Within an HFile, HBase cells are stored in data blocks as a sequence of KeyValues (see <a class="xref" href="hfile_format.html#hfilev1.overview" title="H.1.1.&nbsp;Overview of Version 1">Section&nbsp;H.1.1, &#8220;Overview of Version 1&#8221;</a>, or <a class="link" href="http://www.larsgeorge.com/2009/10/hbase-architecture-101-storage.html" target="_top">Lars George's
+        excellent introduction to HBase Storage</a>). In version 3, these KeyValue optionally
+        will include a set of 0 or more tags:
+        </p><div class="informaltable"><table border="1"><colgroup><col class="c1"><col class="c2"></colgroup><tbody><tr><td>
+                  <p>Version 1 &amp; 2</p>
+                  <p>Version 3 without MAX_TAGS_LEN</p>
+                </td><td><p>Version 3 with MAX_TAGS_LEN</p></td></tr><tr><td colspan="2" align="center">
+                  <p>Key Length (4 bytes)</p>
+                </td></tr><tr><td colspan="2" align="center">
+                  <p>Value Length (4 bytes)</p>
+                </td></tr><tr><td colspan="2" align="center">
+                  <p>Key bytes (variable)</p>
+                </td></tr><tr><td colspan="2" align="center">
+                  <p>Value bytes (variable)</p>
+                </td></tr><tr><td class="auto-generated">&nbsp;</td><td align="center">
+                  <p>Tags Length (2 bytes)</p>
+                </td></tr><tr><td class="auto-generated">&nbsp;</td><td align="center">
+                  <p>Tags bytes (variable)</p>
+                </td></tr></tbody></table></div><p>
+      </p><p>
+        If the info block for a given HFile contains an entry for
+        <code class="classname">MAX_TAGS_LEN</code> each cell will have the length of that cell's tags
+        included, even if that length is zero. The actual tags are stored as a sequence of tag
+        length (2 bytes), tag type (1 byte), tag bytes (variable). The format an individual tag's
+        bytes depends on the tag type.
+      </p><p>
+        Note that the dependence on the contents of the info block implies that prior to reading
+        any data blocks you must first process a file's info block. It also implies that prior to
+        writing a data block you must know if the file's info block will include
+        <code class="classname">MAX_TAGS_LEN</code>.
+      </p></div><div class="section" title="H.3.5.&nbsp;Fixed File Trailer in Version 3"><div class="titlepage"><div><div><h3 class="title"><a name="hfilev3.fixedtrailer"></a>H.3.5.&nbsp;Fixed File Trailer in Version 3</h3></div></div></div><p>
+        The fixed file trailers written with HFile version 3 are always serialized with protocol
+        buffers. Additionally, it adds an optional field to the version 2 protocol buffer named
+        encryption_key. If HBase is configured to encrypt HFiles this field will store a data
+        encryption key for this particular HFile, encrypted with the current cluster master key
+        using AES. For more information see <a class="xref" href="ch08s03.html#hbase.encryption.server" title="8.3.4.&nbsp;Transparent Encryption of Data At Rest">Section&nbsp;8.3.4, &#8220;Transparent Encryption of Data At Rest&#8221;</a>.
+      </p></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="hfilev2.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="hfile_format.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="other.info.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">H.2.&nbsp;
+      HBase file format with inline blocks (version 2)
+      &nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Appendix&nbsp;I.&nbsp;Other Information About HBase</td></tr></table></div></body></html>

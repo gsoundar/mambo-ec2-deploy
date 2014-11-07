@@ -1,0 +1,61 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>1.4.&nbsp;Read HBase Shell Commands from a Command File</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="shell.html" title="Chapter&nbsp;1.&nbsp;The Apache HBase Shell"><link rel="up" href="shell.html" title="Chapter&nbsp;1.&nbsp;The Apache HBase Shell"><link rel="prev" href="hbase.shell.noninteractive.html" title="1.3.&nbsp;HBase Shell in OS Scripts"><link rel="next" href="ch01s05.html" title="1.5.&nbsp;Passing VM Options to the Shell"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1.4.&nbsp;Read HBase Shell Commands from a Command File</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="hbase.shell.noninteractive.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch01s05.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/.html';
+    </script><div class="section" title="1.4.&nbsp;Read HBase Shell Commands from a Command File"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d8312e120"></a>1.4.&nbsp;Read HBase Shell Commands from a Command File</h2></div></div></div><p>You can enter HBase Shell commands into a text file, one command per line, and pass
+            that file to the HBase Shell.</p><div class="example"><a name="d8312e125"></a><p class="title"><b>Example&nbsp;1.3.&nbsp;Example Command File</b></p><div class="example-contents"><pre class="screen">
+create 'test', 'cf'
+list 'test'
+put 'test', 'row1', 'cf:a', 'value1'
+put 'test', 'row2', 'cf:b', 'value2'
+put 'test', 'row3', 'cf:c', 'value3'
+put 'test', 'row4', 'cf:d', 'value4'
+scan 'test'
+get 'test', 'row1'
+disable 'test'
+enable 'test'
+            </pre></div></div><br class="example-break"><div class="example"><a name="d8312e130"></a><p class="title"><b>Example&nbsp;1.4.&nbsp;Directing HBase Shell to Execute the Commands</b></p><div class="example-contents"><p>Pass the path to the command file as the only argument to the <span class="command"><strong>hbase
+                    shell</strong></span> command. Each command is executed and its output is shown. If
+                you do not include the <span class="command"><strong>exit</strong></span> command in your script, you are
+                returned to the HBase shell prompt. There is no way to programmatically check each
+                individual command for success or failure. Also, though you see the output for each
+                command, the commands themselves are not echoed to the screen so it can be difficult
+                to line up the command with its output.</p><pre class="screen">
+$ <strong class="userinput"><code>./hbase shell ./sample_commands.txt</code></strong>
+<code class="computeroutput">0 row(s) in 3.4170 seconds
+
+TABLE
+test
+1 row(s) in 0.0590 seconds
+
+0 row(s) in 0.1540 seconds
+
+0 row(s) in 0.0080 seconds
+
+0 row(s) in 0.0060 seconds
+
+0 row(s) in 0.0060 seconds
+
+ROW                   COLUMN+CELL
+ row1                 column=cf:a, timestamp=1407130286968, value=value1
+ row2                 column=cf:b, timestamp=1407130286997, value=value2
+ row3                 column=cf:c, timestamp=1407130287007, value=value3
+ row4                 column=cf:d, timestamp=1407130287015, value=value4
+4 row(s) in 0.0420 seconds
+
+COLUMN                CELL
+ cf:a                 timestamp=1407130286968, value=value1
+1 row(s) in 0.0110 seconds
+
+0 row(s) in 1.5630 seconds
+
+0 row(s) in 0.4360 seconds</code>                
+            </pre></div></div><br class="example-break"></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="hbase.shell.noninteractive.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch01s05.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">1.3.&nbsp;HBase Shell in OS Scripts&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="shell.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;1.5.&nbsp;Passing VM Options to the Shell</td></tr></table></div></body></html>

@@ -1,0 +1,146 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>E.3.&nbsp;Compressor Configuration, Installation, and Use</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="compression.html" title="Appendix&nbsp;E.&nbsp;Compression and Data Block Encoding In HBase"><link rel="prev" href="hadoop.native.lib.html" title="E.2.&nbsp;Making use of Hadoop Native Libraries in HBase"><link rel="next" href="data.block.encoding.enable.html" title="E.4.&nbsp;Enable Data Block Encoding"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">E.3.&nbsp;Compressor Configuration, Installation, and Use</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="hadoop.native.lib.html">Prev</a>&nbsp;</td><th width="60%" align="center">Appendix&nbsp;E.&nbsp;Compression and Data Block Encoding In
+          HBase</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="data.block.encoding.enable.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/.html';
+    </script><div class="section" title="E.3.&nbsp;Compressor Configuration, Installation, and Use"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2802e24024"></a>E.3.&nbsp;Compressor Configuration, Installation, and Use</h2></div></div></div><div class="section" title="E.3.1.&nbsp;Configure HBase For Compressors"><div class="titlepage"><div><div><h3 class="title"><a name="compressor.install"></a>E.3.1.&nbsp;Configure HBase For Compressors</h3></div></div></div><p>Before HBase can use a given compressor, its libraries need to be available. Due to
+          licensing issues, only GZ compression is available to HBase (via native Java libraries) in
+          a default installation. Other compression libraries are available via the shared library
+          bundled with your hadoop.  The hadoop native library needs to be findable when HBase
+          starts.  See </p><div class="section" title="E.3.1.1.&nbsp;Compressor Support On the Master"><div class="titlepage"><div><div><h4 class="title"><a name="d2802e24032"></a>E.3.1.1.&nbsp;Compressor Support On the Master</h4></div></div></div><p>A new configuration setting was introduced in HBase 0.95, to check the Master to
+            determine which data block encoders are installed and configured on it, and assume that
+            the entire cluster is configured the same. This option,
+              <code class="code">hbase.master.check.compression</code>, defaults to <code class="literal">true</code>. This
+            prevents the situation described in <a class="link" href="https://issues.apache.org/jira/browse/HBASE-6370" target="_top">HBASE-6370</a>, where
+            a table is created or modified to support a codec that a region server does not support,
+            leading to failures that take a long time to occur and are difficult to debug. </p><p>If <code class="code">hbase.master.check.compression</code> is enabled, libraries for all desired
+            compressors need to be installed and configured on the Master, even if the Master does
+            not run a region server.</p></div><div class="section" title="E.3.1.2.&nbsp;Install GZ Support Via Native Libraries"><div class="titlepage"><div><div><h4 class="title"><a name="d2802e24051"></a>E.3.1.2.&nbsp;Install GZ Support Via Native Libraries</h4></div></div></div><p>HBase uses Java's built-in GZip support unless the native Hadoop libraries are
+            available on the CLASSPATH. The recommended way to add libraries to the CLASSPATH is to
+            set the environment variable <code class="envar">HBASE_LIBRARY_PATH</code> for the user running
+            HBase. If native libraries are not available and Java's GZIP is used, <code class="literal">Got
+              brand-new compressor</code> reports will be present in the logs. See <a class="xref" href="trouble.rs.html#brand.new.compressor" title="15.9.2.10.&nbsp;Logs flooded with '2011-01-10 12:40:48,407 INFO org.apache.hadoop.io.compress.CodecPool: Got brand-new compressor' messages">Section&nbsp;15.9.2.10, &#8220;Logs flooded with '2011-01-10 12:40:48,407 INFO org.apache.hadoop.io.compress.CodecPool: Got
+            brand-new compressor' messages&#8221;</a>).</p></div><div class="section" title="E.3.1.3.&nbsp;Install LZO Support"><div class="titlepage"><div><div><h4 class="title"><a name="lzo.compression"></a>E.3.1.3.&nbsp;Install LZO Support</h4></div></div></div><p>HBase cannot ship with LZO because of incompatibility between HBase, which uses an
+            Apache Software License (ASL) and LZO, which uses a GPL license. See the <a class="link" href="http://wiki.apache.org/hadoop/UsingLzoCompression" target="_top">Using LZO
+              Compression</a> wiki page for information on configuring LZO support for HBase. </p><p>If you depend upon LZO compression, consider configuring your RegionServers to fail
+            to start if LZO is not available. See <a class="xref" href="apes03.html#hbase.regionserver.codecs" title="E.3.1.7.&nbsp;Enforce Compression Settings On a RegionServer">Section&nbsp;E.3.1.7, &#8220;Enforce Compression Settings On a RegionServer&#8221;</a>.</p></div><div class="section" title="E.3.1.4.&nbsp;Configure LZ4 Support"><div class="titlepage"><div><div><h4 class="title"><a name="lz4.compression"></a>E.3.1.4.&nbsp;Configure LZ4 Support</h4></div></div></div><p>LZ4 support is bundled with Hadoop. Make sure the hadoop shared library
+            (libhadoop.so) is accessible when you start
+            HBase. After configuring your platform (see <a class="xref" href="">???</a>), you can make a symbolic link from HBase to the native Hadoop
+            libraries. This assumes the two software installs are colocated. For example, if my
+            'platform' is Linux-amd64-64:
+            </p><pre class="programlisting">$ cd $HBASE_HOME
+$ mkdir lib/native
+$ ln -s $HADOOP_HOME/lib/native lib/native/Linux-amd64-64</pre><p>
+            Use the compression tool to check that LZ4 is installed on all nodes. Start up (or restart)
+            HBase. Afterward, you can create and alter tables to enable LZ4 as a
+            compression codec.:
+            </p><pre class="screen">
+hbase(main):003:0&gt; <strong class="userinput"><code>alter 'TestTable', {NAME =&gt; 'info', COMPRESSION =&gt; 'LZ4'}</code></strong>
+            </pre><p>
+          </p></div><div class="section" title="E.3.1.5.&nbsp;Install Snappy Support"><div class="titlepage"><div><div><h4 class="title"><a name="snappy.compression.installation"></a>E.3.1.5.&nbsp;Install Snappy Support</h4></div></div></div><p>HBase does not ship with Snappy support because of licensing issues. You can install
+            Snappy binaries (for instance, by using <span class="command"><strong>yum install snappy</strong></span> on CentOS)
+            or build Snappy from source. After installing Snappy, search for the shared library,
+            which will be called <code class="filename">libsnappy.so.X</code> where X is a number. If you
+            built from source, copy the shared library to a known location on your system, such as
+              <code class="filename">/opt/snappy/lib/</code>.</p><p>In addition to the Snappy library, HBase also needs access to the Hadoop shared
+            library, which will be called something like <code class="filename">libhadoop.so.X.Y</code>,
+            where X and Y are both numbers. Make note of the location of the Hadoop library, or copy
+            it to the same location as the Snappy library.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>The Snappy and Hadoop libraries need to be available on each node of your cluster.
+              See <a class="xref" href="apes03.html#compression.test" title="E.3.1.6.&nbsp;CompressionTest">Section&nbsp;E.3.1.6, &#8220;CompressionTest&#8221;</a> to find out how to test that this is the case.</p><p>See <a class="xref" href="apes03.html#hbase.regionserver.codecs" title="E.3.1.7.&nbsp;Enforce Compression Settings On a RegionServer">Section&nbsp;E.3.1.7, &#8220;Enforce Compression Settings On a RegionServer&#8221;</a> to configure your RegionServers to fail to
+              start if a given compressor is not available.</p></div><p>Each of these library locations need to be added to the environment variable
+              <code class="envar">HBASE_LIBRARY_PATH</code> for the operating system user that runs HBase. You
+            need to restart the RegionServer for the changes to take effect.</p></div><div class="section" title="E.3.1.6.&nbsp;CompressionTest"><div class="titlepage"><div><div><h4 class="title"><a name="compression.test"></a>E.3.1.6.&nbsp;CompressionTest</h4></div></div></div><p>You can use the CompressionTest tool to verify that your compressor is available to
+            HBase:</p><pre class="screen">
+ $ hbase org.apache.hadoop.hbase.util.CompressionTest hdfs://<em class="replaceable"><code>host/path/to/hbase</code></em> snappy       
+          </pre></div><div class="section" title="E.3.1.7.&nbsp;Enforce Compression Settings On a RegionServer"><div class="titlepage"><div><div><h4 class="title"><a name="hbase.regionserver.codecs"></a>E.3.1.7.&nbsp;Enforce Compression Settings On a RegionServer</h4></div></div></div><p>You can configure a RegionServer so that it will fail to restart if compression is
+            configured incorrectly, by adding the option hbase.regionserver.codecs to the
+              <code class="filename">hbase-site.xml</code>, and setting its value to a comma-separated list
+            of codecs that need to be available. For example, if you set this property to
+              <code class="literal">lzo,gz</code>, the RegionServer would fail to start if both compressors
+            were not available. This would prevent a new server from being added to the cluster
+            without having codecs configured properly.</p></div></div><div class="section" title="E.3.2.&nbsp;Enable Compression On a ColumnFamily"><div class="titlepage"><div><div><h3 class="title"><a name="changing.compression"></a>E.3.2.&nbsp;Enable Compression On a ColumnFamily</h3></div></div></div><p>To enable compression for a ColumnFamily, use an <code class="code">alter</code> command. You do
+          not need to re-create the table or copy data. If you are changing codecs, be sure the old
+          codec is still available until all the old StoreFiles have been compacted.</p><div class="example"><a name="d2802e24154"></a><p class="title"><b>Example&nbsp;E.1.&nbsp;Enabling Compression on a ColumnFamily of an Existing Table using HBase
+            Shell</b></p><div class="example-contents"><pre class="screen">
+hbase&gt; disable 'test'
+hbase&gt; alter 'test', {NAME =&gt; 'cf', COMPRESSION =&gt; 'GZ'}
+hbase&gt; enable 'test'
+        </pre></div></div><br class="example-break"><div class="example"><a name="d2802e24159"></a><p class="title"><b>Example&nbsp;E.2.&nbsp;Creating a New Table with Compression On a ColumnFamily</b></p><div class="example-contents"><pre class="screen">
+hbase&gt; create 'test2', { NAME =&gt; 'cf2', COMPRESSION =&gt; 'SNAPPY' }         
+          </pre></div></div><br class="example-break"><div class="example"><a name="d2802e24164"></a><p class="title"><b>Example&nbsp;E.3.&nbsp;Verifying a ColumnFamily's Compression Settings</b></p><div class="example-contents"><pre class="screen">
+hbase&gt; describe 'test'
+DESCRIPTION                                          ENABLED
+ 'test', {NAME =&gt; 'cf', DATA_BLOCK_ENCODING =&gt; 'NONE false
+ ', BLOOMFILTER =&gt; 'ROW', REPLICATION_SCOPE =&gt; '0',
+ VERSIONS =&gt; '1', COMPRESSION =&gt; 'GZ', MIN_VERSIONS
+ =&gt; '0', TTL =&gt; 'FOREVER', KEEP_DELETED_CELLS =&gt; 'fa
+ lse', BLOCKSIZE =&gt; '65536', IN_MEMORY =&gt; 'false', B
+ LOCKCACHE =&gt; 'true'}
+1 row(s) in 0.1070 seconds
+          </pre></div></div><br class="example-break"></div><div class="section" title="E.3.3.&nbsp;Testing Compression Performance"><div class="titlepage"><div><div><h3 class="title"><a name="d2802e24169"></a>E.3.3.&nbsp;Testing Compression Performance</h3></div></div></div><p>HBase includes a tool called LoadTestTool which provides mechanisms to test your
+          compression performance. You must specify either <code class="literal">-write</code> or
+          <code class="literal">-update-read</code> as your first parameter, and if you do not specify another
+        parameter, usage advice is printed for each option.</p><div class="example"><a name="d2802e24180"></a><p class="title"><b>Example&nbsp;E.4.&nbsp;<span class="command">LoadTestTool</span> Usage</b></p><div class="example-contents"><pre class="screen">
+$ bin/hbase org.apache.hadoop.hbase.util.LoadTestTool -h            
+usage: bin/hbase org.apache.hadoop.hbase.util.LoadTestTool &lt;options&gt;
+Options:
+ -batchupdate                 Whether to use batch as opposed to separate
+                              updates for every column in a row
+ -bloom &lt;arg&gt;                 Bloom filter type, one of [NONE, ROW, ROWCOL]
+ -compression &lt;arg&gt;           Compression type, one of [LZO, GZ, NONE, SNAPPY,
+                              LZ4]
+ -data_block_encoding &lt;arg&gt;   Encoding algorithm (e.g. prefix compression) to
+                              use for data blocks in the test column family, one
+                              of [NONE, PREFIX, DIFF, FAST_DIFF, PREFIX_TREE].
+ -encryption &lt;arg&gt;            Enables transparent encryption on the test table,
+                              one of [AES]
+ -generator &lt;arg&gt;             The class which generates load for the tool. Any
+                              args for this class can be passed as colon
+                              separated after class name
+ -h,--help                    Show usage
+ -in_memory                   Tries to keep the HFiles of the CF inmemory as far
+                              as possible.  Not guaranteed that reads are always
+                              served from inmemory
+ -init_only                   Initialize the test table only, don't do any
+                              loading
+ -key_window &lt;arg&gt;            The 'key window' to maintain between reads and
+                              writes for concurrent write/read workload. The
+                              default is 0.
+ -max_read_errors &lt;arg&gt;       The maximum number of read errors to tolerate
+                              before terminating all reader threads. The default
+                              is 10.
+ -multiput                    Whether to use multi-puts as opposed to separate
+                              puts for every column in a row
+ -num_keys &lt;arg&gt;              The number of keys to read/write
+ -num_tables &lt;arg&gt;            A positive integer number. When a number n is
+                              speicfied, load test tool  will load n table
+                              parallely. -tn parameter value becomes table name
+                              prefix. Each table name is in format
+                              &lt;tn&gt;_1...&lt;tn&gt;_n
+ -read &lt;arg&gt;                  &lt;verify_percent&gt;[:&lt;#threads=20&gt;]
+ -regions_per_server &lt;arg&gt;    A positive integer number. When a number n is
+                              specified, load test tool will create the test
+                              table with n regions per server
+ -skip_init                   Skip the initialization; assume test table already
+                              exists
+ -start_key &lt;arg&gt;             The first key to read/write (a 0-based index). The
+                              default value is 0.
+ -tn &lt;arg&gt;                    The name of the table to read or write
+ -update &lt;arg&gt;                &lt;update_percent&gt;[:&lt;#threads=20&gt;][:&lt;#whether to
+                              ignore nonce collisions=0&gt;]
+ -write &lt;arg&gt;                 &lt;avg_cols_per_key&gt;:&lt;avg_data_size&gt;[:&lt;#threads=20&gt;]
+ -zk &lt;arg&gt;                    ZK quorum as comma-separated host names without
+                              port numbers
+ -zk_root &lt;arg&gt;               name of parent znode in zookeeper            
+          </pre></div></div><br class="example-break"><div class="example"><a name="d2802e24187"></a><p class="title"><b>Example&nbsp;E.5.&nbsp;Example Usage of LoadTestTool</b></p><div class="example-contents"><pre class="screen">
+$ hbase org.apache.hadoop.hbase.util.LoadTestTool -write 1:10:100 -num_keys 1000000
+          -read 100:30 -num_tables 1 -data_block_encoding NONE -tn load_test_tool_NONE
+          </pre></div></div><br class="example-break"></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="hadoop.native.lib.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="compression.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="data.block.encoding.enable.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">E.2.&nbsp;Making use of Hadoop Native Libraries in HBase&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;E.4.&nbsp;Enable Data Block Encoding</td></tr></table></div></body></html>

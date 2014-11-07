@@ -1,0 +1,199 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>Appendix&nbsp;A.&nbsp;Contributing to Documentation</title><link rel="stylesheet" type="text/css" href="css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/appendix_contributing_to_documentation.html';
+    </script><div class="appendix" title="Appendix&nbsp;A.&nbsp;Contributing to Documentation"><div class="titlepage"><div><div><h2 class="title"><a name="appendix_contributing_to_documentation"></a>Appendix&nbsp;A.&nbsp;Contributing to Documentation</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d2571e47">A.1. Getting Access to the Wiki</a></span></dt><dt><span class="section"><a href="#d2571e55">A.2. Contributing to Documentation or Other Strings</a></span></dt><dt><span class="section"><a href="#d2571e126">A.3. Editing the HBase Website</a></span></dt><dt><span class="section"><a href="#d2571e155">A.4. Editing the HBase Reference Guide</a></span></dt><dt><span class="section"><a href="#d2571e174">A.5. Auto-Generated Content</a></span></dt><dt><span class="section"><a href="#d2571e189">A.6. Multi-Page and Single-Page Output</a></span></dt><dt><span class="section"><a href="#d2571e212">A.7. Images in the HBase Reference Guide</a></span></dt><dt><span class="section"><a href="#d2571e228">A.8. Adding a New Chapter to the HBase Reference Guide</a></span></dt><dt><span class="section"><a href="#d2571e239">A.9. Docbook Common Issues</a></span></dt></dl></div><p>The Apache HBase project welcomes contributions to all aspects of the project, including
+        the documentation. In HBase, documentation includes the following areas, and probably some
+        others:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>The <a class="link" href="http://hbase.apache.org/book.html" target="_top">HBase Reference
+                    Guide</a> (this book)</p></li><li class="listitem"><p>The <a class="link" href="http://hbase.apache.org/" target="_top">HBase website</a>e</p></li><li class="listitem"><p>The <a class="link" href="http://wiki.apache.org/hadoop/Hbase" target="_top">HBase
+                Wiki</a></p></li><li class="listitem"><p>API documentation</p></li><li class="listitem"><p>Command-line utility output and help text</p></li><li class="listitem"><p>Web UI strings, explicit help text, context-sensitive strings, and others</p></li><li class="listitem"><p>Log messages</p></li><li class="listitem"><p>Comments in source files, configuration files, and others</p></li><li class="listitem"><p>Localization of any of the above into target languages other than English</p></li></ul></div><p>No matter which area you want to help out with, the first step is almost always to
+        download (typically by cloning the Git repository) and familiarize yourself with the HBase
+        source code. The only exception in the list above is the HBase Wiki, which is edited online.
+        For information on downloading and building the source, see <a class="xref" href="#">???</a>.</p><div class="section" title="A.1.&nbsp;Getting Access to the Wiki"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2571e47"></a>A.1.&nbsp;Getting Access to the Wiki</h2></div></div></div><p>The HBase Wiki is not well-maintained and much of its content has been moved into the
+            HBase Reference Guide (this guide). However, some pages on the Wiki are well maintained,
+            and it would be great to have some volunteers willing to help out with the Wiki. To
+            request access to the Wiki, register a new account at <a class="link" href="https://wiki.apache.org/hadoop/Hbase?action=newaccount" target="_top">https://wiki.apache.org/hadoop/Hbase?action=newaccount</a>. Contact one of the
+            HBase committers, who can either give you access or refer you to someone who can.</p></div><div class="section" title="A.2.&nbsp;Contributing to Documentation or Other Strings"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2571e55"></a>A.2.&nbsp;Contributing to Documentation or Other Strings</h2></div></div></div><p> If you spot an error in a string in a UI, utility, script, log message, or elsewhere,
+            or you think something could be made more clear, or you think text needs to be added
+            where it doesn't currently exist, the first step is to file a JIRA. Be sure to set the
+            component to <code class="literal">Documentation</code> in addition any other involved components.
+            Most components have one or more default owners, who monitor new issues which come into
+            those queues. Regardless of whether you feel able to fix the bug, you should still file
+            bugs where you see them.</p><p>If you want to try your hand at fixing your newly-filed bug, assign it to yourself.
+            You will need to clone the HBase Git repository to your local system and work on the
+            issue there. When you have developed a potential fix, submit it for review. If it
+            addresses the issue and is seen as an improvement, one of the HBase committers will
+            commit it to one or more branches, as appropriate.</p><div class="procedure" title="Procedure&nbsp;A.1.&nbsp;Suggested Work flow for Submitting Patches"><a name="submit_doc_patch_procedure"></a><p class="title"><b>Procedure&nbsp;A.1.&nbsp;Suggested Work flow for Submitting Patches</b></p><p>This procedure goes into more detail than Git pros will need, but is included in
+                this appendix so that people unfamiliar with Git can feel confident contributing to
+                HBase while they learn.</p><ol class="procedure" type="1"><li class="step" title="Step 1"><p>If you have not already done so, clone the Git repository locally. You only
+                    need to do this once.</p></li><li class="step" title="Step 2"><p>Fairly often, pull remote changes into your local repository by using the
+                        <code class="code">git pull</code> command, while your master branch is checked
+                    out.</p></li><li class="step" title="Step 3"><p>For each issue you work on, create a new branch. One convention that works
+                    well for naming the branches is to name a given branch the same as the JIRA it
+                    relates to:</p><pre class="screen">$ git checkout -b HBASE-123456</pre></li><li class="step" title="Step 4"><p>Make your suggested changes on your branch, committing your changes to your
+                    local repository often. If you need to switch to working on a different issue,
+                    remember to check out the appropriate branch.</p></li><li class="step" title="Step 5"><p>When you are ready to submit your patch, first be sure that HBase builds
+                    cleanly and behaves as expected in your modified branch. If you have made
+                    documentation changes, be sure the documentation and website builds.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Before you use the <code class="literal">site</code> target the very first time, be
+                        sure you have built HBase at least once, in order to fetch all the Maven
+                        dependencies you need.</p></div><pre class="screen">$ mvn clean install -DskipTests               # Builds HBase</pre><pre class="screen">$ mvn clean site -DskipTests                  # Builds the website and documentation</pre><p>If any errors occur, address them.</p></li><li class="step" title="Step 6"><p>If it takes you several days or weeks to implement your fix, or you know that
+                    the area of the code you are working in has had a lot of changes lately, make
+                    sure you rebase your branch against the remote master and take care of any
+                    conflicts before submitting your patch.</p><pre class="screen">
+$ git checkout HBASE-123456
+$ git rebase origin/master                
+                </pre></li><li class="step" title="Step 7"><p>Generate your patch against the remote master. Run the following command from
+                    the top level of your git repository (usually called
+                    <code class="literal">hbase</code>):</p><pre class="screen">$ git diff --no-prefix origin/master &gt; HBASE-123456.patch</pre><p>The name of the patch should contain the JIRA ID. Look over the patch file to
+                    be sure that you did not change any additional files by accident and that there
+                    are no other surprises. When you are satisfied, attach the patch to the JIRA and
+                    click the <span class="guibutton">Patch Available</span> button. A reviewer
+                    will review your patch. If you need to submit a new version of the patch, leave
+                    the old one on the JIRA and add a version number to the name of the new
+                    patch.</p></li><li class="step" title="Step 8"><p>After a change has been committed, there is no need to keep your local branch
+                    around. Instead you should run <span class="command"><strong>git pull</strong></span> to get the new change
+                    into your master branch.</p></li></ol></div></div><div class="section" title="A.3.&nbsp;Editing the HBase Website"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2571e126"></a>A.3.&nbsp;Editing the HBase Website</h2></div></div></div><p>The source for the HBase website is in the HBase source, in the
+                <code class="filename">src/main/site/</code> directory. Within this directory, source for the
+            individual pages is in the <code class="filename">xdocs/</code> directory, and images referenced
+            in those pages are in the <code class="filename">images/</code> directory. This directory also
+            stores images used in the HBase Reference Guide.</p><p>The website's pages are written in an HTML-like XML dialect called xdoc, which has a
+            reference guide at <a class="link" href="http://maven.apache.org/archives/maven-1.x/plugins/xdoc/reference/xdocs.html" target="_top">http://maven.apache.org/archives/maven-1.x/plugins/xdoc/reference/xdocs.html</a>.
+            You can edit these files in a plain-text editor, an IDE, or an XML editor such as
+            XML Mind XML Editor (XXE) or Oxygen XML Author. </p><p>To preview your changes, build the website using the <span class="command"><strong>mvn clean site
+                -DskipTests</strong></span> command. The HTML output resides in the
+                <code class="filename">target/site/</code> directory. When you are satisfied with your
+            changes, follow the procedure in <a class="xref" href="#submit_doc_patch_procedure" title="Procedure&nbsp;A.1.&nbsp;Suggested Work flow for Submitting Patches">Procedure&nbsp;A.1, &#8220;Suggested Work flow for Submitting Patches&#8221;</a> to submit
+            your patch.</p></div><div class="section" title="A.4.&nbsp;Editing the HBase Reference Guide"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2571e155"></a>A.4.&nbsp;Editing the HBase Reference Guide</h2></div></div></div><p>The source for the HBase Reference Guide is in the HBase source, in the
+                <code class="filename">src/main/docbkx/</code> directory. It is written in <a class="link" href="http://www.docbook.org/" target="_top">Docbook</a> XML. Docbook can be
+            intimidating, but you can typically follow the formatting of the surrounding file to get
+            an idea of the mark-up. You can edit Docbook XML files using a plain-text editor, an
+            XML-aware IDE, or a specialized XML editor.</p><p>Docbook's syntax can be picky. Before submitting a patch, be sure to build the output
+            locally using the <span class="command"><strong>mvn site</strong></span> command. If you do not get any build
+            errors, that means that the XML is well-formed, which means that each opening tag is
+            balanced by a closing tag. Well-formedness is not exactly the same as validity. Check
+            the output in <code class="filename">target/docbkx/</code> for any surprises before submitting a
+            patch.</p></div><div class="section" title="A.5.&nbsp;Auto-Generated Content"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2571e174"></a>A.5.&nbsp;Auto-Generated Content</h2></div></div></div><p>Some parts of the HBase Reference Guide, most notably <a class="xref" href="#">???</a>,
+            are generated automatically, so that this area of the documentation stays in sync with
+            the code. This is done by means of an XSLT transform, which you can examine in the
+            source at <code class="filename">src/main/xslt/configuration_to_docbook_section.xsl</code>. This
+            transforms the <code class="filename">hbase-common/src/main/resources/hbase-default.xml</code>
+            file into a Docbook output which can be included in the Reference Guide. Sometimes, it
+            is necessary to add configuration parameters or modify their descriptions. Make the
+            modifications to the source file, and they will be included in the Reference Guide when
+            it is rebuilt.</p><p>It is possible that other types of content can and will be automatically generated
+            from HBase source files in the future.</p></div><div class="section" title="A.6.&nbsp;Multi-Page and Single-Page Output"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2571e189"></a>A.6.&nbsp;Multi-Page and Single-Page Output</h2></div></div></div><p>You can examine the <code class="literal">site</code> target in the Maven
+                <code class="filename">pom.xml</code> file included at the top level of the HBase source for
+            details on the process of building the website and documentation. The Reference Guide is
+            built twice, once as a single-page output and once with one HTML file per chapter. The
+            single-page output is located in <code class="filename">target/docbkx/book.html</code>, while the
+            multi-page output's index page is at <code class="filename">target/docbkx/book/book.html</code>.
+            Each of these outputs has its own <code class="filename">images/</code> and
+                <code class="filename">css/</code> directories, which are created at build time.</p></div><div class="section" title="A.7.&nbsp;Images in the HBase Reference Guide"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2571e212"></a>A.7.&nbsp;Images in the HBase Reference Guide</h2></div></div></div><p>You can include images in the HBase Reference Guide. For accessibility reasons, it is
+            recommended that you use a &lt;figure&gt; Docbook element for an image. This allows
+            screen readers to navigate to the image and also provides alternative text for the
+            image. The following is an example of a &lt;figure&gt; element.</p><pre class="programlisting">&lt;figure&gt;
+  &lt;title&gt;HFile Version 1&lt;/title&gt;
+  &lt;mediaobject&gt;
+    &lt;imageobject&gt;
+      &lt;imagedata fileref="timeline_consistency.png" /&gt;
+    &lt;/imageobject&gt;
+    &lt;textobject&gt;
+      &lt;phrase&gt;HFile Version 1&lt;/phrase&gt;
+    &lt;/textobject&gt;
+  &lt;/mediaobject&gt;
+&lt;/figure&gt;
+        </pre><p>The &lt;textobject&gt; can contain a few sentences describing the image, rather than
+            simply reiterating the title. You can optionally specify alignment and size options in
+            the &lt;imagedata&gt; element.</p><p>When doing a local build, save the image to the
+                <code class="filename">src/main/site/resources/images/</code> directory. In the
+            &lt;imagedata&gt; element, refer to the image as above, with no directory component. The
+            image will be copied to the appropriate target location during the build of the
+            output.</p><p>When you submit a patch which includes adding an image to the HBase Reference Guide,
+            attach the image to the JIRA. If the committer asks where the image should be committed,
+            it should go into the above directory.</p></div><div class="section" title="A.8.&nbsp;Adding a New Chapter to the HBase Reference Guide"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2571e228"></a>A.8.&nbsp;Adding a New Chapter to the HBase Reference Guide</h2></div></div></div><p>If you want to add a new chapter to the HBase Reference Guide, the easiest way is to
+            copy an existing chapter file, rename it, and change the ID and title elements near the
+            top of the file. Delete the existing content and create the new content. Then open the
+                <code class="filename">book.xml</code> file, which is the main file for the HBase Reference
+            Guide, and use an &lt;xi:include&gt; element to include your new chapter in the
+            appropriate location. Be sure to add your new file to your Git repository before
+            creating your patch. Note that the <code class="filename">book.xml</code> file currently contains
+            many chapters. You can only include a chapter at the same nesting levels as the other
+            chapters in the file. When in doubt, check to see how other files have been
+            included.</p></div><div class="section" title="A.9.&nbsp;Docbook Common Issues"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2571e239"></a>A.9.&nbsp;Docbook Common Issues</h2></div></div></div><p>The following Docbook issues come up often. Some of these are preferences, but others
+            can create mysterious build errors or other problems.</p><div class="qandaset" title="Frequently Asked Questions"><a name="d2571e244"></a><dl><dt>A.9.1. <a href="#d2571e245">What can go where?</a></dt><dt>A.9.2. <a href="#d2571e255">Paragraphs and Admonitions</a></dt><dt>A.9.3. <a href="#d2571e264">Wrap textual &lt;listitem&gt; and &lt;entry&gt; contents in &lt;para&gt;
+                        elements.</a></dt><dt>A.9.4. <a href="#d2571e273">When to use &lt;command&gt;, &lt;code&gt;, &lt;programlisting&gt;,
+                        &lt;screen&gt;</a></dt><dt>A.9.5. <a href="#d2571e290">How to escape XML elements so that they show up as XML</a></dt><dt>A.9.6. <a href="#d2571e297">Tips and tricks for making screen output look good</a></dt><dt>A.9.7. <a href="#d2571e316">Isolate Changes for Easy Diff Review.</a></dt><dt>A.9.8. <a href="#d2571e323">Syntax Highlighting</a></dt></dl><table border="0" width="100%" summary="Q and A Set"><col align="left" width="1%"><col><tbody><tr class="question" title="A.9.1."><td align="left" valign="top"><a name="d2571e245"></a><a name="d2571e246"></a><p><b>A.9.1.</b></p></td><td align="left" valign="top"><p>What can go where?</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>There is often confusion about which child elements are valid in a given
+                        context. When in doubt, <a class="link" href="http://docbook.org/tdg/en/html/docbook.html" target="_top">Docbook: The
+                            Definitive Guide</a> is the best resource. It has an appendix which
+                        is indexed by element and contains all valid child and parent elements of
+                        any given element. If you edit Docbook often, a schema-aware XML editor
+                        makes things easier.</p></td></tr><tr class="question" title="A.9.2."><td align="left" valign="top"><a name="d2571e255"></a><a name="d2571e256"></a><p><b>A.9.2.</b></p></td><td align="left" valign="top"><p>Paragraphs and Admonitions</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>It is a common pattern, and it is technically valid, to put an admonition
+                        such as a &lt;note&gt; inside a &lt;para&gt; element. Because admonitions
+                        render as block-level elements (they take the whole width of the page), it
+                        is better to mark them up as siblings to the paragraphs around them, like
+                        this:</p><pre class="programlisting">&lt;para&gt;This is the paragraph.&lt;/para&gt;
+&lt;note&gt;
+    &lt;para&gt;This is an admonition which occurs after the paragraph.&lt;/para&gt;
+&lt;/note&gt;</pre></td></tr><tr class="question" title="A.9.3."><td align="left" valign="top"><a name="d2571e264"></a><a name="d2571e265"></a><p><b>A.9.3.</b></p></td><td align="left" valign="top"><p>Wrap textual &lt;listitem&gt; and &lt;entry&gt; contents in &lt;para&gt;
+                        elements.</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>Because the contents of a &lt;listitem&gt; (an element in an itemized,
+                        ordered, or variable list) or an &lt;entry&gt; (a cell in a table) can
+                        consist of things other than plain text, they need to be wrapped in some
+                        element. If they are plain text, they need to be inclosed in &lt;para&gt;
+                        tags. This is tedious but necessary for validity.</p><pre class="programlisting">&lt;itemizedlist&gt;
+    &lt;listitem&gt;
+        &lt;para&gt;This is a paragraph.&lt;/para&gt;
+    &lt;/listitem&gt;
+    &lt;listitem&gt;
+        &lt;screen&gt;This is screen output.&lt;/screen&gt;
+    &lt;/listitem&gt;
+&lt;/itemizedlist&gt;</pre></td></tr><tr class="question" title="A.9.4."><td align="left" valign="top"><a name="d2571e273"></a><a name="d2571e274"></a><p><b>A.9.4.</b></p></td><td align="left" valign="top"><p>When to use &lt;command&gt;, &lt;code&gt;, &lt;programlisting&gt;,
+                        &lt;screen&gt;</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>The first two are in-line tags, which can occur within the flow of
+                        paragraphs or titles. The second two are block elements.</p><p>Use &lt;command&gt; to mention a command such as <span class="command"><strong>hbase
+                            shell</strong></span> in the flow of a sentence. Use &lt;code&gt; for other
+                        inline text referring to code. Incidentally, use &lt;literal&gt; to specify
+                        literal strings that should be typed or entered exactly as shown. Within a
+                        &lt;screen&gt; listing, it can be helpful to use the &lt;userinput&gt; and
+                        &lt;computeroutput&gt; elements to mark up the text further.</p><p>Use &lt;screen&gt; to display input and output as the user would
+                            <span class="emphasis"><em>see</em></span> it on the screen, in a log file, etc. Use
+                        &lt;programlisting&gt; only for blocks of code that occur within a file,
+                        such as Java or XML code, or a Bash shell script.</p></td></tr><tr class="question" title="A.9.5."><td align="left" valign="top"><a name="d2571e290"></a><a name="d2571e291"></a><p><b>A.9.5.</b></p></td><td align="left" valign="top"><p>How to escape XML elements so that they show up as XML</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>For one-off instances or short in-line mentions, use the &amp;lt; and
+                        &amp;gt; encoded characters. For longer mentions, or blocks of code, enclose
+                        it with &amp;lt;![CDATA[]]&amp;gt;, which is much easier to maintain and
+                        parse in the source files..</p></td></tr><tr class="question" title="A.9.6."><td align="left" valign="top"><a name="d2571e297"></a><a name="d2571e298"></a><p><b>A.9.6.</b></p></td><td align="left" valign="top"><p>Tips and tricks for making screen output look good</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>Text within &lt;screen&gt; and &lt;programlisting&gt; elements is shown
+                        exactly as it appears in the source, including indentation, tabs, and line
+                        wrap.</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Indent the starting and closing XML elements, but do not indent
+                                the content. Also, to avoid having an extra blank line at the
+                                beginning of the programlisting output, do not put the CDATA
+                                element on its own line. For example:</p><pre class="programlisting">        &lt;programlisting&gt;
+case $1 in
+  --cleanZk|--cleanHdfs|--cleanAll)
+    matches="yes" ;;
+  *) ;;
+esac
+        &lt;/programlisting&gt;</pre></li><li class="listitem"><p>After pasting code into a programlisting, fix the indentation
+                                manually, using two <span class="emphasis"><em>spaces</em></span> per desired
+                                indentation. For screen output, be sure to include line breaks so
+                                that the text is no longer than 100 characters.</p></li></ul></div></td></tr><tr class="question" title="A.9.7."><td align="left" valign="top"><a name="d2571e316"></a><a name="d2571e317"></a><p><b>A.9.7.</b></p></td><td align="left" valign="top"><p>Isolate Changes for Easy Diff Review.</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>Be careful with pretty-printing or re-formatting an entire XML file, even
+                        if the formatting has degraded over time. If you need to reformat a file, do
+                        that in a separate JIRA where you do not change any content. Be careful
+                        because some XML editors do a bulk-reformat when you open a new file,
+                        especially if you use GUI mode in the editor.</p></td></tr><tr class="question" title="A.9.8."><td align="left" valign="top"><a name="d2571e323"></a><a name="d2571e324"></a><p><b>A.9.8.</b></p></td><td align="left" valign="top"><p>Syntax Highlighting</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>The HBase Reference Guide uses the <a class="link" href="http://sourceforge.net/projects/xslthl/files/xslthl/2.1.0/" target="_top">XSLT Syntax Highlighting</a> Maven module for syntax highlighting.
+                        To enable syntax highlighting for a given &lt;programlisting&gt; or
+                        &lt;screen&gt; (or possibly other elements), add the attribute
+                                <code class="literal">language=<em class="replaceable"><code>LANGUAGE_OF_CHOICE</code></em></code>
+                        to the element, as in the following example:</p><pre class="programlisting">
+&lt;programlisting language="xml"&gt;
+    &lt;foo&gt;bar&lt;/foo&gt;
+    &lt;bar&gt;foo&lt;/bar&gt;
+&lt;/programlisting&gt;</pre><p>Several syntax types are supported. The most interesting ones for the
+                        HBase Reference Guide are <code class="literal">java</code>, <code class="literal">xml</code>,
+                            <code class="literal">sql</code>, and <code class="literal">bourne</code> (for BASH shell
+                        output or Linux command-line examples).</p></td></tr></tbody></table></div></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a></body></html>

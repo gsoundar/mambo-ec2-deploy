@@ -1,0 +1,85 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>1.15.&nbsp;HBase and HDFS</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="troubleshooting.html" title="Chapter&nbsp;1.&nbsp;Troubleshooting and Debugging Apache HBase"><link rel="up" href="troubleshooting.html" title="Chapter&nbsp;1.&nbsp;Troubleshooting and Debugging Apache HBase"><link rel="prev" href="ch01s14.html" title="1.14.&nbsp;IPC Configuration Conflicts with Hadoop"><link rel="next" href="trouble.tests.html" title="1.16.&nbsp;Running unit or integration tests"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1.15.&nbsp;HBase and HDFS</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch01s14.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="trouble.tests.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/.html';
+    </script><div class="section" title="1.15.&nbsp;HBase and HDFS"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e1227"></a>1.15.&nbsp;HBase and HDFS</h2></div></div></div><p>General configuration guidance for Apache HDFS is out of the scope of this guide. Refer to
+      the documentation available at <a class="link" href="http://hadoop.apache.org/" target="_top">http://hadoop.apache.org/</a> for extensive
+      information about configuring HDFS. This section deals with HDFS in terms of HBase. </p><p>In most cases, HBase stores its data in Apache HDFS. This includes the HFiles containing
+      the data, as well as the write-ahead logs (WALs) which store data before it is written to the
+      HFiles and protect against RegionServer crashes. HDFS provides reliability and protection to
+      data in HBase because it is distributed. To operate with the most efficiency, HBase needs data
+    to be available locally. Therefore, it is a good practice to run an HDFS datanode on each
+    RegionServer.</p><div class="variablelist" title="Important Information and Guidelines for HBase and HDFS"><p class="title"><b>Important Information and Guidelines for HBase and HDFS</b></p><dl><dt><span class="term">HBase is a client of HDFS.</span></dt><dd><p>HBase is an HDFS client, using the HDFS <code class="code">DFSClient</code> class, and references
+            to this class appear in HBase logs with other HDFS client log messages.</p></dd><dt><span class="term">Configuration is necessary in multiple places.</span></dt><dd><p>Some HDFS configurations relating to HBase need to be done at the HDFS (server) side.
+            Others must be done within HBase (at the client side). Other settings need
+            to be set at both the server and client side.
+          </p></dd><dt><span class="term">Write errors which affect HBase may be logged in the HDFS logs rather than HBase logs.</span></dt><dd><p>When writing, HDFS pipelines communications from one datanode to another. HBase
+            communicates to both the HDFS namenode and datanode, using the HDFS client classes.
+            Communication problems between datanodes are logged in the HDFS logs, not the HBase
+            logs.</p><p>HDFS writes are always local when possible. HBase RegionServers should not
+            experience many write errors, because they write the local datanode. If the datanode
+            cannot replicate the blocks, the errors are logged in HDFS, not in the HBase
+            RegionServer logs.</p></dd><dt><span class="term">HBase communicates with HDFS using two different ports.</span></dt><dd><p>HBase communicates with datanodes using the <code class="code">ipc.Client</code> interface and
+            the <code class="code">DataNode</code> class. References to these will appear in HBase logs. Each of
+            these communication channels use a different port (50010 and 50020 by default). The
+            ports are configured in the HDFS configuration, via the
+              <code class="code">dfs.datanode.address</code> and <code class="code">dfs.datanode.ipc.address</code>
+            parameters.</p></dd><dt><span class="term">Errors may be logged in HBase, HDFS, or both.</span></dt><dd><p>When troubleshooting HDFS issues in HBase, check logs in both places for errors.</p></dd><dt><span class="term">HDFS takes a while to mark a node as dead. You can configure HDFS to avoid using stale
+          datanodes.</span></dt><dd><p>By default, HDFS does not mark a node as dead until it is unreachable for 630
+            seconds. In Hadoop 1.1 and Hadoop 2.x, this can be alleviated by enabling checks for
+            stale datanodes, though this check is disabled by default. You can enable the check for
+            reads and writes separately, via <code class="code">dfs.namenode.avoid.read.stale.datanode</code> and
+              <code class="code">dfs.namenode.avoid.write.stale.datanode settings</code>. A stale datanode is one
+            that has not been reachable for <code class="code">dfs.namenode.stale.datanode.interval</code>
+            (default is 30 seconds). Stale datanodes are avoided, and marked as the last possible
+            target for a read or write operation. For configuration details, see the HDFS
+            documentation.</p></dd><dt><span class="term">Settings for HDFS retries and timeouts are important to HBase.</span></dt><dd><p>You can configure settings for various retries and timeouts. Always refer to the
+            HDFS documentation for current recommendations and defaults. Some of the settings
+            important to HBase are listed here. Defaults are current as of Hadoop 2.3. Check the
+            Hadoop documentation for the most current values and recommendations.</p><div class="variablelist" title="Retries"><p class="title"><b>Retries</b></p><dl><dt><span class="term"><code class="code">ipc.client.connect.max.retries</code> (default: 10)</span></dt><dd><p>The number of times a client will attempt to establish a connection with the
+                  server. This value sometimes needs to be increased. You can specify different
+                  setting for the maximum number of retries if a timeout occurs. For SASL
+                  connections, the number of retries is hard-coded at 15 and cannot be
+                  configured.</p></dd><dt><span class="term"><code class="code">ipc.client.connect.max.retries.on.timeouts</code> (default: 45)</span></dt><dd><p>The number of times a client will attempt to establish a connection
+                with the server in the event of a timeout. If some retries are due to timeouts and
+                some are due to other reasons, this counter is added to
+                <code class="code">ipc.client.connect.max.retries</code>, so the maximum number of retries for
+                all reasons could be the combined value.</p></dd><dt><span class="term"><code class="code">dfs.client.block.write.retries</code> (default: 3)</span></dt><dd><p>How many times the client attempts to write to the datanode. After the
+              number of retries is reached, the client reconnects to the namenode to get a new
+              location of a datanode. You can try increasing this value.</p></dd></dl></div><div class="variablelist" title="HDFS Heartbeats"><p class="title"><b>HDFS Heartbeats</b></p><p>HDFS heartbeats are entirely on the HDFS side, between the namenode and datanodes.</p><dl><dt><span class="term"><code class="code">dfs.heartbeat.interval</code> (default: 3)</span></dt><dd><p>The interval at which a node heartbeats.</p></dd><dt><span class="term"><code class="code">dfs.namenode.heartbeat.recheck-interval</code> (default: 300000)</span></dt><dd><p>The interval of time between heartbeat checks. The total time before a node is
+                  marked as stale is determined by the following formula, which works out to 10
+                  minutes and 30 seconds:</p><pre class="screen"> 2 * (dfs.namenode.heartbeat.recheck-interval) + 10 * 1000 * (dfs.heartbeat.interval)</pre></dd><dt><span class="term"><code class="code">dfs.namenode.stale.datanode.interval</code> (default: 3000)</span></dt><dd><p>How long (in milliseconds) a node can go without a heartbeat before it is
+                  determined to be stale, if the other options to do with stale datanodes are
+                  configured (off by default).</p></dd></dl></div></dd></dl></div><div class="variablelist" title="Connection Timeouts"><p class="title"><b>Connection Timeouts</b></p><p>Connection timeouts occur between the client (HBASE) and the HDFS datanode. They may
+        occur when establishing a connection, attempting to read, or attempting to write. The two
+        settings below are used in combination, and affect connections between the DFSClient and the
+        datanode, the ipc.cClient and the datanode, and communication between two datanodes. </p><dl><dt><span class="term"><code class="code">dfs.client.socket-timeout</code> (default: 60000)</span></dt><dd><p>The amount of time before a client connection times out when establishing a
+            connection or reading. The value is expressed in milliseconds, so the default is 60
+            seconds.</p></dd><dt><span class="term"><code class="code">dfs.datanode.socket.write.timeout</code> (default: 480000)</span></dt><dd><p>The amount of time before a write operation times out. The default is 8
+            minutes, expressed as milliseconds.</p></dd></dl></div><div class="variablelist" title="Typical Error Logs"><p class="title"><b>Typical Error Logs</b></p><p>The following types of errors are often seen in the logs.</p><dl><dt><span class="term"><code class="code">INFO HDFS.DFSClient: Failed to connect to /xxx50010, add to deadNodes and
+            continue java.net.SocketTimeoutException: 60000 millis timeout while waiting for channel
+            to be ready for connect. ch : java.nio.channels.SocketChannel[connection-pending
+            remote=/region-server-1:50010]</code></span></dt><dd><p>All datanodes for a block are dead, and recovery is not possible. Here is the
+            sequence of events that leads to this error:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>The client attempts to connect to a dead datanode.</p></li><li class="listitem"><p>The connection fails, so the client moves down the list of datanodes and tries
+                the next one. It also fails.</p></li><li class="listitem"><p>When the client exhausts its entire list, it sleeps for 3 seconds and requests a
+              new list. It is very likely to receive the exact same list as before, in which case
+              the error occurs again.</p></li></ul></div></dd><dt><span class="term"><code class="code">INFO org.apache.hadoop.HDFS.DFSClient: Exception in createBlockOutputStream
+            java.net.SocketTimeoutException: 69000 millis timeout while waiting for channel to be
+            ready for connect. ch : java.nio.channels.SocketChannel[connection-pending remote=/
+            xxx:50010]</code></span></dt><dd><p>This type of error indicates a write issue. In this case, the master wants to split
+            the log. It does not have a local datanode so it tries to connect to a remote datanode,
+            but the datanode is dead.</p><p>In this situation, there will be three retries (by default). If all retries fail, a
+            message like the following is logged:</p><pre class="screen">
+WARN HDFS.DFSClient: DataStreamer Exception: java.io.IOException: Unable to create new block
+          </pre><p>If the operation was an attempt to split the log, the following type of message may
+            also appear:</p><pre class="screen">
+FATAL wal.HLogSplitter: WriterThread-xxx Got while writing log entry to log            
+          </pre></dd></dl></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch01s14.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="trouble.tests.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">1.14.&nbsp;IPC Configuration Conflicts with Hadoop&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="troubleshooting.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;1.16.&nbsp;Running unit or integration tests</td></tr></table></div></body></html>

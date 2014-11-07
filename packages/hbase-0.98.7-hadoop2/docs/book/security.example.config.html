@@ -1,0 +1,136 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>8.4.&nbsp;Security Configuration Example</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="security.html" title="Chapter&nbsp;8.&nbsp;Secure Apache HBase"><link rel="prev" href="ch08s03.html" title="8.3.&nbsp;Securing Access To Your Data"><link rel="next" href="architecture.html" title="Chapter&nbsp;9.&nbsp;Architecture"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">8.4.&nbsp;Security Configuration Example</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch08s03.html">Prev</a>&nbsp;</td><th width="60%" align="center">Chapter&nbsp;8.&nbsp;Secure Apache HBase</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="architecture.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/security.example.config.html';
+    </script><div class="section" title="8.4.&nbsp;Security Configuration Example"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="security.example.config"></a>8.4.&nbsp;Security Configuration Example</h2></div></div></div><p>This configuration example includes support for HFile v3, ACLs, Visibility Labels, and
+      transparent encryption of data at rest and the WAL. All options have been discussed separately
+      in the sections above.</p><div class="example"><a name="d2802e9140"></a><p class="title"><b>Example&nbsp;8.16.&nbsp;Example Security Settings in <code class="filename">hbase-site.xml</code></b></p><div class="example-contents"><pre class="programlisting">
+&lt;!-- HFile v3 Support --&gt;
+&lt;property&gt;
+  &lt;name&gt;hfile.format.version&lt;/name&gt;
+  &lt;value&gt;3&lt;/value&gt;
+&lt;/property&gt;
+&lt;!-- HBase Superuser --&gt;
+&lt;property&gt;
+  &lt;name&gt;hbase.superuser&lt;/name&gt;
+  &lt;value&gt;hbase, admin&lt;/value&gt;
+&lt;/property&gt;
+&lt;!-- Coprocessors for ACLs and Visibility Tags --&gt;
+&lt;property&gt;
+  &lt;name&gt;hbase.coprocessor.region.classes&lt;/name&gt;
+  &lt;value&gt;org.apache.hadoop.hbase.security.access.AccessController,
+  org.apache.hadoop.hbase.security.visibility.VisibilityController,
+  org.apache.hadoop.hbase.security.token.TokenProvider&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;hbase.coprocessor.master.classes&lt;/name&gt;
+  &lt;value&gt;org.apache.hadoop.hbase.security.access.AccessController,
+  org.apache.hadoop.hbase.security.visibility.VisibilityController&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;hbase.coprocessor.regionserver.classes&lt;/name&gt;
+  &lt;value&gt;org.apache.hadoop/hbase.security.access.AccessController,
+  org.apache.hadoop.hbase.security.access.VisibilityController&lt;/value&gt;
+&lt;/property&gt;
+&lt;!-- Executable ACL for Coprocessor Endpoints --&gt;
+&lt;property&gt;
+  &lt;name&gt;hbase.security.exec.permission.checks&lt;/name&gt;
+  &lt;value&gt;true&lt;/value&gt;
+&lt;/property&gt;
+&lt;!-- Whether a user needs authorization for a visibility tag to set it on a cell --&gt;
+&lt;property&gt;
+  &lt;name&gt;hbase.security.visibility.mutations.checkauth&lt;/name&gt;
+  &lt;value&gt;false&lt;/value&gt;
+&lt;/property&gt;
+&lt;!-- Secure RPC Transport --&gt;
+&lt;property&gt;
+  &lt;name&gt;hbase.rpc.protection&lt;/name&gt;
+  &lt;value&gt;auth-conf&lt;/value&gt;
+ &lt;/property&gt;
+ &lt;!-- Transparent Encryption --&gt;
+&lt;property&gt;
+    &lt;name&gt;hbase.crypto.keyprovider&lt;/name&gt;
+    &lt;value&gt;org.apache.hadoop.hbase.io.crypto.KeyStoreKeyProvider&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+    &lt;name&gt;hbase.crypto.keyprovider.parameters&lt;/name&gt;
+    &lt;value&gt;jceks:///path/to/hbase/conf/hbase.jks?password=***&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+    &lt;name&gt;hbase.crypto.master.key.name&lt;/name&gt;
+    &lt;value&gt;hbase&lt;/value&gt;
+&lt;/property&gt;
+&lt;!-- WAL Encryption --&gt;
+&lt;property&gt;
+    &lt;name&gt;hbase.regionserver.hlog.reader.impl&lt;/name&gt;
+    &lt;value&gt;org.apache.hadoop.hbase.regionserver.wal.SecureProtobufLogReader&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+    &lt;name&gt;hbase.regionserver.hlog.writer.impl&lt;/name&gt;
+    &lt;value&gt;org.apache.hadoop.hbase.regionserver.wal.SecureProtobufLogWriter&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+    &lt;name&gt;hbase.regionserver.wal.encryption&lt;/name&gt;
+    &lt;value&gt;true&lt;/value&gt;
+&lt;/property&gt;
+&lt;!-- For key rotation --&gt;
+&lt;property&gt;
+  &lt;name&gt;hbase.crypto.master.alternate.key.name&lt;/name&gt;
+  &lt;value&gt;hbase.old&lt;/value&gt;
+&lt;/property&gt;
+&lt;!-- Secure Bulk Load --&gt;
+&lt;property&gt;
+  &lt;name&gt;hbase.bulkload.staging.dir&lt;/name&gt;
+  &lt;value&gt;/tmp/hbase-staging&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;hbase.coprocessor.region.classes&lt;/name&gt;
+  &lt;value&gt;org.apache.hadoop.hbase.security.token.TokenProvider,
+  org.apache.hadoop.hbase.security.access.AccessController,org.apache.hadoop.hbase.security.access.SecureBulkLoadEndpoint&lt;/value&gt;
+&lt;/property&gt;
+        </pre></div></div><br class="example-break"><div class="example"><a name="d2802e9147"></a><p class="title"><b>Example&nbsp;8.17.&nbsp;Example Group Mapper in Hadoop <code class="filename">core-site.xml</code></b></p><div class="example-contents"><p>Adjust these settings to suit your environment.</p><pre class="programlisting">
+&lt;property&gt;
+  &lt;name&gt;hadoop.security.group.mapping&lt;/name&gt;
+  &lt;value&gt;org.apache.hadoop.security.LdapGroupsMapping&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;hadoop.security.group.mapping.ldap.url&lt;/name&gt;
+  &lt;value&gt;ldap://server&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;hadoop.security.group.mapping.ldap.bind.user&lt;/name&gt;
+  &lt;value&gt;Administrator@example-ad.local&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;hadoop.security.group.mapping.ldap.bind.password&lt;/name&gt;
+  &lt;value&gt;****&lt;/value&gt; &lt;!-- Replace with the actual password --&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;hadoop.security.group.mapping.ldap.base&lt;/name&gt;
+  &lt;value&gt;dc=example-ad,dc=local&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;hadoop.security.group.mapping.ldap.search.filter.user&lt;/name&gt;
+  &lt;value&gt;(&amp;amp;(objectClass=user)(sAMAccountName={0}))&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;hadoop.security.group.mapping.ldap.search.filter.group&lt;/name&gt;
+  &lt;value&gt;(objectClass=group)&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;hadoop.security.group.mapping.ldap.search.attr.member&lt;/name&gt;
+  &lt;value&gt;member&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;hadoop.security.group.mapping.ldap.search.attr.group.name&lt;/name&gt;
+  &lt;value&gt;cn&lt;/value&gt;
+&lt;/property&gt;
+        </pre></div></div><br class="example-break"></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch08s03.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="security.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="architecture.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">8.3.&nbsp;Securing Access To Your Data&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;9.&nbsp;Architecture</td></tr></table></div></body></html>

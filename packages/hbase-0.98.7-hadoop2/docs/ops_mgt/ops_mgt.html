@@ -1,0 +1,272 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>Chapter&nbsp;1.&nbsp;Apache HBase Operational Management</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="ops_mgt.html" title="Chapter&nbsp;1.&nbsp;Apache HBase Operational Management"><link rel="next" href="ops.regionmgt.html" title="1.2.&nbsp;Region Management"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;1.&nbsp;Apache HBase Operational Management</th></tr><tr><td width="20%" align="left">&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ops.regionmgt.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/ops_mgt.html';
+    </script><div class="chapter" title="Chapter&nbsp;1.&nbsp;Apache HBase Operational Management"><div class="titlepage"><div><div><h2 class="title"><a name="ops_mgt"></a>Chapter&nbsp;1.&nbsp;Apache HBase Operational Management</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="ops_mgt.html#tools">1.1. HBase Tools and Utilities</a></span></dt><dd><dl><dt><span class="section"><a href="ops_mgt.html#canary">1.1.1. Canary</a></span></dt><dt><span class="section"><a href="ops_mgt.html#health.check">1.1.2. Health Checker</a></span></dt><dt><span class="section"><a href="ops_mgt.html#driver">1.1.3. Driver</a></span></dt><dt><span class="section"><a href="ops_mgt.html#hbck">1.1.4. HBase <span class="application">hbck</span></a></span></dt><dt><span class="section"><a href="ops_mgt.html#hfile_tool2">1.1.5. HFile Tool</a></span></dt><dt><span class="section"><a href="ops_mgt.html#wal_tools">1.1.6. WAL Tools</a></span></dt><dt><span class="section"><a href="ops_mgt.html#compression.tool">1.1.7. Compression Tool</a></span></dt><dt><span class="section"><a href="ops_mgt.html#copytable">1.1.8. CopyTable</a></span></dt><dt><span class="section"><a href="ops_mgt.html#export">1.1.9. Export</a></span></dt><dt><span class="section"><a href="ops_mgt.html#import">1.1.10. Import</a></span></dt><dt><span class="section"><a href="ops_mgt.html#importtsv">1.1.11. ImportTsv</a></span></dt><dt><span class="section"><a href="ops_mgt.html#completebulkload">1.1.12. CompleteBulkLoad</a></span></dt><dt><span class="section"><a href="ops_mgt.html#walplayer">1.1.13. WALPlayer</a></span></dt><dt><span class="section"><a href="ops_mgt.html#rowcounter">1.1.14. RowCounter and CellCounter</a></span></dt><dt><span class="section"><a href="ops_mgt.html#mlockall">1.1.15. mlockall</a></span></dt><dt><span class="section"><a href="ops_mgt.html#compaction.tool">1.1.16. Offline Compaction Tool</a></span></dt><dt><span class="section"><a href="ops_mgt.html#d835e586">1.1.17. <span class="command"><strong>hbase clean</strong></span></a></span></dt><dt><span class="section"><a href="ops_mgt.html#d835e603">1.1.18. <span class="command"><strong>hbase pe</strong></span></a></span></dt><dt><span class="section"><a href="ops_mgt.html#d835e627">1.1.19. <span class="command"><strong>hbase ltt</strong></span></a></span></dt></dl></dd><dt><span class="section"><a href="ops.regionmgt.html">1.2. Region Management</a></span></dt><dd><dl><dt><span class="section"><a href="ops.regionmgt.html#ops.regionmgt.majorcompact">1.2.1. Major Compaction</a></span></dt><dt><span class="section"><a href="ops.regionmgt.html#ops.regionmgt.merge">1.2.2. Merge</a></span></dt></dl></dd><dt><span class="section"><a href="node.management.html">1.3. Node Management</a></span></dt><dd><dl><dt><span class="section"><a href="node.management.html#decommission">1.3.1. Node Decommission</a></span></dt><dt><span class="section"><a href="node.management.html#rolling">1.3.2. Rolling Restart</a></span></dt><dt><span class="section"><a href="node.management.html#adding.new.node">1.3.3. Adding a New Node</a></span></dt></dl></dd><dt><span class="section"><a href="hbase_metrics.html">1.4. HBase Metrics</a></span></dt><dd><dl><dt><span class="section"><a href="hbase_metrics.html#metric_setup">1.4.1. Metric Setup</a></span></dt><dt><span class="section"><a href="hbase_metrics.html#d835e1028">1.4.2. Disabling Metrics</a></span></dt><dt><span class="section"><a href="hbase_metrics.html#d835e1036">1.4.3. Discovering Available Metrics</a></span></dt><dt><span class="section"><a href="hbase_metrics.html#d835e1152">1.4.4. Units of Measure for Metrics</a></span></dt><dt><span class="section"><a href="hbase_metrics.html#rs_metrics">1.4.5. Most Important RegionServer Metrics</a></span></dt></dl></dd><dt><span class="section"><a href="ops.monitoring.html">1.5. HBase Monitoring</a></span></dt><dd><dl><dt><span class="section"><a href="ops.monitoring.html#ops.monitoring.overview">1.5.1. Overview</a></span></dt><dt><span class="section"><a href="ops.monitoring.html#ops.slow.query">1.5.2. Slow Query Log</a></span></dt><dt><span class="section"><a href="ops.monitoring.html#d835e1308">1.5.3. Block Cache Monitoring</a></span></dt></dl></dd><dt><span class="section"><a href="cluster_replication.html">1.6. Cluster Replication</a></span></dt><dd><dl><dt><span class="section"><a href="cluster_replication.html#d835e1408">1.6.1. Life of a WAL Edit</a></span></dt><dt><span class="section"><a href="cluster_replication.html#d835e1481">1.6.2. Replication Internals</a></span></dt><dt><span class="section"><a href="cluster_replication.html#d835e1560">1.6.3. Replication Configuration Options</a></span></dt><dt><span class="section"><a href="cluster_replication.html#d835e1678">1.6.4. Replication Implementation Details</a></span></dt></dl></dd><dt><span class="section"><a href="ops.backup.html">1.7. HBase Backup</a></span></dt><dd><dl><dt><span class="section"><a href="ops.backup.html#ops.backup.fullshutdown">1.7.1. Full Shutdown Backup</a></span></dt><dt><span class="section"><a href="ops.backup.html#ops.backup.live.replication">1.7.2. Live Cluster Backup - Replication</a></span></dt><dt><span class="section"><a href="ops.backup.html#ops.backup.live.copytable">1.7.3. Live Cluster Backup - CopyTable</a></span></dt><dt><span class="section"><a href="ops.backup.html#ops.backup.live.export">1.7.4. Live Cluster Backup - Export</a></span></dt></dl></dd><dt><span class="section"><a href="ops.snapshots.html">1.8. HBase Snapshots</a></span></dt><dd><dl><dt><span class="section"><a href="ops.snapshots.html#ops.snapshots.configuration">1.8.1. Configuration</a></span></dt><dt><span class="section"><a href="ops.snapshots.html#ops.snapshots.takeasnapshot">1.8.2. Take a Snapshot</a></span></dt><dt><span class="section"><a href="ops.snapshots.html#ops.snapshots.list">1.8.3. Listing Snapshots</a></span></dt><dt><span class="section"><a href="ops.snapshots.html#ops.snapshots.delete">1.8.4. Deleting Snapshots</a></span></dt><dt><span class="section"><a href="ops.snapshots.html#ops.snapshots.clone">1.8.5. Clone a table from snapshot</a></span></dt><dt><span class="section"><a href="ops.snapshots.html#ops.snapshots.restore">1.8.6. Restore a snapshot</a></span></dt><dt><span class="section"><a href="ops.snapshots.html#ops.snapshots.acls">1.8.7. Snapshots operations and ACLs</a></span></dt><dt><span class="section"><a href="ops.snapshots.html#ops.snapshots.export">1.8.8. Export to another cluster</a></span></dt></dl></dd><dt><span class="section"><a href="ops.capacity.html">1.9. Capacity Planning and Region Sizing</a></span></dt><dd><dl><dt><span class="section"><a href="ops.capacity.html#ops.capacity.nodes">1.9.1. Node count and hardware/VM configuration</a></span></dt><dt><span class="section"><a href="ops.capacity.html#ops.capacity.regions">1.9.2. Determining region count and size</a></span></dt><dt><span class="section"><a href="ops.capacity.html#ops.capacity.config">1.9.3. Initial configuration and tuning</a></span></dt></dl></dd><dt><span class="section"><a href="table.rename.html">1.10. Table Rename</a></span></dt></dl></div><p> This chapter will cover operational tools and practices required of a running Apache HBase
+    cluster. The subject of operations is related to the topics of <a class="xref" href="">???</a>, <a class="xref" href="">???</a>, and <a class="xref" href="">???</a> but is a distinct topic in itself. </p><div class="section" title="1.1.&nbsp;HBase Tools and Utilities"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="tools"></a>1.1.&nbsp;HBase Tools and Utilities</h2></div></div></div><p>HBase provides several tools for administration, analysis, and debugging of your cluster.
+      The entry-point to most of these tools is the <code class="filename">bin/hbase</code> command, though
+      some tools are available in the <code class="filename">dev-support/</code> directory.</p><p>To see usage instructions for <code class="filename">bin/hbase</code> command, run it with no
+      arguments, or with the <code class="option">-h</code> argument. These are the usage instructions for
+      HBase 0.98.x. Some commands, such as <span class="command"><strong>version</strong></span>, <span class="command"><strong>pe</strong></span>,
+        <span class="command"><strong>ltt</strong></span>, <span class="command"><strong>clean</strong></span>, are not available in previous
+      versions.</p><pre class="screen">
+$ <strong class="userinput"><code>bin/hbase</code></strong>
+Usage: hbase [&lt;options&gt;] &lt;command&gt; [&lt;args&gt;]
+Options:
+  --config DIR    Configuration direction to use. Default: ./conf
+  --hosts HOSTS   Override the list in 'regionservers' file
+
+Commands:
+Some commands take arguments. Pass no args or -h for usage.
+  shell           Run the HBase shell
+  hbck            Run the hbase 'fsck' tool
+  hlog            Write-ahead-log analyzer
+  hfile           Store file analyzer
+  zkcli           Run the ZooKeeper shell
+  upgrade         Upgrade hbase
+  master          Run an HBase HMaster node
+  regionserver    Run an HBase HRegionServer node
+  zookeeper       Run a Zookeeper server
+  rest            Run an HBase REST server
+  thrift          Run the HBase Thrift server
+  thrift2         Run the HBase Thrift2 server
+  clean           Run the HBase clean up script
+  classpath       Dump hbase CLASSPATH
+  mapredcp        Dump CLASSPATH entries required by mapreduce
+  pe              Run PerformanceEvaluation
+  ltt             Run LoadTestTool
+  version         Print the version
+  CLASSNAME       Run the class named CLASSNAME      
+    </pre><p>Some of the tools and utilities below are Java classes which are passed directly to the
+        <code class="filename">bin/hbase</code> command, as referred to in the last line of the usage
+      instructions. Others, such as <span class="command"><strong>hbase shell</strong></span> (<a class="xref" href="">???</a>),
+        <span class="command"><strong>hbase upgrade</strong></span> (<a class="xref" href="">???</a>), and <span class="command"><strong>hbase
+        thrift</strong></span> (<a class="xref" href="">???</a>), are documented elsewhere in this guide.</p><div class="section" title="1.1.1.&nbsp;Canary"><div class="titlepage"><div><div><h3 class="title"><a name="canary"></a>1.1.1.&nbsp;Canary</h3></div></div></div><p> There is a Canary class can help users to canary-test the HBase cluster status, with
+        every column-family for every regions or regionservers granularity. To see the usage, use
+        the <code class="literal">--help</code> parameter. </p><pre class="screen">$ ${HBASE_HOME}/bin/hbase org.apache.hadoop.hbase.tool.Canary -help
+
+Usage: bin/hbase org.apache.hadoop.hbase.tool.Canary [opts] [table1 [table2]...] | [regionserver1 [regionserver2]..]
+ where [opts] are:
+   -help          Show this help and exit.
+   -regionserver  replace the table argument to regionserver,
+      which means to enable regionserver mode
+   -daemon        Continuous check at defined intervals.
+   -interval &lt;N&gt;  Interval between checks (sec)
+   -e             Use region/regionserver as regular expression
+      which means the region/regionserver is regular expression pattern
+   -f &lt;B&gt;         stop whole program if first error occurs, default is true
+   -t &lt;N&gt;         timeout for a check, default is 600000 (milliseconds)</pre><p> This tool will return non zero error codes to user for collaborating with other
+        monitoring tools, such as Nagios. The error code definitions are: </p><pre class="programlisting">private static final int USAGE_EXIT_CODE = 1;
+private static final int INIT_ERROR_EXIT_CODE = 2;
+private static final int TIMEOUT_ERROR_EXIT_CODE = 3;
+private static final int ERROR_EXIT_CODE = 4;</pre><p> Here are some examples based on the following given case. There are two HTable called
+        test-01 and test-02, they have two column family cf1 and cf2 respectively, and deployed on
+        the 3 regionservers. see following table. </p><div class="informaltable"><table border="1"><colgroup><col align="center" class="regionserver"><col align="center" class="test-01"><col align="center" class="test-02"></colgroup><thead><tr><th align="center">RegionServer</th><th align="center">test-01</th><th align="center">test-02</th></tr></thead><tbody><tr><td align="center">rs1</td><td align="center">r1</td><td align="center">r2</td></tr><tr><td align="center">rs2</td><td align="center">r2</td><td align="center">&nbsp;</td></tr><tr><td align="center">rs3</td><td align="center">r2</td><td align="center">r1</td></tr></tbody></table></div><p> Following are some examples based on the previous given case. </p><div class="section" title="1.1.1.1.&nbsp;Canary test for every column family (store) of every region of every table"><div class="titlepage"><div><div><h4 class="title"><a name="d835e121"></a>1.1.1.1.&nbsp;Canary test for every column family (store) of every region of every table</h4></div></div></div><pre class="screen">$ ${HBASE_HOME}/bin/hbase org.apache.hadoop.hbase.tool.Canary
+            
+3/12/09 03:26:32 INFO tool.Canary: read from region test-01,,1386230156732.0e3c7d77ffb6361ea1b996ac1042ca9a. column family cf1 in 2ms
+13/12/09 03:26:32 INFO tool.Canary: read from region test-01,,1386230156732.0e3c7d77ffb6361ea1b996ac1042ca9a. column family cf2 in 2ms
+13/12/09 03:26:32 INFO tool.Canary: read from region test-01,0004883,1386230156732.87b55e03dfeade00f441125159f8ca87. column family cf1 in 4ms
+13/12/09 03:26:32 INFO tool.Canary: read from region test-01,0004883,1386230156732.87b55e03dfeade00f441125159f8ca87. column family cf2 in 1ms
+...
+13/12/09 03:26:32 INFO tool.Canary: read from region test-02,,1386559511167.aa2951a86289281beee480f107bb36ee. column family cf1 in 5ms
+13/12/09 03:26:32 INFO tool.Canary: read from region test-02,,1386559511167.aa2951a86289281beee480f107bb36ee. column family cf2 in 3ms
+13/12/09 03:26:32 INFO tool.Canary: read from region test-02,0004883,1386559511167.cbda32d5e2e276520712d84eaaa29d84. column family cf1 in 31ms
+13/12/09 03:26:32 INFO tool.Canary: read from region test-02,0004883,1386559511167.cbda32d5e2e276520712d84eaaa29d84. column family cf2 in 8ms
+</pre><p> So you can see, table test-01 has two regions and two column families, so the Canary
+          tool will pick 4 small piece of data from 4 (2 region * 2 store) different stores. This is
+          a default behavior of the this tool does. </p></div><div class="section" title="1.1.1.2.&nbsp;Canary test for every column family (store) of every region of specific table(s)"><div class="titlepage"><div><div><h4 class="title"><a name="d835e128"></a>1.1.1.2.&nbsp;Canary test for every column family (store) of every region of specific
+          table(s)</h4></div></div></div><p> You can also test one or more specific tables.</p><pre class="screen">$ ${HBASE_HOME}/bin/hbase orghapache.hadoop.hbase.tool.Canary test-01 test-02</pre></div><div class="section" title="1.1.1.3.&nbsp;Canary test with regionserver granularity"><div class="titlepage"><div><div><h4 class="title"><a name="d835e135"></a>1.1.1.3.&nbsp;Canary test with regionserver granularity</h4></div></div></div><p> This will pick one small piece of data from each regionserver, and can also put your
+          resionserver name as input options for canary-test specific regionservers.</p><pre class="screen">$ ${HBASE_HOME}/bin/hbase org.apache.hadoop.hbase.tool.Canary -regionserver
+            
+13/12/09 06:05:17 INFO tool.Canary: Read from table:test-01 on region server:rs2 in 72ms
+13/12/09 06:05:17 INFO tool.Canary: Read from table:test-02 on region server:rs3 in 34ms
+13/12/09 06:05:17 INFO tool.Canary: Read from table:test-01 on region server:rs1 in 56ms</pre></div><div class="section" title="1.1.1.4.&nbsp;Canary test with regular expression pattern"><div class="titlepage"><div><div><h4 class="title"><a name="d835e142"></a>1.1.1.4.&nbsp;Canary test with regular expression pattern</h4></div></div></div><p> This will test both table test-01 and test-02.</p><pre class="screen">$ ${HBASE_HOME}/bin/hbase orghapache.hadoop.hbase.tool.Canary -e test-0[1-2]</pre></div><div class="section" title="1.1.1.5.&nbsp;Run canary test as daemon mode"><div class="titlepage"><div><div><h4 class="title"><a name="d835e149"></a>1.1.1.5.&nbsp;Run canary test as daemon mode</h4></div></div></div><p> Run repeatedly with interval defined in option -interval whose default value is 6
+          seconds. This daemon will stop itself and return non-zero error code if any error occurs,
+          due to the default value of option -f is true.</p><pre class="screen">$ ${HBASE_HOME}/bin/hbase orghapache.hadoop.hbase.tool.Canary -daemon</pre><p>Run repeatedly with internal 5 seconds and will not stop itself even error occurs in
+          the test.</p><pre class="screen">$ ${HBASE_HOME}/bin/hbase orghapache.hadoop.hbase.tool.Canary -daemon -interval 50000 -f false</pre></div><div class="section" title="1.1.1.6.&nbsp;Force timeout if canary test stuck"><div class="titlepage"><div><div><h4 class="title"><a name="d835e160"></a>1.1.1.6.&nbsp;Force timeout if canary test stuck</h4></div></div></div><p>In some cases, we suffered the request stucked on the regionserver and not response
+          back to the client. The regionserver in problem, would also not indicated to be dead by
+          Master, which would bring the clients hung. So we provide the timeout option to kill the
+          canary test forcefully and return non-zero error code as well. This run sets the timeout
+          value to 60 seconds, the default value is 600 seconds.</p><pre class="screen">$ ${HBASE_HOME}/bin/hbase orghapache.hadoop.hbase.tool.Canary -t 600000</pre></div></div><div class="section" title="1.1.2.&nbsp;Health Checker"><div class="titlepage"><div><div><h3 class="title"><a name="health.check"></a>1.1.2.&nbsp;Health Checker</h3></div></div></div><p>You can configure HBase to run a script on a period and if it fails N times
+        (configurable), have the server exit. See <a class="link" href="" target="_top">HBASE-7351 Periodic health check script</a> for configurations and
+        detail. </p></div><div class="section" title="1.1.3.&nbsp;Driver"><div class="titlepage"><div><div><h3 class="title"><a name="driver"></a>1.1.3.&nbsp;Driver</h3></div></div></div><p>Several frequently-accessed utilities are provided as <code class="code">Driver</code> classes, and executed by
+        the <code class="filename">bin/hbase</code> command. These utilities represent MapReduce jobs which
+        run on your cluster. They are run in the following way, replacing
+          <em class="replaceable"><code>UtilityName</code></em> with the utility you want to run. This command
+        assumes you have set the environment variable <code class="literal">HBASE_HOME</code> to the directory
+        where HBase is unpacked on your server.</p><pre class="screen">
+${HBASE_HOME}/bin/hbase org.apache.hadoop.hbase.mapreduce.<em class="replaceable"><code>UtilityName</code></em>        
+      </pre><p>The following utilities are available:</p><div class="variablelist"><dl><dt><span class="term"><span class="command"><strong>LoadIncrementalHFiles</strong></span></span></dt><dd><p>Complete a bulk data load.</p></dd><dt><span class="term"><span class="command"><strong>CopyTable</strong></span></span></dt><dd><p>Export a table from the local cluster to a peer cluster.</p></dd><dt><span class="term"><span class="command"><strong>Export</strong></span></span></dt><dd><p>Write table data to HDFS.</p></dd><dt><span class="term"><span class="command"><strong>Import</strong></span></span></dt><dd><p>Import data written by a previous <span class="command"><strong>Export</strong></span> operation.</p></dd><dt><span class="term"><span class="command"><strong>ImportTsv</strong></span></span></dt><dd><p>Import data in TSV format.</p></dd><dt><span class="term"><span class="command"><strong>RowCounter</strong></span></span></dt><dd><p>Count rows in an HBase table.</p></dd><dt><span class="term"><span class="command"><strong>replication.VerifyReplication</strong></span></span></dt><dd><p>Compare the data from tables in two different clusters. WARNING: It
+            doesn't work for incrementColumnValues'd cells since the timestamp is changed. Note that
+          this command is in a different package than the others.</p></dd></dl></div><p>Each command except <span class="command"><strong>RowCounter</strong></span> accepts a single
+        <code class="literal">--help</code> argument to print usage instructions.</p></div><div class="section" title="1.1.4.&nbsp;HBase hbck"><div class="titlepage"><div><div><h3 class="title"><a name="hbck"></a>1.1.4.&nbsp;HBase <span class="application">hbck</span></h3></div><div><h4 class="subtitle">An <span class="command"><strong>fsck</strong></span> for your HBase install</h4></div></div></div><p>To run <span class="application">hbck</span> against your HBase cluster run <span class="command"><strong>$
+          ./bin/hbase hbck</strong></span> At the end of the command's output it prints
+          <code class="literal">OK</code> or <code class="literal">INCONSISTENCY</code>. If your cluster reports
+        inconsistencies, pass <span class="command"><strong>-details</strong></span> to see more detail emitted. If
+        inconsistencies, run <span class="command"><strong>hbck</strong></span> a few times because the inconsistency may be
+        transient (e.g. cluster is starting up or a region is splitting). Passing
+          <span class="command"><strong>-fix</strong></span> may correct the inconsistency (This latter is an experimental
+        feature). </p><p>For more information, see <a class="xref" href="">???</a>. </p></div><div class="section" title="1.1.5.&nbsp;HFile Tool"><div class="titlepage"><div><div><h3 class="title"><a name="hfile_tool2"></a>1.1.5.&nbsp;HFile Tool</h3></div></div></div><p>See <a class="xref" href="">???</a>.</p></div><div class="section" title="1.1.6.&nbsp;WAL Tools"><div class="titlepage"><div><div><h3 class="title"><a name="wal_tools"></a>1.1.6.&nbsp;WAL Tools</h3></div></div></div><div class="section" title="1.1.6.1.&nbsp;FSHLog tool"><div class="titlepage"><div><div><h4 class="title"><a name="hlog_tool"></a>1.1.6.1.&nbsp;<code class="classname">FSHLog</code> tool</h4></div></div></div><p>The main method on <code class="classname">FSHLog</code> offers manual split and dump
+          facilities. Pass it WALs or the product of a split, the content of the
+            <code class="filename">recovered.edits</code>. directory.</p><p>You can get a textual dump of a WAL file content by doing the following:</p><pre class="screen"> $ ./bin/hbase org.apache.hadoop.hbase.regionserver.wal.FSHLog --dump hdfs://example.org:8020/hbase/.logs/example.org,60020,1283516293161/10.10.21.10%3A60020.1283973724012 </pre><p>The return code will be non-zero if issues with the file so you can test wholesomeness
+          of file by redirecting <code class="varname">STDOUT</code> to <code class="code">/dev/null</code> and testing the
+          program return.</p><p>Similarly you can force a split of a log file directory by doing:</p><pre class="screen"> $ ./bin/hbase org.apache.hadoop.hbase.regionserver.wal.FSHLog --split hdfs://example.org:8020/hbase/.logs/example.org,60020,1283516293161/</pre><div class="section" title="1.1.6.1.1.&nbsp;HLogPrettyPrinter"><div class="titlepage"><div><div><h5 class="title"><a name="hlog_tool.prettyprint"></a>1.1.6.1.1.&nbsp;<code class="classname">HLogPrettyPrinter</code></h5></div></div></div><p><code class="classname">HLogPrettyPrinter</code> is a tool with configurable options to
+            print the contents of an HLog. </p></div></div></div><div class="section" title="1.1.7.&nbsp;Compression Tool"><div class="titlepage"><div><div><h3 class="title"><a name="compression.tool"></a>1.1.7.&nbsp;Compression Tool</h3></div></div></div><p>See <a class="xref" href="">???</a>.</p></div><div class="section" title="1.1.8.&nbsp;CopyTable"><div class="titlepage"><div><div><h3 class="title"><a name="copytable"></a>1.1.8.&nbsp;CopyTable</h3></div></div></div><p> CopyTable is a utility that can copy part or of all of a table, either to the same
+        cluster or another cluster. The target table must first exist. The usage is as
+        follows:</p><pre class="screen">
+$ <strong class="userinput"><code>./bin/hbase org.apache.hadoop.hbase.mapreduce.CopyTable --help </code></strong>       
+/bin/hbase org.apache.hadoop.hbase.mapreduce.CopyTable --help
+Usage: CopyTable [general options] [--starttime=X] [--endtime=Y] [--new.name=NEW] [--peer.adr=ADR] &lt;tablename&gt;
+
+Options:
+ rs.class     hbase.regionserver.class of the peer cluster, 
+              specify if different from current cluster
+ rs.impl      hbase.regionserver.impl of the peer cluster,
+ startrow     the start row
+ stoprow      the stop row
+ starttime    beginning of the time range (unixtime in millis)
+              without endtime means from starttime to forever
+ endtime      end of the time range.  Ignored if no starttime specified.
+ versions     number of cell versions to copy
+ new.name     new table's name
+ peer.adr     Address of the peer cluster given in the format
+              hbase.zookeeer.quorum:hbase.zookeeper.client.port:zookeeper.znode.parent
+ families     comma-separated list of families to copy
+              To copy from cf1 to cf2, give sourceCfName:destCfName.
+              To keep the same name, just give "cfName"
+ all.cells    also copy delete markers and deleted cells
+
+Args:
+ tablename    Name of the table to copy
+
+Examples:
+ To copy 'TestTable' to a cluster that uses replication for a 1 hour window:
+ $ bin/hbase org.apache.hadoop.hbase.mapreduce.CopyTable --starttime=1265875194289 --endtime=1265878794289 --peer.adr=server1,server2,server3:2181:/hbase --families=myOldCf:myNewCf,cf2,cf3 TestTable
+
+For performance consider the following general options:
+  It is recommended that you set the following to &gt;=100. A higher value uses more memory but
+  decreases the round trip time to the server and may increase performance.
+    -Dhbase.client.scanner.caching=100
+  The following should always be set to false, to prevent writing data twice, which may produce
+  inaccurate results.
+    -Dmapred.map.tasks.speculative.execution=false       
+      </pre><div class="note" title="Scanner Caching" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Scanner Caching</h3><p>Caching for the input Scan is configured via <code class="code">hbase.client.scanner.caching</code>
+          in the job configuration. </p></div><div class="note" title="Versions" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Versions</h3><p>By default, CopyTable utility only copies the latest version of row cells unless
+            <code class="code">--versions=n</code> is explicitly specified in the command. </p></div><p> See Jonathan Hsieh's <a class="link" href="http://www.cloudera.com/blog/2012/06/online-hbase-backups-with-copytable-2/" target="_top">Online
+          HBase Backups with CopyTable</a> blog post for more on <span class="command"><strong>CopyTable</strong></span>.
+      </p></div><div class="section" title="1.1.9.&nbsp;Export"><div class="titlepage"><div><div><h3 class="title"><a name="export"></a>1.1.9.&nbsp;Export</h3></div></div></div><p>Export is a utility that will dump the contents of table to HDFS in a sequence file.
+        Invoke via:</p><pre class="screen">$ bin/hbase org.apache.hadoop.hbase.mapreduce.Export &lt;tablename&gt; &lt;outputdir&gt; [&lt;versions&gt; [&lt;starttime&gt; [&lt;endtime&gt;]]]
+</pre><p>Note: caching for the input Scan is configured via
+          <code class="code">hbase.client.scanner.caching</code> in the job configuration. </p></div><div class="section" title="1.1.10.&nbsp;Import"><div class="titlepage"><div><div><h3 class="title"><a name="import"></a>1.1.10.&nbsp;Import</h3></div></div></div><p>Import is a utility that will load data that has been exported back into HBase. Invoke
+        via:</p><pre class="screen">$ bin/hbase org.apache.hadoop.hbase.mapreduce.Import &lt;tablename&gt; &lt;inputdir&gt;
+</pre><p>To import 0.94 exported files in a 0.96 cluster or onwards, you need to set system
+        property "hbase.import.version" when running the import command as below:</p><pre class="screen">$ bin/hbase -Dhbase.import.version=0.94 org.apache.hadoop.hbase.mapreduce.Import &lt;tablename&gt; &lt;inputdir&gt;
+</pre></div><div class="section" title="1.1.11.&nbsp;ImportTsv"><div class="titlepage"><div><div><h3 class="title"><a name="importtsv"></a>1.1.11.&nbsp;ImportTsv</h3></div></div></div><p>ImportTsv is a utility that will load data in TSV format into HBase. It has two distinct
+        usages: loading data from TSV format in HDFS into HBase via Puts, and preparing StoreFiles
+        to be loaded via the <code class="code">completebulkload</code>. </p><p>To load data via Puts (i.e., non-bulk loading):</p><pre class="screen">$ bin/hbase org.apache.hadoop.hbase.mapreduce.ImportTsv -Dimporttsv.columns=a,b,c &lt;tablename&gt; &lt;hdfs-inputdir&gt;
+</pre><p>To generate StoreFiles for bulk-loading:</p><pre class="programlisting">$ bin/hbase org.apache.hadoop.hbase.mapreduce.ImportTsv -Dimporttsv.columns=a,b,c -Dimporttsv.bulk.output=hdfs://storefile-outputdir &lt;tablename&gt; &lt;hdfs-data-inputdir&gt;
+</pre><p>These generated StoreFiles can be loaded into HBase via <a class="xref" href="ops_mgt.html#completebulkload" title="1.1.12.&nbsp;CompleteBulkLoad">Section&nbsp;1.1.12, &#8220;CompleteBulkLoad&#8221;</a>. </p><div class="section" title="1.1.11.1.&nbsp;ImportTsv Options"><div class="titlepage"><div><div><h4 class="title"><a name="importtsv.options"></a>1.1.11.1.&nbsp;ImportTsv Options</h4></div></div></div><p>Running <span class="command"><strong>ImportTsv</strong></span> with no arguments prints brief usage
+          information:</p><pre class="screen">
+Usage: importtsv -Dimporttsv.columns=a,b,c &lt;tablename&gt; &lt;inputdir&gt;
+
+Imports the given input directory of TSV data into the specified table.
+
+The column names of the TSV data must be specified using the -Dimporttsv.columns
+option. This option takes the form of comma-separated column names, where each
+column name is either a simple column family, or a columnfamily:qualifier. The special
+column name HBASE_ROW_KEY is used to designate that this column should be used
+as the row key for each imported record. You must specify exactly one column
+to be the row key, and you must specify a column name for every column that exists in the
+input data.
+
+By default importtsv will load data directly into HBase. To instead generate
+HFiles of data to prepare for a bulk data load, pass the option:
+  -Dimporttsv.bulk.output=/path/for/output
+  Note: the target table will be created with default column family descriptors if it does not already exist.
+
+Other options that may be specified with -D include:
+  -Dimporttsv.skip.bad.lines=false - fail if encountering an invalid line
+  '-Dimporttsv.separator=|' - eg separate on pipes instead of tabs
+  -Dimporttsv.timestamp=currentTimeAsLong - use the specified timestamp for the import
+  -Dimporttsv.mapper.class=my.Mapper - A user-defined Mapper to use instead of org.apache.hadoop.hbase.mapreduce.TsvImporterMapper
+        </pre></div><div class="section" title="1.1.11.2.&nbsp;ImportTsv Example"><div class="titlepage"><div><div><h4 class="title"><a name="importtsv.example"></a>1.1.11.2.&nbsp;ImportTsv Example</h4></div></div></div><p>For example, assume that we are loading data into a table called 'datatsv' with a
+          ColumnFamily called 'd' with two columns "c1" and "c2". </p><p>Assume that an input file exists as follows:
+          </p><pre class="screen">
+row1	c1	c2
+row2	c1	c2
+row3	c1	c2
+row4	c1	c2
+row5	c1	c2
+row6	c1	c2
+row7	c1	c2
+row8	c1	c2
+row9	c1	c2
+row10	c1	c2
+          </pre><p>
+        </p><p>For ImportTsv to use this imput file, the command line needs to look like this:</p><pre class="screen">
+ HADOOP_CLASSPATH=`${HBASE_HOME}/bin/hbase classpath` ${HADOOP_HOME}/bin/hadoop jar ${HBASE_HOME}/hbase-server-VERSION.jar importtsv -Dimporttsv.columns=HBASE_ROW_KEY,d:c1,d:c2 -Dimporttsv.bulk.output=hdfs://storefileoutput datatsv hdfs://inputfile
+ </pre><p> ... and in this example the first column is the rowkey, which is why the
+          HBASE_ROW_KEY is used. The second and third columns in the file will be imported as "d:c1"
+          and "d:c2", respectively. </p></div><div class="section" title="1.1.11.3.&nbsp;ImportTsv Warning"><div class="titlepage"><div><div><h4 class="title"><a name="importtsv.warning"></a>1.1.11.3.&nbsp;ImportTsv Warning</h4></div></div></div><p>If you have preparing a lot of data for bulk loading, make sure the target HBase table
+          is pre-split appropriately. </p></div><div class="section" title="1.1.11.4.&nbsp;See Also"><div class="titlepage"><div><div><h4 class="title"><a name="importtsv.also"></a>1.1.11.4.&nbsp;See Also</h4></div></div></div><p>For more information about bulk-loading HFiles into HBase, see <a class="xref" href="">???</a></p></div></div><div class="section" title="1.1.12.&nbsp;CompleteBulkLoad"><div class="titlepage"><div><div><h3 class="title"><a name="completebulkload"></a>1.1.12.&nbsp;CompleteBulkLoad</h3></div></div></div><p>The <code class="code">completebulkload</code> utility will move generated StoreFiles into an HBase
+        table. This utility is often used in conjunction with output from <a class="xref" href="ops_mgt.html#importtsv" title="1.1.11.&nbsp;ImportTsv">Section&nbsp;1.1.11, &#8220;ImportTsv&#8221;</a>. </p><p>There are two ways to invoke this utility, with explicit classname and via the
+        driver:</p><pre class="screen">$ bin/hbase org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles &lt;hdfs://storefileoutput&gt; &lt;tablename&gt;
+</pre><p> .. and via the Driver..</p><pre class="screen">HADOOP_CLASSPATH=`${HBASE_HOME}/bin/hbase classpath` ${HADOOP_HOME}/bin/hadoop jar ${HBASE_HOME}/hbase-server-VERSION.jar completebulkload &lt;hdfs://storefileoutput&gt; &lt;tablename&gt;
+</pre><div class="section" title="1.1.12.1.&nbsp;CompleteBulkLoad Warning"><div class="titlepage"><div><div><h4 class="title"><a name="completebulkload.warning"></a>1.1.12.1.&nbsp;CompleteBulkLoad Warning</h4></div></div></div><p>Data generated via MapReduce is often created with file permissions that are not
+          compatible with the running HBase process. Assuming you're running HDFS with permissions
+          enabled, those permissions will need to be updated before you run CompleteBulkLoad.</p><p>For more information about bulk-loading HFiles into HBase, see <a class="xref" href="">???</a>. </p></div></div><div class="section" title="1.1.13.&nbsp;WALPlayer"><div class="titlepage"><div><div><h3 class="title"><a name="walplayer"></a>1.1.13.&nbsp;WALPlayer</h3></div></div></div><p>WALPlayer is a utility to replay WAL files into HBase. </p><p>The WAL can be replayed for a set of tables or all tables, and a timerange can be
+        provided (in milliseconds). The WAL is filtered to this set of tables. The output can
+        optionally be mapped to another set of tables. </p><p>WALPlayer can also generate HFiles for later bulk importing, in that case only a single
+        table and no mapping can be specified. </p><p>Invoke via:</p><pre class="screen">$ bin/hbase org.apache.hadoop.hbase.mapreduce.WALPlayer [options] &lt;wal inputdir&gt; &lt;tables&gt; [&lt;tableMappings&gt;]&gt;
+</pre><p>For example:</p><pre class="screen">$ bin/hbase org.apache.hadoop.hbase.mapreduce.WALPlayer /backuplogdir oldTable1,oldTable2 newTable1,newTable2
+</pre><p> WALPlayer, by default, runs as a mapreduce job. To NOT run WALPlayer as a mapreduce job
+        on your cluster, force it to run all in the local process by adding the flags
+          <code class="code">-Dmapreduce.jobtracker.address=local</code> on the command line. </p></div><div class="section" title="1.1.14.&nbsp;RowCounter and CellCounter"><div class="titlepage"><div><div><h3 class="title"><a name="rowcounter"></a>1.1.14.&nbsp;RowCounter and CellCounter</h3></div></div></div><p><a class="link" href="http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/mapreduce/RowCounter.html" target="_top">RowCounter</a>
+        is a mapreduce job to count all the rows of a table. This is a good utility to use as a
+        sanity check to ensure that HBase can read all the blocks of a table if there are any
+        concerns of metadata inconsistency. It will run the mapreduce all in a single process but it
+        will run faster if you have a MapReduce cluster in place for it to exploit.</p><pre class="screen">$ bin/hbase org.apache.hadoop.hbase.mapreduce.RowCounter &lt;tablename&gt; [&lt;column1&gt; &lt;column2&gt;...]
+</pre><p>Note: caching for the input Scan is configured via
+          <code class="code">hbase.client.scanner.caching</code> in the job configuration. </p><p>HBase ships another diagnostic mapreduce job called <a class="link" href="http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/mapreduce/CellCounter.html" target="_top">CellCounter</a>.
+        Like RowCounter, it gathers more fine-grained statistics about your table. The statistics
+        gathered by RowCounter are more fine-grained and include: </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Total number of rows in the table.</p></li><li class="listitem"><p>Total number of CFs across all rows.</p></li><li class="listitem"><p>Total qualifiers across all rows.</p></li><li class="listitem"><p>Total occurrence of each CF.</p></li><li class="listitem"><p>Total occurrence of each qualifier.</p></li><li class="listitem"><p>Total number of versions of each qualifier.</p></li></ul></div><p>The program allows you to limit the scope of the run. Provide a row regex or prefix to
+        limit the rows to analyze. Use <code class="code">hbase.mapreduce.scan.column.family</code> to specify
+        scanning a single column family.</p><pre class="screen">$ bin/hbase org.apache.hadoop.hbase.mapreduce.CellCounter &lt;tablename&gt; &lt;outputDir&gt; [regex or prefix]</pre><p>Note: just like RowCounter, caching for the input Scan is configured via
+          <code class="code">hbase.client.scanner.caching</code> in the job configuration. </p></div><div class="section" title="1.1.15.&nbsp;mlockall"><div class="titlepage"><div><div><h3 class="title"><a name="mlockall"></a>1.1.15.&nbsp;mlockall</h3></div></div></div><p>It is possible to optionally pin your servers in physical memory making them less likely
+        to be swapped out in oversubscribed environments by having the servers call <a class="link" href="http://linux.die.net/man/2/mlockall" target="_top">mlockall</a> on startup. See <a class="link" href="https://issues.apache.org/jira/browse/HBASE-4391" target="_top">HBASE-4391 Add ability to
+          start RS as root and call mlockall</a> for how to build the optional library and have
+        it run on startup. </p></div><div class="section" title="1.1.16.&nbsp;Offline Compaction Tool"><div class="titlepage"><div><div><h3 class="title"><a name="compaction.tool"></a>1.1.16.&nbsp;Offline Compaction Tool</h3></div></div></div><p>See the usage for the <a class="link" href="http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/regionserver/CompactionTool.html" target="_top">Compaction
+          Tool</a>. Run it like this <span class="command"><strong>./bin/hbase
+          org.apache.hadoop.hbase.regionserver.CompactionTool</strong></span>
+      </p></div><div class="section" title="1.1.17.&nbsp;hbase clean"><div class="titlepage"><div><div><h3 class="title"><a name="d835e586"></a>1.1.17.&nbsp;<span class="command"><strong>hbase clean</strong></span></h3></div></div></div><p>The <span class="command"><strong>hbase clean</strong></span> command cleans HBase data from ZooKeeper, HDFS, or
+        both. It is appropriate to use for testing. Run it with no options for usage instructions.
+        The <span class="command"><strong>hbase clean</strong></span> command was introduced in HBase 0.98.</p><pre class="screen">
+$ <strong class="userinput"><code>bin/hbase clean</code></strong>
+Usage: hbase clean (--cleanZk|--cleanHdfs|--cleanAll)
+Options:
+        --cleanZk   cleans hbase related data from zookeeper.
+        --cleanHdfs cleans hbase related data from hdfs.
+        --cleanAll  cleans hbase related data from both zookeeper and hdfs.        
+      </pre></div><div class="section" title="1.1.18.&nbsp;hbase pe"><div class="titlepage"><div><div><h3 class="title"><a name="d835e603"></a>1.1.18.&nbsp;<span class="command"><strong>hbase pe</strong></span></h3></div></div></div><p>The <span class="command"><strong>hbase pe</strong></span> command is a shortcut provided to run the
+          <code class="code">org.apache.hadoop.hbase.PerformanceEvaluation</code> tool, which is used for
+        testing. The <span class="command"><strong>hbase pe</strong></span> command was introduced in HBase 0.98.4.</p><p>The PerformanceEvaluation tool accepts many different options and commands. For usage
+        instructions, run the command with no options.</p><p>To run PerformanceEvaluation prior to HBase 0.98.4, issue the command
+          <span class="command"><strong>hbase org.apache.hadoop.hbase.PerformanceEvaluation</strong></span>.</p><p>The PerformanceEvaluation tool has received many updates in recent HBase releases,
+        including support for namespaces, support for tags, cell-level ACLs and visibility labels,
+        multiget support for RPC calls, increased sampling sizes, an option to randomly sleep during
+        testing, and ability to "warm up" the cluster before testing starts.</p></div><div class="section" title="1.1.19.&nbsp;hbase ltt"><div class="titlepage"><div><div><h3 class="title"><a name="d835e627"></a>1.1.19.&nbsp;<span class="command"><strong>hbase ltt</strong></span></h3></div></div></div><p>The <span class="command"><strong>hbase ltt</strong></span> command is a shortcut provided to run the
+        <code class="code">org.apache.hadoop.hbase.util.LoadTestTool</code> utility, which is used for
+        testing. The <span class="command"><strong>hbase ltt</strong></span> command was introduced in HBase 0.98.4.</p><p>You must specify either <code class="option">-write</code> or <code class="option">-update-read</code> as the
+        first option. For general usage instructions, pass the <code class="option">-h</code> option.</p><p>To run LoadTestTool prior to HBase 0.98.4, issue the command <span class="command"><strong>hbase
+          org.apache.hadoop.hbase.util.LoadTestTool</strong></span>.</p><p>The LoadTestTool has received many updates in recent HBase releases, including support
+        for namespaces, support for tags, cell-level ACLS and visibility labels, testing
+        security-related features, ability to specify the number of regions per server, tests for
+        multi-get RPC calls, and tests relating to replication.</p></div></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left">&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ops.regionmgt.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right" valign="top">&nbsp;1.2.&nbsp;Region Management</td></tr></table></div></body></html>

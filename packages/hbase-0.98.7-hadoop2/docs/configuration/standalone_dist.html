@@ -1,0 +1,97 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>1.2.&nbsp;HBase run modes: Standalone and Distributed</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="configuration.html" title="Chapter&nbsp;1.&nbsp;Apache HBase Configuration"><link rel="up" href="configuration.html" title="Chapter&nbsp;1.&nbsp;Apache HBase Configuration"><link rel="prev" href="configuration.html" title="Chapter&nbsp;1.&nbsp;Apache HBase Configuration"><link rel="next" href="confirm.html" title="1.3.&nbsp;Running and Confirming Your Installation"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1.2.&nbsp;HBase run modes: Standalone and Distributed</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="configuration.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="confirm.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/standalone_dist.html';
+    </script><div class="section" title="1.2.&nbsp;HBase run modes: Standalone and Distributed"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="standalone_dist"></a>1.2.&nbsp;HBase run modes: Standalone and Distributed</h2></div></div></div><p>HBase has two run modes: <a class="xref" href="standalone_dist.html#standalone" title="1.2.1.&nbsp;Standalone HBase">Section&nbsp;1.2.1, &#8220;Standalone HBase&#8221;</a> and <a class="xref" href="standalone_dist.html#distributed" title="1.2.2.&nbsp;Distributed">Section&nbsp;1.2.2, &#8220;Distributed&#8221;</a>. Out of the box, HBase runs in standalone mode. Whatever your mode,
+      you will need to configure HBase by editing files in the HBase <code class="filename">conf</code>
+      directory. At a minimum, you must edit <code class="code">conf/hbase-env.sh</code> to tell HBase which
+        <span class="command"><strong>java</strong></span> to use. In this file you set HBase environment variables such as the
+      heapsize and other options for the <span class="application">JVM</span>, the preferred location for
+      log files, etc. Set <code class="varname">JAVA_HOME</code> to point at the root of your
+        <span class="command"><strong>java</strong></span> install.</p><div class="section" title="1.2.1.&nbsp;Standalone HBase"><div class="titlepage"><div><div><h3 class="title"><a name="standalone"></a>1.2.1.&nbsp;Standalone HBase</h3></div></div></div><p>This is the default mode. Standalone mode is what is described in the <a class="xref" href="">???</a> section. In standalone mode, HBase does not use HDFS -- it uses
+        the local filesystem instead -- and it runs all HBase daemons and a local ZooKeeper all up
+        in the same JVM. Zookeeper binds to a well known port so clients may talk to HBase.</p></div><div class="section" title="1.2.2.&nbsp;Distributed"><div class="titlepage"><div><div><h3 class="title"><a name="distributed"></a>1.2.2.&nbsp;Distributed</h3></div></div></div><p>Distributed mode can be subdivided into distributed but all daemons run on a single node
+        -- a.k.a <span class="emphasis"><em>pseudo-distributed</em></span>-- and
+          <span class="emphasis"><em>fully-distributed</em></span> where the daemons are spread across all nodes in
+        the cluster. The pseudo-distributed vs fully-distributed nomenclature comes from Hadoop.</p><p>Pseudo-distributed mode can run against the local filesystem or it can run against an
+        instance of the <span class="emphasis"><em>Hadoop Distributed File System</em></span> (HDFS).
+        Fully-distributed mode can ONLY run on HDFS. See the Hadoop <a class="link" href="http://hadoop.apache.org/common/docs/r1.1.1/api/overview-summary.html#overview_description" target="_top">
+          requirements and instructions</a> for how to set up HDFS for Hadoop 1.x. A good
+        walk-through for setting up HDFS on Hadoop 2 is at <a class="link" href="http://www.alexjf.net/blog/distributed-systems/hadoop-yarn-installation-definitive-guide" target="_top">http://www.alexjf.net/blog/distributed-systems/hadoop-yarn-installation-definitive-guide</a>.</p><p>Below we describe the different distributed setups. Starting, verification and
+        exploration of your install, whether a <span class="emphasis"><em>pseudo-distributed</em></span> or
+          <span class="emphasis"><em>fully-distributed</em></span> configuration is described in a section that
+        follows, <a class="xref" href="confirm.html" title="1.3.&nbsp;Running and Confirming Your Installation">Section&nbsp;1.3, &#8220;Running and Confirming Your Installation&#8221;</a>. The same verification script applies to both deploy types.</p><div class="section" title="1.2.2.1.&nbsp;Pseudo-distributed"><div class="titlepage"><div><div><h4 class="title"><a name="pseudo"></a>1.2.2.1.&nbsp;Pseudo-distributed</h4></div></div></div><div class="note" title="Pseudo-Distributed Quickstart" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Pseudo-Distributed Quickstart</h3><p>A quickstart has been added to the <a class="xref" href="">???</a> chapter. See <a class="xref" href="">???</a>. Some of the information that was originally in this
+            section has been moved there.</p></div><p>A pseudo-distributed mode is simply a fully-distributed mode run on a single host. Use
+          this configuration testing and prototyping on HBase. Do not use this configuration for
+          production nor for evaluating HBase performance.</p></div></div><div class="section" title="1.2.3.&nbsp;Fully-distributed"><div class="titlepage"><div><div><h3 class="title"><a name="fully_dist"></a>1.2.3.&nbsp;Fully-distributed</h3></div></div></div><p>By default, HBase runs in standalone mode. Both standalone mode and pseudo-distributed
+        mode are provided for the purposes of small-scale testing. For a production environment,
+        distributed mode is appropriate. In distributed mode, multiple instances of HBase daemons
+        run on multiple servers in the cluster.</p><p>Just as in pseudo-distributed mode, a fully distributed configuration requires that you
+        set the <code class="code">hbase-cluster.distributed</code> property to <code class="literal">true</code>.
+        Typically, the <code class="code">hbase.rootdir</code> is configured to point to a highly-available HDFS
+        filesystem. </p><p>In addition, the cluster is configured so that multiple cluster nodes enlist as
+        RegionServers, ZooKeeper QuorumPeers, and backup HMaster servers. These configuration basics
+        are all demonstrated in <a class="xref" href="">???</a>.</p><p title="Distributed RegionServers"><a name="regionserver"></a><b>Distributed RegionServers.&nbsp;</b>Typically, your cluster will contain multiple RegionServers all running on different
+          servers, as well as primary and backup Master and Zookeeper daemons. The
+            <code class="filename">conf/regionservers</code> file on the master server contains a list of
+          hosts whose RegionServers are associated with this cluster. Each host is on a separate
+          line. All hosts listed in this file will have their RegionServer processes started and
+          stopped when the master server starts or stops.</p><p title="ZooKeeper and HBase"><a name="hbase.zookeeper"></a><b>ZooKeeper and HBase.&nbsp;</b>See section <a class="xref" href="">???</a> for ZooKeeper setup for HBase.</p><div class="example"><a name="d1560e837"></a><p class="title"><b>Example&nbsp;1.2.&nbsp;Example Distributed HBase Cluster</b></p><div class="example-contents"><p>This is a bare-bones <code class="filename">conf/hbase-site.xml</code> for a distributed HBase
+          cluster. A cluster that is used for real-world work would contain more custom
+          configuration parameters. Most HBase configuration directives have default values, which
+          are used unless the value is overridden in the <code class="filename">hbase-site.xml</code>. See <a class="xref" href="config.files.html" title="1.4.&nbsp;Configuration Files">Section&nbsp;1.4, &#8220;Configuration Files&#8221;</a> for more information.</p><pre class="programlisting">
+&lt;configuration&gt;
+  &lt;property&gt;
+    &lt;name&gt;hbase.rootdir&lt;/name&gt;
+    &lt;value&gt;hdfs://namenode.example.org:8020/hbase&lt;/value&gt;
+  &lt;/property&gt;
+  &lt;property&gt;
+    &lt;name&gt;hbase.cluster.distributed&lt;/name&gt;
+    &lt;value&gt;true&lt;/value&gt;
+  &lt;/property&gt;
+  &lt;property&gt;
+      &lt;name&gt;hbase.zookeeper.quorum&lt;/name&gt;
+      &lt;value&gt;node-a.example.com,node-b.example.com,node-c.example.com&lt;/value&gt;
+    &lt;/property&gt;
+&lt;/configuration&gt;
+
+        </pre><p>This is an example <code class="filename">conf/regionservers</code> file, which contains a list
+          of each node that should run a RegionServer in the cluster. These nodes need HBase
+          installed and they need to use the same contents of the <code class="filename">conf/</code>
+          directory as the Master server..</p><pre class="programlisting">
+node-a.example.com
+node-b.example.com
+node-c.example.com
+        </pre><p>This is an example <code class="filename">conf/backup-masters</code> file, which contains a
+          list of each node that should run a backup Master instance. The backup Master instances
+          will sit idle unless the main Master becomes unavailable.</p><pre class="programlisting">
+node-b.example.com
+node-c.example.com
+        </pre></div></div><br class="example-break"><p title="Distributed HBase Quickstart"><b>Distributed HBase Quickstart.&nbsp;</b>See <a class="xref" href="">???</a> for a walk-through of a simple three-node
+          cluster configuration with multiple ZooKeeper, backup HMaster, and RegionServer
+          instances.</p><div class="procedure" title="Procedure&nbsp;1.1.&nbsp;HDFS Client Configuration"><a name="hdfs_client_conf"></a><p class="title"><b>Procedure&nbsp;1.1.&nbsp;HDFS Client Configuration</b></p><ul class="procedure"><li class="step" title="Step 1"><p>Of note, if you have made HDFS client configuration on your Hadoop cluster, such as
+            configuration directives for HDFS clients, as opposed to server-side configurations, you
+            must use one of the following methods to enable HBase to see and use these configuration
+            changes:</p><ul class="stepalternatives">
+            <li class="step" title="Step 1.1"><p>Add a pointer to your <code class="varname">HADOOP_CONF_DIR</code> to the
+                  <code class="varname">HBASE_CLASSPATH</code> environment variable in
+                  <code class="filename">hbase-env.sh</code>.</p></li>
+
+            <li class="step" title="Step 1.2"><p>Add a copy of <code class="filename">hdfs-site.xml</code> (or
+                  <code class="filename">hadoop-site.xml</code>) or, better, symlinks, under
+                  <code class="filename">${HBASE_HOME}/conf</code>, or</p></li>
+
+            <li class="step" title="Step 1.3"><p>if only a small set of HDFS client configurations, add them to
+                  <code class="filename">hbase-site.xml</code>.</p></li>
+          </ul></li></ul></div><p>An example of such an HDFS client configuration is <code class="varname">dfs.replication</code>.
+        If for example, you want to run with a replication factor of 5, hbase will create files with
+        the default of 3 unless you do the above to make the configuration available to
+        HBase.</p></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="configuration.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="confirm.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;1.&nbsp;Apache HBase Configuration&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="configuration.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;1.3.&nbsp;Running and Confirming Your Installation</td></tr></table></div></body></html>

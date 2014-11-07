@@ -1,0 +1,75 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>Appendix&nbsp;E.&nbsp;Compression and Data Block Encoding In HBase</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="prev" href="appendix_acl_matrix.html" title="Appendix&nbsp;D.&nbsp;Access Control Matrix"><link rel="next" href="hadoop.native.lib.html" title="E.2.&nbsp;Making use of Hadoop Native Libraries in HBase"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Appendix&nbsp;E.&nbsp;Compression and Data Block Encoding In
+          HBase</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="appendix_acl_matrix.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="hadoop.native.lib.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/compression.html';
+    </script><div class="appendix" title="Appendix&nbsp;E.&nbsp;Compression and Data Block Encoding In HBase"><div class="titlepage"><div><div><h2 class="title"><a name="compression"></a>Appendix&nbsp;E.&nbsp;Compression and Data Block Encoding In
+          HBase<a class="indexterm" name="d2802e23806"></a></h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="compression.html#d2802e23931">E.1. Which Compressor or Data Block Encoder To Use</a></span></dt><dt><span class="section"><a href="hadoop.native.lib.html">E.2. Making use of Hadoop Native Libraries in HBase</a></span></dt><dt><span class="section"><a href="apes03.html">E.3. Compressor Configuration, Installation, and Use</a></span></dt><dd><dl><dt><span class="section"><a href="apes03.html#compressor.install">E.3.1. Configure HBase For Compressors</a></span></dt><dt><span class="section"><a href="apes03.html#changing.compression">E.3.2. Enable Compression On a ColumnFamily</a></span></dt><dt><span class="section"><a href="apes03.html#d2802e24169">E.3.3. Testing Compression Performance</a></span></dt></dl></dd><dt><span class="section"><a href="data.block.encoding.enable.html">E.4. Enable Data Block Encoding</a></span></dt></dl></div><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Codecs mentioned in this section are for encoding and decoding data blocks or row keys.
+       For information about replication codecs, see <a class="xref" href="cluster_replication.html#cluster.replication.preserving.tags" title="Preserving Tags During Replication">Preserving Tags During Replication</a>.</p></div><p>Some of the information in this section is pulled from a <a class="link" href="http://search-hadoop.com/m/lL12B1PFVhp1/v=threaded" target="_top">discussion</a> on the
+      HBase Development mailing list.</p><p>HBase supports several different compression algorithms which can be enabled on a
+      ColumnFamily. Data block encoding attempts to limit duplication of information in keys, taking
+      advantage of some of the fundamental designs and patterns of HBase, such as sorted row keys
+      and the schema of a given table. Compressors reduce the size of large, opaque byte arrays in
+      cells, and can significantly reduce the storage space needed to store uncompressed
+      data.</p><p>Compressors and data block encoding can be used together on the same ColumnFamily.</p><p title="Changes Take Effect Upon Compaction"><b>Changes Take Effect Upon Compaction.&nbsp;</b>If you change compression or encoding for a ColumnFamily, the changes take effect during
+       compaction.</p><p>Some codecs take advantage of capabilities built into Java, such as GZip compression.
+      Others rely on native libraries. Native libraries may be available as part of Hadoop, such as
+      LZ4. In this case, HBase only needs access to the appropriate shared library. Other codecs,
+      such as Google Snappy, need to be installed first. Some codecs are licensed in ways that
+      conflict with HBase's license and cannot be shipped as part of HBase.</p><p>This section discusses common codecs that are used and tested with HBase. No matter what
+      codec you use, be sure to test that it is installed correctly and is available on all nodes in
+      your cluster. Extra operational steps may be necessary to be sure that codecs are available on
+      newly-deployed nodes. You can use the <a class="xref" href="apes03.html#compression.test" title="E.3.1.6.&nbsp;CompressionTest">Section&nbsp;E.3.1.6, &#8220;CompressionTest&#8221;</a> utility to check that a given codec is correctly
+      installed.</p><p>To configure HBase to use a compressor, see <a class="xref" href="apes03.html#compressor.install" title="E.3.1.&nbsp;Configure HBase For Compressors">Section&nbsp;E.3.1, &#8220;Configure HBase For Compressors&#8221;</a>. To enable a compressor for a ColumnFamily, see <a class="xref" href="apes03.html#changing.compression" title="E.3.2.&nbsp;Enable Compression On a ColumnFamily">Section&nbsp;E.3.2, &#8220;Enable Compression On a ColumnFamily&#8221;</a>. To enable data block encoding for a ColumnFamily, see
+      <a class="xref" href="data.block.encoding.enable.html" title="E.4.&nbsp;Enable Data Block Encoding">Section&nbsp;E.4, &#8220;Enable Data Block Encoding&#8221;</a>.</p><div class="itemizedlist" title="Block Compressors"><p class="title"><b>Block Compressors</b></p><ul class="itemizedlist" type="disc"><li class="listitem"><p>none</p></li><li class="listitem"><p>Snappy</p></li><li class="listitem"><p>LZO</p></li><li class="listitem"><p>LZ4</p></li><li class="listitem"><p>GZ</p></li></ul></div><div class="itemizedlist" title="Data Block Encoding Types"><a name="data.block.encoding.types"></a><p class="title"><b>Data Block Encoding Types</b></p><ul class="itemizedlist" type="disc"><li class="listitem"><p>Prefix - Often, keys are very similar. Specifically, keys often share a common prefix
+          and only differ near the end. For instance, one key might be
+            <code class="literal">RowKey:Family:Qualifier0</code> and the next key might be
+            <code class="literal">RowKey:Family:Qualifier1</code>. In Prefix encoding, an extra column is
+          added which holds the length of the prefix shared between the current key and the previous
+          key. Assuming the first key here is totally different from the key before, its prefix
+          length is 0. The second key's prefix length is <code class="literal">23</code>, since they have the
+          first 23 characters in common.</p><p>Obviously if the keys tend to have nothing in common, Prefix will not provide much
+          benefit.</p><p>The following image shows a hypothetical ColumnFamily with no data block encoding.</p><div class="figure"><a name="d2802e23883"></a><p class="title"><b>Figure&nbsp;E.1.&nbsp;ColumnFamily with No Encoding</b></p><div class="figure-contents"><div class="mediaobject"><table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0" width="800"><tr><td><img src="../images/data_block_no_encoding.png" width="800" alt="ColumnFamily with No Encoding"></td></tr></table><div class="caption"><p>A ColumnFamily with no encoding&gt;</p></div></div></div></div><br class="figure-break"><p>Here is the same data with prefix data encoding.</p><div class="figure"><a name="d2802e23894"></a><p class="title"><b>Figure&nbsp;E.2.&nbsp;ColumnFamily with Prefix Encoding</b></p><div class="figure-contents"><div class="mediaobject"><table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0" width="800"><tr><td><img src="../images/data_block_prefix_encoding.png" width="800" alt="ColumnFamily with Prefix Encoding"></td></tr></table><div class="caption"><p>A ColumnFamily with prefix encoding</p></div></div></div></div><br class="figure-break"></li><li class="listitem"><p>Diff - Diff encoding expands upon Prefix encoding. Instead of considering the key
+          sequentially as a monolithic series of bytes, each key field is split so that each part of
+          the key can be compressed more efficiently. Two new fields are added: timestamp and type.
+          If the ColumnFamily is the same as the previous row, it is omitted from the current row.
+          If the key length, value length or type are the same as the previous row, the field is
+          omitted. In addition, for increased compression, the timestamp is stored as a Diff from
+          the previous row's timestamp, rather than being stored in full. Given the two row keys in
+          the Prefix example, and given an exact match on timestamp and the same type, neither the
+          value length, or type needs to be stored for the second row, and the timestamp value for
+          the second row is just 0, rather than a full timestamp.</p><p>Diff encoding is disabled by default because writing and scanning are slower but more
+          data is cached.</p><p>This image shows the same ColumnFamily from the previous images, with Diff encoding.</p><div class="figure"><a name="d2802e23910"></a><p class="title"><b>Figure&nbsp;E.3.&nbsp;ColumnFamily with Diff Encoding</b></p><div class="figure-contents"><div class="mediaobject"><table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0" width="800"><tr><td><img src="../images/data_block_diff_encoding.png" width="800" alt="ColumnFamily with Diff Encoding"></td></tr></table><div class="caption"><p>A ColumnFamily with diff encoding</p></div></div></div></div><br class="figure-break"></li><li class="listitem"><p>Fast Diff - Fast Diff works similar to Diff, but uses a faster implementation. It also
+          adds another field which stores a single bit to track whether the data itself is the same
+          as the previous row. If it is, the data is not stored again. Fast Diff is the recommended
+          codec to use if you have long keys or many columns. The data format is nearly identical to
+        Diff encoding, so there is not an image to illustrate it.</p></li><li class="listitem"><p>Prefix Tree encoding was introduced as an experimental feature in HBase 0.96. It
+          provides similar memory savings to the Prefix, Diff, and Fast Diff encoder, but provides
+          faster random access at a cost of slower encoding speed. Prefix Tree may be appropriate
+          for applications that have high block cache hit ratios. It introduces new 'tree' fields
+          for the row and column. The row tree field contains a list of offsets/references
+          corresponding to the cells in that row. This allows for a good deal of compression. For
+          more details about Prefix Tree encoding, see <a class="link" href="https://issues.apache.org/jira/browse/HBASE-4676" target="_top">HBASE-4676</a>. It is
+          difficult to graphically illustrate a prefix tree, so no image is included. See the
+          Wikipedia article for <a class="link" href="http://en.wikipedia.org/wiki/Trie" target="_top">Trie</a> for more general information
+          about this data structure.</p></li></ul></div><div class="section" title="E.1.&nbsp;Which Compressor or Data Block Encoder To Use"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2802e23931"></a>E.1.&nbsp;Which Compressor or Data Block Encoder To Use</h2></div></div></div><p>The compression or codec type to use depends on the characteristics of your data.
+        Choosing the wrong type could cause your data to take more space rather than less, and can
+        have performance implications. In general, you need to weigh your options between smaller
+        size and faster compression/decompression. Following are some general guidelines, expanded from a discussion at <a class="link" href="http://search-hadoop.com/m/lL12B1PFVhp1" target="_top">Documenting Guidance on compression and codecs</a>. </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>If you have long keys (compared to the values) or many columns, use a prefix
+            encoder. FAST_DIFF is recommended, as more testing is needed for Prefix Tree
+            encoding.</p></li><li class="listitem"><p>If the values are large (and not precompressed, such as images), use a data block
+            compressor.</p></li><li class="listitem"><p>Use GZIP for <em class="firstterm">cold data</em>, which is accessed infrequently. GZIP
+            compression uses more CPU resources than Snappy or LZO, but provides a higher
+            compression ratio.</p></li><li class="listitem"><p>Use Snappy or LZO for <em class="firstterm">hot data</em>, which is accessed
+            frequently. Snappy and LZO use fewer CPU resources than GZIP, but do not provide as high
+          of a compression ratio.</p></li><li class="listitem"><p>In most cases, enabling Snappy or LZO by default is a good choice, because they have
+            a low performance overhead and provide space savings.</p></li><li class="listitem"><p>Before Snappy became available by Google in 2011, LZO was the default. Snappy has
+            similar qualities as LZO but has been shown to perform better.</p></li></ul></div></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="appendix_acl_matrix.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="hadoop.native.lib.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Appendix&nbsp;D.&nbsp;Access Control Matrix&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;E.2.&nbsp;Making use of Hadoop Native Libraries in HBase</td></tr></table></div></body></html>

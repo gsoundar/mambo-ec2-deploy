@@ -1,0 +1,30 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>18.8.&nbsp;Updating hbase.apache.org</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="developer.html" title="Chapter&nbsp;18.&nbsp;Building and Developing Apache HBase"><link rel="prev" href="documentation.html" title="18.7.&nbsp;Generating the HBase Reference Guide"><link rel="next" href="hbase.tests.html" title="18.9.&nbsp;Tests"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">18.8.&nbsp;Updating hbase.apache.org</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="documentation.html">Prev</a>&nbsp;</td><th width="60%" align="center">Chapter&nbsp;18.&nbsp;Building and Developing Apache HBase</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="hbase.tests.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/hbase.org.html';
+    </script><div class="section" title="18.8.&nbsp;Updating hbase.apache.org"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="hbase.org"></a>18.8.&nbsp;Updating <a class="link" href="http://hbase.apache.org" target="_top">hbase.apache.org</a></h2></div></div></div><div class="section" title="18.8.1.&nbsp;Contributing to hbase.apache.org"><div class="titlepage"><div><div><h3 class="title"><a name="hbase.org.site.contributing"></a>18.8.1.&nbsp;Contributing to hbase.apache.org</h3></div></div></div><p>See <a class="xref" href="appendix_contributing_to_documentation.html" title="Appendix&nbsp;A.&nbsp;Contributing to Documentation">Appendix&nbsp;A, <i>Contributing to Documentation</i></a> for more information
+                on contributing to the documentation or website.</p></div><div class="section" title="18.8.2.&nbsp;Publishing hbase.apache.org"><div class="titlepage"><div><div><h3 class="title"><a name="hbase.org.site.publishing"></a>18.8.2.&nbsp;Publishing <a class="link" href="http://hbase.apache.org" target="_top">hbase.apache.org</a></h3></div></div></div><p>As of <a class="link" href="https://issues.apache.org/jira/browse/INFRA-5680" target="_top">INFRA-5680 Migrate apache hbase website</a>, to publish the website, build
+                it using Maven, and then deploy it over a checkout of
+                    <code class="filename">https://svn.apache.org/repos/asf/hbase/hbase.apache.org/trunk</code>
+                and check in your changes. The script
+                    <code class="filename">dev-scripts/publish_hbase_website.sh</code> is provided to
+                automate this process and to be sure that stale files are removed from SVN. Review
+                the script even if you decide to publish the website manually. Use the script as
+                follows:</p><pre class="screen">$ <strong class="userinput"><code>publish_hbase_website.sh -h</code></strong>
+Usage: publish_hbase_website.sh [-i | -a] [-g &lt;dir&gt;] [-s &lt;dir&gt;]
+ -h          Show this message
+ -i          Prompts the user for input
+ -a          Does not prompt the user. Potentially dangerous.
+ -g          The local location of the HBase git repository
+ -s          The local location of the HBase svn checkout
+ Either --interactive or --silent is required.
+ Edit the script to set default Git and SVN directories.
+            </pre><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>The SVN commit takes a long time.</p></div></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="documentation.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="developer.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="hbase.tests.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">18.7.&nbsp;Generating the HBase Reference Guide&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;18.9.&nbsp;Tests</td></tr></table></div></body></html>

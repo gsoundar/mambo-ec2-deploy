@@ -1,0 +1,57 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>Chapter&nbsp;19.&nbsp;Unit Testing HBase Applications</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="prev" href="developing.html" title="18.10.&nbsp;Developer Guidelines"><link rel="next" href="mockito.html" title="19.2.&nbsp;Mockito"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;19.&nbsp;Unit Testing HBase Applications</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="developing.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="mockito.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/unit.tests.html';
+    </script><div class="chapter" title="Chapter&nbsp;19.&nbsp;Unit Testing HBase Applications"><div class="titlepage"><div><div><h2 class="title"><a name="unit.tests"></a>Chapter&nbsp;19.&nbsp;Unit Testing HBase Applications</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="unit.tests.html#d2802e21387">19.1. JUnit</a></span></dt><dt><span class="section"><a href="mockito.html">19.2. Mockito</a></span></dt><dt><span class="section"><a href="ch19s03.html">19.3. MRUnit</a></span></dt><dt><span class="section"><a href="ch19s04.html">19.4. Integration Testing with a HBase Mini-Cluster</a></span></dt></dl></div><p>This chapter discusses unit testing your HBase application using JUnit, Mockito, MRUnit,
+        and HBaseTestingUtility. Much of the information comes from <a class="link" href="http://blog.cloudera.com/blog/2013/09/how-to-test-hbase-applications-using-popular-tools/" target="_top">a community blog post about testing HBase applications</a>. For information on unit
+        tests for HBase itself, see <a class="xref" href="hbase.tests.html" title="18.9.&nbsp;Tests">Section&nbsp;18.9, &#8220;Tests&#8221;</a>.</p><div class="section" title="19.1.&nbsp;JUnit"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2802e21387"></a>19.1.&nbsp;JUnit</h2></div></div></div><p>HBase uses <a class="link" href="http://junit.org" target="_top">JUnit</a> 4 for unit tests</p><p>This example will add unit tests to the following example class:</p><pre class="programlisting">
+public class MyHBaseDAO {
+
+    public static void insertRecord(HTableInterface table, HBaseTestObj obj)
+    throws Exception {
+        Put put = createPut(obj);
+        table.put(put);
+    }
+    
+    private static Put createPut(HBaseTestObj obj) {
+        Put put = new Put(Bytes.toBytes(obj.getRowKey()));
+        put.add(Bytes.toBytes("CF"), Bytes.toBytes("CQ-1"),
+                    Bytes.toBytes(obj.getData1()));
+        put.add(Bytes.toBytes("CF"), Bytes.toBytes("CQ-2"),
+                    Bytes.toBytes(obj.getData2()));
+        return put;
+    }
+}                
+            </pre><p>The first step is to add JUnit dependencies to your Maven POM file:</p><pre class="programlisting">
+&lt;dependency&gt;
+    &lt;groupId&gt;junit&lt;/groupId&gt;
+    &lt;artifactId&gt;junit&lt;/artifactId&gt;
+    &lt;version&gt;4.11&lt;/version&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;                
+                </pre><p>Next, add some unit tests to your code. Tests are annotated with
+                <code class="literal">@Test</code>. Here, the unit tests are in bold.</p><pre class="programlisting">
+public class TestMyHbaseDAOData {
+  @Test
+  public void testCreatePut() throws Exception {
+  HBaseTestObj obj = new HBaseTestObj();
+  obj.setRowKey("ROWKEY-1");
+  obj.setData1("DATA-1");
+  obj.setData2("DATA-2");
+  Put put = MyHBaseDAO.createPut(obj);
+  <strong class="userinput"><code>assertEquals(obj.getRowKey(), Bytes.toString(put.getRow()));
+  assertEquals(obj.getData1(), Bytes.toString(put.get(Bytes.toBytes("CF"), Bytes.toBytes("CQ-1")).get(0).getValue()));
+  assertEquals(obj.getData2(), Bytes.toString(put.get(Bytes.toBytes("CF"), Bytes.toBytes("CQ-2")).get(0).getValue()));</code></strong>
+  }
+}                
+            </pre><p>These tests ensure that your <code class="code">createPut</code> method creates, populates, and
+            returns a <code class="code">Put</code> object with expected values. Of course, JUnit can do much
+            more than this. For an introduction to JUnit, see <a class="link" href="https://github.com/junit-team/junit/wiki/Getting-started" target="_top">https://github.com/junit-team/junit/wiki/Getting-started</a>. </p></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="developing.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="mockito.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">18.10.&nbsp;Developer Guidelines&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;19.2.&nbsp;Mockito</td></tr></table></div></body></html>

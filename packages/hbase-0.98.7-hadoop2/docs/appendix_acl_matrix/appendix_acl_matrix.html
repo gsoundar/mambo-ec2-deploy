@@ -1,0 +1,278 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>Appendix&nbsp;A.&nbsp;Access Control Matrix</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="appendix_acl_matrix.html" title="Appendix&nbsp;A.&nbsp;Access Control Matrix"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Appendix&nbsp;A.&nbsp;Access Control Matrix</th></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/appendix_acl_matrix.html';
+    </script><div class="appendix" title="Appendix&nbsp;A.&nbsp;Access Control Matrix"><div class="titlepage"><div><div><h2 class="title"><a name="appendix_acl_matrix"></a>Appendix&nbsp;A.&nbsp;Access Control Matrix</h2></div></div></div><p>The following matrix shows the minimum permission set required to perform operations in
+        HBase. Before using the table, read through the information about how to interpret it.</p><div class="variablelist" title="Interpreting the ACL Matrix Table"><p class="title"><b>Interpreting the ACL Matrix Table</b></p><p>The following conventions are used in the ACL Matrix table:</p><dl><dt><span class="term">Scopes</span></dt><dd><p>Permissions are evaluated starting at the widest scope and working to the
+              narrowest scope. A scope corresponds to a level of the data model. From broadest to
+              narrowest, the scopes are as follows::</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Global</p></li><li class="listitem"><p>Namespace (NS)</p></li><li class="listitem"><p>Table</p></li><li class="listitem"><p>Column Family (CF)</p></li><li class="listitem"><p>Column Qualifier (CQ)</p></li><li class="listitem"><p>Cell</p></li></ul></div><p>For instance, a permission granted at table level dominates any grants done at
+                    the Column Family, Column Qualifier, or cell level. The user can do what that
+                    grant implies at any location in the table. A permission granted at global scope
+                    dominates all: the user is always allowed to take that action everywhere.</p></dd><dt><span class="term">Permissions</span></dt><dd><p>Possible permissions include the following:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Superuser - a special user that belongs to group "supergroup" and has
+                unlimited access</p></li><li class="listitem"><p>Admin (A)</p></li><li class="listitem"><p>Create (C)</p></li><li class="listitem"><p>Write (W)</p></li><li class="listitem"><p>Read (R)</p></li><li class="listitem"><p>Execute (X)</p></li></ul></div></dd></dl></div><p>For the most part, permissions work in an expected way, with the following caveats:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Having Write permission does not imply Read permission. It is possible and sometimes
+          desirable for a user to be able to write data that same user cannot read. One such example
+          is a log-writing process.</p></li><li class="listitem"><p>The <code class="systemitem">hbase:meta</code> table is readable by every user, regardless
+            of the user's other grants or restrictions. This is a requirement for HBase to
+            function correctly.</p></li><li class="listitem"><p><code class="code">CheckAndPut</code> and <code class="code">CheckAndDelete</code> operations will fail if
+                the user does not have both Write and Read permission.</p></li><li class="listitem"><p><code class="code">Increment</code> and <code class="code">Append</code> operations do not require Read
+                access.</p></li></ul></div><p>The following table is sorted by the interface that provides each operation. In case the
+        table goes out of date, the unit tests which check for accuracy of permissions can be found
+        in
+            <code class="filename">hbase-server/src/test/java/org/apache/hadoop/hbase/security/access/TestAccessController.java</code>,
+        and the access controls themselves can be examined in
+            <code class="filename">hbase-server/src/main/java/org/apache/hadoop/hbase/security/access/AccessController.java</code>.</p><div class="table"><a name="d2653e100"></a><p class="title"><b>Table&nbsp;A.1.&nbsp;ACL Matrix</b></p><div class="table-contents"><table summary="ACL Matrix" border="1"><colgroup><col><col><col><col></colgroup><thead><tr><th>Interface</th><th>Operation</th><th>Minimum Scope</th><th>Minimum Permission</th></tr></thead><tbody><tr><td rowspan="28">
+                        
+                        <p>Master</p>
+                    </td><td>
+                        <p>createTable</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>C</p>
+                    </td></tr><tr><td>
+                        <p>modifyTable</p>
+                    </td><td>
+                        <p>Table</p>
+                    </td><td>
+                        <p>A|C</p>
+                    </td></tr><tr><td>
+                        <p>deleteTable</p>
+                    </td><td>
+                        <p>Table</p>
+                    </td><td>
+                        <p>A|C</p>
+                    </td></tr><tr><td>
+                        <p>truncateTable</p>
+                    </td><td>
+                        <p>Table</p>
+                    </td><td>
+                        <p>A|C</p>
+                    </td></tr><tr><td>
+                        <p>addColumn</p>
+                    </td><td>
+                        <p>Table</p>
+                    </td><td>
+                        <p>A|C</p>
+                    </td></tr><tr><td>
+                        <p>modifyColumn</p>
+                    </td><td>
+                        <p>Table</p>
+                    </td><td>
+                        <p>A|C</p>
+                    </td></tr><tr><td>
+                        <p>deleteColumn</p>
+                    </td><td>
+                        <p>Table</p>
+                    </td><td>
+                        <p>A|C</p>
+                    </td></tr><tr><td>
+                        <p>disableTable</p>
+                    </td><td>
+                        <p>Table</p>
+                    </td><td>
+                        <p>A|C</p>
+                    </td></tr><tr><td>
+                        <p>disableAclTable</p>
+                    </td><td>
+                        <p>None</p>
+                    </td><td>
+                        <p>Not allowed</p>
+                    </td></tr><tr><td>
+                        <p>enableTable</p>
+                    </td><td>
+                        <p>Table</p>
+                    </td><td>
+                        <p>A|C</p>
+                    </td></tr><tr><td>
+                        <p>move</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>assign</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>unassign</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>regionOffline</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>balance</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>balanceSwitch</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>shutdown</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>stopMaster</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>snapshot</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>clone</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>restore</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>deleteSnapshot</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>createNamespace</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>deleteNamespace</p>
+                    </td><td>
+                        <p>Namespace</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>modifyNamespace</p>
+                    </td><td>
+                        <p>Namespace</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>flushTable</p>
+                    </td><td>
+                        <p>Table</p>
+                    </td><td>
+                        <p>A|C</p>
+                    </td></tr><tr><td>
+                        <p>getTableDescriptors</p>
+                    </td><td>
+                        <p>Global|Table</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>mergeRegions</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td rowspan="25">Region</td><td>open</td><td>Global</td><td>A</td></tr><tr><td>
+                        <p>openRegion</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>close</td><td>Global</td><td>A</td></tr><tr><td>
+                        <p>closeRegion</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>stopRegionServer</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                    <p>rollHLog</p>
+                  </td><td>
+                    <p>Global</p>
+                  </td><td>
+                    <p>A</p>
+                  </td></tr><tr><td>
+                        <p>mergeRegions</p>
+                    </td><td>
+                        <p>Global</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>append</td><td>Table|CF|CQ</td><td>W</td></tr><tr><td>delete</td><td>Table|CF|CQ|Cell (if the user has write permission for all cells)</td><td>W</td></tr><tr><td>exists</td><td>Table|CF|CQ</td><td>R</td></tr><tr><td>get</td><td>Table|CF|CQ</td><td>R</td></tr><tr><td>getClosestRowBefore</td><td>Table|CF|CQ</td><td>R</td></tr><tr><td>increment</td><td>Table|CF|CQ</td><td>W</td></tr><tr><td>put</td><td>Table|CF|CQ</td><td>W</td></tr><tr><td>
+                        <p>flush</p>
+                    </td><td>
+                        <p>Global|Table</p>
+                    </td><td>
+                        <p>A|C</p>
+                    </td></tr><tr><td>
+                        <p>split</p>
+                    </td><td>
+                        <p>Global|Table</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>compact</p>
+                    </td><td>
+                        <p>Global|Table</p>
+                    </td><td>
+                        <p>A|C</p>
+                    </td></tr><tr><td>bulkLoadHFile</td><td>Table</td><td>W</td></tr><tr><td>prepareBulkLoad</td><td>Table</td><td>C</td></tr><tr><td>cleanupBulkLoad</td><td>Table</td><td>W</td></tr><tr><td>checkAndDelete</td><td>Table|CF|CQ</td><td>RW</td></tr><tr><td>checkAndPut</td><td>Table|CF|CQ</td><td>RW</td></tr><tr><td>incrementColumnValue</td><td>Table|CF|CQ</td><td>RW</td></tr><tr><td>scannerClose</td><td>Table</td><td>R</td></tr><tr><td>scannerNext</td><td>Table</td><td>R</td></tr><tr><td>scannerOpen</td><td>Table|CQ|CF</td><td>R</td><td class="auto-generated">&nbsp;</td></tr><tr><td>
+                        <p>Endpoint</p>
+                    </td><td>
+                        <p>invoke</p>
+                    </td><td>Endpoint</td><td>
+                        <p>X</p>
+                    </td></tr><tr><td rowspan="4">
+                        <p>AccessController</p>
+                    </td><td>
+                        <p>grant</p>
+                    </td><td>Global|Table|NS</td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>revoke</p>
+                    </td><td>Global|Table|NS</td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>getUserPermissions</p>
+                    </td><td>
+                        <p>Global|Table|NS</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr><tr><td>
+                        <p>checkPermissions</p>
+                    </td><td>
+                        <p>Global|Table|NS</p>
+                    </td><td>
+                        <p>A</p>
+                    </td></tr></tbody></table></div></div><br class="table-break"></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr></div></body></html>

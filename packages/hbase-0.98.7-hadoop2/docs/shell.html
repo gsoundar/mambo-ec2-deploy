@@ -1,0 +1,239 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>Chapter&nbsp;1.&nbsp;The Apache HBase Shell</title><link rel="stylesheet" type="text/css" href="css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/shell.html';
+    </script><div class="chapter" title="Chapter&nbsp;1.&nbsp;The Apache HBase Shell"><div class="titlepage"><div><div><h2 class="title"><a name="shell"></a>Chapter&nbsp;1.&nbsp;The Apache HBase Shell</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#scripting">1.1. Scripting with Ruby</a></span></dt><dt><span class="section"><a href="#d8312e44">1.2. Running the Shell in Non-Interactive Mode</a></span></dt><dt><span class="section"><a href="#hbase.shell.noninteractive">1.3. HBase Shell in OS Scripts</a></span></dt><dd><dl><dt><span class="section"><a href="#d8312e115">1.3.1. Checking for Success or Failure In Scripts</a></span></dt></dl></dd><dt><span class="section"><a href="#d8312e120">1.4. Read HBase Shell Commands from a Command File</a></span></dt><dt><span class="section"><a href="#d8312e149">1.5. Passing VM Options to the Shell</a></span></dt><dt><span class="section"><a href="#shell_tricks">1.6. Shell Tricks</a></span></dt><dd><dl><dt><span class="section"><a href="#table_variables">1.6.1. Table variables</a></span></dt><dt><span class="section"><a href="#d8312e192">1.6.2. <code class="filename">irbrc</code></a></span></dt><dt><span class="section"><a href="#d8312e211">1.6.3. LOG data to timestamp</a></span></dt><dt><span class="section"><a href="#d8312e227">1.6.4. Debug</a></span></dt><dt><span class="section"><a href="#d8312e247">1.6.5. Commands</a></span></dt></dl></dd></dl></div><p> The Apache HBase Shell is <a class="link" href="http://jruby.org" target="_top">(J)Ruby</a>'s IRB with some HBase particular commands
+        added. Anything you can do in IRB, you should be able to do in the HBase Shell.</p><p>To run the HBase shell, do as follows:</p><pre class="programlisting">$ ./bin/hbase shell</pre><p>Type <span class="command"><strong>help</strong></span> and then <span class="command"><strong>&lt;RETURN&gt;</strong></span> to see a listing
+        of shell commands and options. Browse at least the paragraphs at the end of the help
+        emission for the gist of how variables and command arguments are entered into the HBase
+        shell; in particular note how table names, rows, and columns, etc., must be quoted.</p><p>See <a class="xref" href="#">???</a> for example basic shell operation. </p><p>Here is a nicely formatted listing of <a class="link" href="http://learnhbase.wordpress.com/2013/03/02/hbase-shell-commands/" target="_top">all shell
+            commands</a> by Rajeshbabu Chintaguntla. </p><div class="section" title="1.1.&nbsp;Scripting with Ruby"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="scripting"></a>1.1.&nbsp;Scripting with Ruby</h2></div></div></div><p>For examples scripting Apache HBase, look in the HBase <code class="filename">bin</code>
+            directory. Look at the files that end in <code class="filename">*.rb</code>. To run one of these
+            files, do as follows:</p><pre class="programlisting">$ ./bin/hbase org.jruby.Main PATH_TO_SCRIPT</pre></div><div class="section" title="1.2.&nbsp;Running the Shell in Non-Interactive Mode"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d8312e44"></a>1.2.&nbsp;Running the Shell in Non-Interactive Mode</h2></div></div></div><p>A new non-interactive mode has been added to the HBase Shell (<a class="link" href="https://issues.apache.org/jira/browse/HBASE-11658" target="_top">HBASE-11658)</a>.
+            Non-interactive mode captures the exit status (success or failure) of HBase Shell
+            commands and passes that status back to the command interpreter. If you use the normal
+            interactive mode, the HBase Shell will only ever return its own exit status, which will
+            nearly always be <code class="literal">0</code> for success.</p><p>To invoke non-interactive mode, pass the <code class="option">-n</code> or
+                <code class="option">--non-interactive</code> option to HBase Shell.</p></div><div class="section" title="1.3.&nbsp;HBase Shell in OS Scripts"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="hbase.shell.noninteractive"></a>1.3.&nbsp;HBase Shell in OS Scripts</h2></div></div></div><p>You can use the HBase shell from within operating system script interpreters like the
+            Bash shell which is the default command interpreter for most Linux and UNIX
+            distributions. The following guidelines use Bash syntax, but could be adjusted to work
+            with C-style shells such as csh or tcsh, and could probably be modified to work with the
+            Microsoft Windows script interpreter as well. Submissions are welcome.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Spawning HBase Shell commands in this way is slow, so keep that in mind when you
+                are deciding when combining HBase operations with the operating system command line
+                is appropriate.</p></div><div class="example"><a name="d8312e71"></a><p class="title"><b>Example&nbsp;1.1.&nbsp;Passing Commands to the HBase Shell</b></p><div class="example-contents"><p>You can pass commands to the HBase Shell in non-interactive mode (see <a class="xref" href="#">???</a>) using the <span class="command"><strong>echo</strong></span>
+                command and the <code class="literal">|</code> (pipe) operator. Be sure to escape characters
+                in the HBase commands which would otherwise be interpreted by the shell. Some
+                debug-level output has been truncated from the example below.</p><pre class="screen">$ <strong class="userinput"><code>echo "describe 'test1'" | ./hbase shell -n</code></strong>
+                <code class="computeroutput">
+Version 0.98.3-hadoop2, rd5e65a9144e315bb0a964e7730871af32f5018d5, Sat May 31 19:56:09 PDT 2014
+
+describe 'test1'
+
+DESCRIPTION                                          ENABLED
+ 'test1', {NAME =&gt; 'cf', DATA_BLOCK_ENCODING =&gt; 'NON true
+ E', BLOOMFILTER =&gt; 'ROW', REPLICATION_SCOPE =&gt; '0',
+  VERSIONS =&gt; '1', COMPRESSION =&gt; 'NONE', MIN_VERSIO
+ NS =&gt; '0', TTL =&gt; 'FOREVER', KEEP_DELETED_CELLS =&gt;
+ 'false', BLOCKSIZE =&gt; '65536', IN_MEMORY =&gt; 'false'
+ , BLOCKCACHE =&gt; 'true'}
+1 row(s) in 3.2410 seconds    
+                </code>            
+            </pre><p>To suppress all output, echo it to <code class="filename">/dev/null:</code></p><pre class="screen">$ <strong class="userinput"><code>echo "describe 'test'" | ./hbase shell -n &gt; /dev/null 2&gt;&amp;1</code></strong></pre></div></div><br class="example-break"><div class="example"><a name="d8312e100"></a><p class="title"><b>Example&nbsp;1.2.&nbsp;Checking the Result of a Scripted Command</b></p><div class="example-contents"><p>Since scripts are not designed to be run interactively, you need a way to check
+                whether your command failed or succeeded. The HBase shell uses the standard
+                convention of returning a value of <code class="literal">0</code> for successful commands, and
+                some non-zero value for failed commands. Bash stores a command's return value in a
+                special environment variable called <code class="varname">$?</code>. Because that variable is
+                overwritten each time the shell runs any command, you should store the result in a
+                different, script-defined variable.</p><p>This is a naive script that shows one way to store the return value and make a
+                decision based upon it.</p><pre class="programlisting">
+#!/bin/bash
+
+echo "describe 'test'" | ./hbase shell -n &gt; /dev/null 2&gt;&amp;1
+status=$?
+echo "The status was " $status  
+if ($status == 0); then
+    echo "The command succeeded"
+else
+    echo "The command may have failed."
+fi
+return $status
+            </pre></div></div><br class="example-break"><div class="section" title="1.3.1.&nbsp;Checking for Success or Failure In Scripts"><div class="titlepage"><div><div><h3 class="title"><a name="d8312e115"></a>1.3.1.&nbsp;Checking for Success or Failure In Scripts</h3></div></div></div><p>Getting an exit code of 0 means that the command you scripted definitely
+                succeeded. However, getting a non-zero exit code does not necessarily mean the
+                command failed. The command could have succeeded, but the client lost connectivity,
+                or some other event obscured its success. This is because RPC commands are
+                stateless. The only way to be sure of the status of an operation is to check. For
+                instance, if your script creates a table, but returns a non-zero exit value, you
+                should check whether the table was actually created before trying again to create
+                it.</p></div></div><div class="section" title="1.4.&nbsp;Read HBase Shell Commands from a Command File"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d8312e120"></a>1.4.&nbsp;Read HBase Shell Commands from a Command File</h2></div></div></div><p>You can enter HBase Shell commands into a text file, one command per line, and pass
+            that file to the HBase Shell.</p><div class="example"><a name="d8312e125"></a><p class="title"><b>Example&nbsp;1.3.&nbsp;Example Command File</b></p><div class="example-contents"><pre class="screen">
+create 'test', 'cf'
+list 'test'
+put 'test', 'row1', 'cf:a', 'value1'
+put 'test', 'row2', 'cf:b', 'value2'
+put 'test', 'row3', 'cf:c', 'value3'
+put 'test', 'row4', 'cf:d', 'value4'
+scan 'test'
+get 'test', 'row1'
+disable 'test'
+enable 'test'
+            </pre></div></div><br class="example-break"><div class="example"><a name="d8312e130"></a><p class="title"><b>Example&nbsp;1.4.&nbsp;Directing HBase Shell to Execute the Commands</b></p><div class="example-contents"><p>Pass the path to the command file as the only argument to the <span class="command"><strong>hbase
+                    shell</strong></span> command. Each command is executed and its output is shown. If
+                you do not include the <span class="command"><strong>exit</strong></span> command in your script, you are
+                returned to the HBase shell prompt. There is no way to programmatically check each
+                individual command for success or failure. Also, though you see the output for each
+                command, the commands themselves are not echoed to the screen so it can be difficult
+                to line up the command with its output.</p><pre class="screen">
+$ <strong class="userinput"><code>./hbase shell ./sample_commands.txt</code></strong>
+<code class="computeroutput">0 row(s) in 3.4170 seconds
+
+TABLE
+test
+1 row(s) in 0.0590 seconds
+
+0 row(s) in 0.1540 seconds
+
+0 row(s) in 0.0080 seconds
+
+0 row(s) in 0.0060 seconds
+
+0 row(s) in 0.0060 seconds
+
+ROW                   COLUMN+CELL
+ row1                 column=cf:a, timestamp=1407130286968, value=value1
+ row2                 column=cf:b, timestamp=1407130286997, value=value2
+ row3                 column=cf:c, timestamp=1407130287007, value=value3
+ row4                 column=cf:d, timestamp=1407130287015, value=value4
+4 row(s) in 0.0420 seconds
+
+COLUMN                CELL
+ cf:a                 timestamp=1407130286968, value=value1
+1 row(s) in 0.0110 seconds
+
+0 row(s) in 1.5630 seconds
+
+0 row(s) in 0.4360 seconds</code>                
+            </pre></div></div><br class="example-break"></div><div class="section" title="1.5.&nbsp;Passing VM Options to the Shell"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d8312e149"></a>1.5.&nbsp;Passing VM Options to the Shell</h2></div></div></div><p>You can pass VM options to the HBase Shell using the <code class="code">HBASE_SHELL_OPTS</code>
+            environment variable. You can set this in your environment, for instance by editing
+                <code class="filename">~/.bashrc</code>, or set it as part of the command to launch HBase
+            Shell. The following example sets several garbage-collection-related variables, just for
+            the lifetime of the VM running the HBase Shell. The command should be run all on a
+            single line, but is broken by the <code class="literal">\</code> character, for
+            readability.</p><pre class="screen">
+$ <strong class="userinput"><code>HBASE_SHELL_OPTS="-verbose:gc -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCDateStamps \ 
+  -XX:+PrintGCDetails -Xloggc:$HBASE_HOME/logs/gc-hbase.log" ./bin/hbase shell</code></strong>            
+        </pre></div><div class="section" title="1.6.&nbsp;Shell Tricks"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="shell_tricks"></a>1.6.&nbsp;Shell Tricks</h2></div></div></div><div class="section" title="1.6.1.&nbsp;Table variables"><div class="titlepage"><div><div><h3 class="title"><a name="table_variables"></a>1.6.1.&nbsp;Table variables</h3></div></div></div><p> HBase 0.95 adds shell commands that provide a jruby-style object-oriented
+                references for tables. Previously all of the shell commands that act upon a table
+                have a procedural style that always took the name of the table as an argument. HBase
+                0.95 introduces the ability to assign a table to a jruby variable. The table
+                reference can be used to perform data read write operations such as puts, scans, and
+                gets well as admin functionality such as disabling, dropping, describing tables. </p><p> For example, previously you would always specify a table name:</p><pre class="screen">
+hbase(main):000:0&gt; create &#8216;t&#8217;, &#8216;f&#8217;
+0 row(s) in 1.0970 seconds
+hbase(main):001:0&gt; put 't', 'rold', 'f', 'v'
+0 row(s) in 0.0080 seconds
+
+hbase(main):002:0&gt; scan 't' 
+ROW                                COLUMN+CELL                                                                                      
+ rold                              column=f:, timestamp=1378473207660, value=v                                                      
+1 row(s) in 0.0130 seconds
+
+hbase(main):003:0&gt; describe 't'
+DESCRIPTION                                                                           ENABLED                                       
+ 't', {NAME =&gt; 'f', DATA_BLOCK_ENCODING =&gt; 'NONE', BLOOMFILTER =&gt; 'ROW', REPLICATION_ true                                          
+ SCOPE =&gt; '0', VERSIONS =&gt; '1', COMPRESSION =&gt; 'NONE', MIN_VERSIONS =&gt; '0', TTL =&gt; '2                                               
+ 147483647', KEEP_DELETED_CELLS =&gt; 'false', BLOCKSIZE =&gt; '65536', IN_MEMORY =&gt; 'false                                               
+ ', BLOCKCACHE =&gt; 'true'}                                                                                 
+1 row(s) in 1.4430 seconds
+
+hbase(main):004:0&gt; disable 't'
+0 row(s) in 14.8700 seconds
+
+hbase(main):005:0&gt; drop 't'
+0 row(s) in 23.1670 seconds
+
+hbase(main):006:0&gt; 
+	  </pre><p> Now you can assign the table to a variable and use the results in jruby shell
+                code.</p><pre class="screen">
+hbase(main):007 &gt; t = create 't', 'f'
+0 row(s) in 1.0970 seconds
+
+=&gt; Hbase::Table - t
+hbase(main):008 &gt; t.put 'r', 'f', 'v'
+0 row(s) in 0.0640 seconds
+hbase(main):009 &gt; t.scan
+ROW                           COLUMN+CELL                                                                        
+ r                            column=f:, timestamp=1331865816290, value=v                                        
+1 row(s) in 0.0110 seconds
+hbase(main):010:0&gt; t.describe
+DESCRIPTION                                                                           ENABLED                                       
+ 't', {NAME =&gt; 'f', DATA_BLOCK_ENCODING =&gt; 'NONE', BLOOMFILTER =&gt; 'ROW', REPLICATION_ true                                          
+ SCOPE =&gt; '0', VERSIONS =&gt; '1', COMPRESSION =&gt; 'NONE', MIN_VERSIONS =&gt; '0', TTL =&gt; '2                                               
+ 147483647', KEEP_DELETED_CELLS =&gt; 'false', BLOCKSIZE =&gt; '65536', IN_MEMORY =&gt; 'false                                               
+ ', BLOCKCACHE =&gt; 'true'}                                                                                 
+1 row(s) in 0.0210 seconds
+hbase(main):038:0&gt; t.disable
+0 row(s) in 6.2350 seconds
+hbase(main):039:0&gt; t.drop
+0 row(s) in 0.2340 seconds
+	  </pre><p> If the table has already been created, you can assign a Table to a variable by
+                using the get_table method:</p><pre class="screen">
+hbase(main):011 &gt; create 't','f'
+0 row(s) in 1.2500 seconds
+
+=&gt; Hbase::Table - t
+hbase(main):012:0&gt; tab = get_table 't'
+0 row(s) in 0.0010 seconds
+
+=&gt; Hbase::Table - t
+hbase(main):013:0&gt; tab.put &#8216;r1&#8217; ,&#8217;f&#8217;, &#8216;v&#8217; 
+0 row(s) in 0.0100 seconds
+hbase(main):014:0&gt; tab.scan
+ROW                                COLUMN+CELL                                                                                      
+ r1                                column=f:, timestamp=1378473876949, value=v                                                      
+1 row(s) in 0.0240 seconds
+hbase(main):015:0&gt; 
+	  </pre><p> The list functionality has also been extended so that it returns a list of table
+                names as strings. You can then use jruby to script table operations based on these
+                names. The list_snapshots command also acts similarly.</p><pre class="screen">
+hbase(main):016 &gt; tables = list(&#8216;t.*&#8217;)
+TABLE                                                                                                                               
+t                                                                                                                                   
+1 row(s) in 0.1040 seconds
+
+=&gt; #&lt;#&lt;Class:0x7677ce29&gt;:0x21d377a4&gt;
+hbase(main):017:0&gt; tables.map { |t| disable t ; drop  t}
+0 row(s) in 2.2510 seconds
+
+=&gt; [nil]
+hbase(main):018:0&gt; 
+            </pre></div><div class="section" title="1.6.2.&nbsp;irbrc"><div class="titlepage"><div><div><h3 class="title"><a name="d8312e192"></a>1.6.2.&nbsp;<code class="filename">irbrc</code></h3></div></div></div><p>Create an <code class="filename">.irbrc</code> file for yourself in your home directory.
+                Add customizations. A useful one is command history so commands are save across
+                Shell invocations:</p><pre class="screen">
+$ more .irbrc
+require 'irb/ext/save-history'
+IRB.conf[:SAVE_HISTORY] = 100
+IRB.conf[:HISTORY_FILE] = "#{ENV['HOME']}/.irb-save-history"</pre><p>See the <span class="application">ruby</span> documentation of
+                    <code class="filename">.irbrc</code> to learn about other possible configurations.
+            </p></div><div class="section" title="1.6.3.&nbsp;LOG data to timestamp"><div class="titlepage"><div><div><h3 class="title"><a name="d8312e211"></a>1.6.3.&nbsp;LOG data to timestamp</h3></div></div></div><p> To convert the date '08/08/16 20:56:29' from an hbase log into a timestamp,
+                do:</p><pre class="screen">
+hbase(main):021:0&gt; import java.text.SimpleDateFormat
+hbase(main):022:0&gt; import java.text.ParsePosition
+hbase(main):023:0&gt; SimpleDateFormat.new("yy/MM/dd HH:mm:ss").parse("08/08/16 20:56:29", ParsePosition.new(0)).getTime() =&gt; 1218920189000</pre><p> To go the other direction:</p><pre class="screen">
+hbase(main):021:0&gt; import java.util.Date
+hbase(main):022:0&gt; Date.new(1218920189000).toString() =&gt; "Sat Aug 16 20:56:29 UTC 2008"</pre><p> To output in a format that is exactly like that of the HBase log format will take
+                a little messing with <a class="link" href="http://download.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html" target="_top">SimpleDateFormat</a>.
+            </p></div><div class="section" title="1.6.4.&nbsp;Debug"><div class="titlepage"><div><div><h3 class="title"><a name="d8312e227"></a>1.6.4.&nbsp;Debug</h3></div></div></div><div class="section" title="1.6.4.1.&nbsp;Shell debug switch"><div class="titlepage"><div><div><h4 class="title"><a name="d8312e230"></a>1.6.4.1.&nbsp;Shell debug switch</h4></div></div></div><p>You can set a debug switch in the shell to see more output -- e.g. more of the
+                    stack trace on exception -- when you run a command:</p><pre class="programlisting">hbase&gt; debug &lt;RETURN&gt;</pre></div><div class="section" title="1.6.4.2.&nbsp;DEBUG log level"><div class="titlepage"><div><div><h4 class="title"><a name="d8312e237"></a>1.6.4.2.&nbsp;DEBUG log level</h4></div></div></div><p>To enable DEBUG level logging in the shell, launch it with the
+                        <span class="command"><strong>-d</strong></span> option.</p><pre class="programlisting">$ ./bin/hbase shell -d</pre></div></div><div class="section" title="1.6.5.&nbsp;Commands"><div class="titlepage"><div><div><h3 class="title"><a name="d8312e247"></a>1.6.5.&nbsp;Commands</h3></div></div></div><div class="section" title="1.6.5.1.&nbsp;count"><div class="titlepage"><div><div><h4 class="title"><a name="d8312e250"></a>1.6.5.1.&nbsp;count</h4></div></div></div><p>Count command returns the number of rows in a table. It's quite fast when
+                    configured with the right CACHE
+                    </p><pre class="programlisting">hbase&gt; count '&lt;tablename&gt;', CACHE =&gt; 1000</pre><p>
+                    The above count fetches 1000 rows at a time. Set CACHE lower if your rows are
+                    big. Default is to fetch one row at a time. </p></div></div></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a></body></html>

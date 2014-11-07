@@ -1,0 +1,86 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>1.3.&nbsp;MRUnit</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="unit_testing.html" title="Chapter&nbsp;1.&nbsp;Unit Testing HBase Applications"><link rel="up" href="unit_testing.html" title="Chapter&nbsp;1.&nbsp;Unit Testing HBase Applications"><link rel="prev" href="mockito.html" title="1.2.&nbsp;Mockito"><link rel="next" href="ch01s04.html" title="1.4.&nbsp;Integration Testing with a HBase Mini-Cluster"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1.3.&nbsp;MRUnit</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="mockito.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch01s04.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/.html';
+    </script><div class="section" title="1.3.&nbsp;MRUnit"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d437e96"></a>1.3.&nbsp;MRUnit</h2></div></div></div><p><a class="link" href="http://mrunit.apache.org/" target="_top">Apache MRUnit</a> is a library that
+            allows you to unit-test MapReduce jobs. You can use it to test HBase jobs in the same
+            way as other MapReduce jobs.</p><p>Given a MapReduce job that writes to an HBase table called <code class="literal">MyTest</code>,
+            which has one column family called <code class="literal">CF</code>, the reducer of such a job
+            could look like the following:</p><pre class="programlisting">
+public class MyReducer extends TableReducer&lt;Text, Text, ImmutableBytesWritable&gt; {
+   public static final byte[] CF = "CF".getBytes();
+   public static final byte[] QUALIFIER = "CQ-1".getBytes();
+   public void reduce(Text key, Iterable&lt;Text&gt; values, Context context) throws IOException, InterruptedException {
+     //bunch of processing to extract data to be inserted, in our case, lets say we are simply
+     //appending all the records we receive from the mapper for this particular
+     //key and insert one record into HBase
+     StringBuffer data = new StringBuffer();
+     Put put = new Put(Bytes.toBytes(key.toString()));
+     for (Text val : values) {
+         data = data.append(val);
+     }
+     put.add(CF, QUALIFIER, Bytes.toBytes(data.toString()));
+     //write to HBase
+     context.write(new ImmutableBytesWritable(Bytes.toBytes(key.toString())), put);
+   }
+ }                    
+                </pre><p>To test this code, the first step is to add a dependency to MRUnit to your Maven POM
+            file. </p><pre class="programlisting">
+&lt;dependency&gt;
+   &lt;groupId&gt;org.apache.mrunit&lt;/groupId&gt;
+   &lt;artifactId&gt;mrunit&lt;/artifactId&gt;
+   &lt;version&gt;1.0.0 &lt;/version&gt;
+   &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;                    
+                    </pre><p>Next, use the ReducerDriver provided by MRUnit, in your Reducer job.</p><pre class="programlisting">
+public class MyReducerTest {
+    ReduceDriver&lt;Text, Text, ImmutableBytesWritable, Writable&gt; reduceDriver;
+    byte[] CF = "CF".getBytes();
+    byte[] QUALIFIER = "CQ-1".getBytes();
+
+    @Before
+    public void setUp() {
+      MyReducer reducer = new MyReducer();
+      reduceDriver = ReduceDriver.newReduceDriver(reducer);
+    }
+  
+   @Test
+   public void testHBaseInsert() throws IOException {
+      String strKey = "RowKey-1", strValue = "DATA", strValue1 = "DATA1", 
+strValue2 = "DATA2";
+      List&lt;Text&gt; list = new ArrayList&lt;Text&gt;();
+      list.add(new Text(strValue));
+      list.add(new Text(strValue1));
+      list.add(new Text(strValue2));
+      //since in our case all that the reducer is doing is appending the records that the mapper   
+      //sends it, we should get the following back
+      String expectedOutput = strValue + strValue1 + strValue2;
+     //Setup Input, mimic what mapper would have passed
+      //to the reducer and run test
+      reduceDriver.withInput(new Text(strKey), list);
+      //run the reducer and get its output
+      List&lt;Pair&lt;ImmutableBytesWritable, Writable&gt;&gt; result = reduceDriver.run();
+    
+      //extract key from result and verify
+      assertEquals(Bytes.toString(result.get(0).getFirst().get()), strKey);
+    
+      //extract value for CF/QUALIFIER and verify
+      Put a = (Put)result.get(0).getSecond();
+      String c = Bytes.toString(a.get(CF, QUALIFIER).get(0).getValue());
+      assertEquals(expectedOutput,c );
+   }
+
+}                    
+                    </pre><p>Your MRUnit test verifies that the output is as expected, the Put that is inserted
+            into HBase has the correct value, and the ColumnFamily and ColumnQualifier have the
+            correct values.</p><p>MRUnit includes a MapperDriver to test mapping jobs, and you can use MRUnit to test
+            other operations, including reading from HBase, processing data, or writing to
+            HDFS,</p></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="mockito.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch01s04.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">1.2.&nbsp;Mockito&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="unit_testing.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;1.4.&nbsp;Integration Testing with a HBase Mini-Cluster</td></tr></table></div></body></html>

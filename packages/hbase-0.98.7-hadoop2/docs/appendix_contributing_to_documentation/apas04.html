@@ -1,0 +1,22 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>A.4.&nbsp;Editing the HBase Reference Guide</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="appendix_contributing_to_documentation.html" title="Appendix&nbsp;A.&nbsp;Contributing to Documentation"><link rel="up" href="appendix_contributing_to_documentation.html" title="Appendix&nbsp;A.&nbsp;Contributing to Documentation"><link rel="prev" href="apas03.html" title="A.3.&nbsp;Editing the HBase Website"><link rel="next" href="apas05.html" title="A.5.&nbsp;Auto-Generated Content"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">A.4.&nbsp;Editing the HBase Reference Guide</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="apas03.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="apas05.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/.html';
+    </script><div class="section" title="A.4.&nbsp;Editing the HBase Reference Guide"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2571e155"></a>A.4.&nbsp;Editing the HBase Reference Guide</h2></div></div></div><p>The source for the HBase Reference Guide is in the HBase source, in the
+                <code class="filename">src/main/docbkx/</code> directory. It is written in <a class="link" href="http://www.docbook.org/" target="_top">Docbook</a> XML. Docbook can be
+            intimidating, but you can typically follow the formatting of the surrounding file to get
+            an idea of the mark-up. You can edit Docbook XML files using a plain-text editor, an
+            XML-aware IDE, or a specialized XML editor.</p><p>Docbook's syntax can be picky. Before submitting a patch, be sure to build the output
+            locally using the <span class="command"><strong>mvn site</strong></span> command. If you do not get any build
+            errors, that means that the XML is well-formed, which means that each opening tag is
+            balanced by a closing tag. Well-formedness is not exactly the same as validity. Check
+            the output in <code class="filename">target/docbkx/</code> for any surprises before submitting a
+            patch.</p></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="apas03.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="apas05.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">A.3.&nbsp;Editing the HBase Website&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="appendix_contributing_to_documentation.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;A.5.&nbsp;Auto-Generated Content</td></tr></table></div></body></html>

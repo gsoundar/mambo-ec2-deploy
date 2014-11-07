@@ -1,0 +1,52 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>A.2.&nbsp;Contributing to Documentation or Other Strings</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="appendix_contributing_to_documentation.html" title="Appendix&nbsp;A.&nbsp;Contributing to Documentation"><link rel="prev" href="appendix_contributing_to_documentation.html" title="Appendix&nbsp;A.&nbsp;Contributing to Documentation"><link rel="next" href="apas03.html" title="A.3.&nbsp;Editing the HBase Website"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">A.2.&nbsp;Contributing to Documentation or Other Strings</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="appendix_contributing_to_documentation.html">Prev</a>&nbsp;</td><th width="60%" align="center">Appendix&nbsp;A.&nbsp;Contributing to Documentation</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="apas03.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/.html';
+    </script><div class="section" title="A.2.&nbsp;Contributing to Documentation or Other Strings"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2802e22164"></a>A.2.&nbsp;Contributing to Documentation or Other Strings</h2></div></div></div><p> If you spot an error in a string in a UI, utility, script, log message, or elsewhere,
+            or you think something could be made more clear, or you think text needs to be added
+            where it doesn't currently exist, the first step is to file a JIRA. Be sure to set the
+            component to <code class="literal">Documentation</code> in addition any other involved components.
+            Most components have one or more default owners, who monitor new issues which come into
+            those queues. Regardless of whether you feel able to fix the bug, you should still file
+            bugs where you see them.</p><p>If you want to try your hand at fixing your newly-filed bug, assign it to yourself.
+            You will need to clone the HBase Git repository to your local system and work on the
+            issue there. When you have developed a potential fix, submit it for review. If it
+            addresses the issue and is seen as an improvement, one of the HBase committers will
+            commit it to one or more branches, as appropriate.</p><div class="procedure" title="Procedure&nbsp;A.1.&nbsp;Suggested Work flow for Submitting Patches"><a name="submit_doc_patch_procedure"></a><p class="title"><b>Procedure&nbsp;A.1.&nbsp;Suggested Work flow for Submitting Patches</b></p><p>This procedure goes into more detail than Git pros will need, but is included in
+                this appendix so that people unfamiliar with Git can feel confident contributing to
+                HBase while they learn.</p><ol class="procedure" type="1"><li class="step" title="Step 1"><p>If you have not already done so, clone the Git repository locally. You only
+                    need to do this once.</p></li><li class="step" title="Step 2"><p>Fairly often, pull remote changes into your local repository by using the
+                        <code class="code">git pull</code> command, while your master branch is checked
+                    out.</p></li><li class="step" title="Step 3"><p>For each issue you work on, create a new branch. One convention that works
+                    well for naming the branches is to name a given branch the same as the JIRA it
+                    relates to:</p><pre class="screen">$ git checkout -b HBASE-123456</pre></li><li class="step" title="Step 4"><p>Make your suggested changes on your branch, committing your changes to your
+                    local repository often. If you need to switch to working on a different issue,
+                    remember to check out the appropriate branch.</p></li><li class="step" title="Step 5"><p>When you are ready to submit your patch, first be sure that HBase builds
+                    cleanly and behaves as expected in your modified branch. If you have made
+                    documentation changes, be sure the documentation and website builds.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Before you use the <code class="literal">site</code> target the very first time, be
+                        sure you have built HBase at least once, in order to fetch all the Maven
+                        dependencies you need.</p></div><pre class="screen">$ mvn clean install -DskipTests               # Builds HBase</pre><pre class="screen">$ mvn clean site -DskipTests                  # Builds the website and documentation</pre><p>If any errors occur, address them.</p></li><li class="step" title="Step 6"><p>If it takes you several days or weeks to implement your fix, or you know that
+                    the area of the code you are working in has had a lot of changes lately, make
+                    sure you rebase your branch against the remote master and take care of any
+                    conflicts before submitting your patch.</p><pre class="screen">
+$ git checkout HBASE-123456
+$ git rebase origin/master                
+                </pre></li><li class="step" title="Step 7"><p>Generate your patch against the remote master. Run the following command from
+                    the top level of your git repository (usually called
+                    <code class="literal">hbase</code>):</p><pre class="screen">$ git diff --no-prefix origin/master &gt; HBASE-123456.patch</pre><p>The name of the patch should contain the JIRA ID. Look over the patch file to
+                    be sure that you did not change any additional files by accident and that there
+                    are no other surprises. When you are satisfied, attach the patch to the JIRA and
+                    click the <span class="guibutton">Patch Available</span> button. A reviewer
+                    will review your patch. If you need to submit a new version of the patch, leave
+                    the old one on the JIRA and add a version number to the name of the new
+                    patch.</p></li><li class="step" title="Step 8"><p>After a change has been committed, there is no need to keep your local branch
+                    around. Instead you should run <span class="command"><strong>git pull</strong></span> to get the new change
+                    into your master branch.</p></li></ol></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="appendix_contributing_to_documentation.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="appendix_contributing_to_documentation.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="apas03.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Appendix&nbsp;A.&nbsp;Contributing to Documentation&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;A.3.&nbsp;Editing the HBase Website</td></tr></table></div></body></html>

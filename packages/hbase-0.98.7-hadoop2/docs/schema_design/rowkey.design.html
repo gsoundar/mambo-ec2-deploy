@@ -1,0 +1,216 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>1.3.&nbsp;Rowkey Design</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="schema_design.html" title="Chapter&nbsp;1.&nbsp;HBase and Schema Design"><link rel="up" href="schema_design.html" title="Chapter&nbsp;1.&nbsp;HBase and Schema Design"><link rel="prev" href="number.of.cfs.html" title="1.2.&nbsp; On the number of column families"><link rel="next" href="schema.versions.html" title="1.4.&nbsp; Number of Versions"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1.3.&nbsp;Rowkey Design</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="number.of.cfs.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="schema.versions.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/rowkey.design.html';
+    </script><div class="section" title="1.3.&nbsp;Rowkey Design"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="rowkey.design"></a>1.3.&nbsp;Rowkey Design</h2></div></div></div><div class="section" title="1.3.1.&nbsp;Hotspotting"><div class="titlepage"><div><div><h3 class="title"><a name="d2109e60"></a>1.3.1.&nbsp;Hotspotting</h3></div></div></div><p>Rows in HBase are sorted lexicographically by row key. This design optimizes for scans,
+        allowing you to store related rows, or rows that will be read together, near each other.
+        However, poorly designed row keys are a common source of <em class="firstterm">hotspotting</em>.
+        Hotspotting occurs when a large amount of client traffic is directed at one node, or only a
+        few nodes, of a cluster. This traffic may represent reads, writes, or other operations. The
+        traffic overwhelms the single machine responsible for hosting that region, causing
+        performance degradation and potentially leading to region unavailability. This can also have
+        adverse effects on other regions hosted by the same region server as that host is unable to
+        service the requested load. It is important to design data access patterns such that the
+        cluster is fully and evenly utilized.</p><p>To prevent hotspotting on writes, design your row keys such that rows that truly do need
+        to be in the same region are, but in the bigger picture, data is being written to multiple
+        regions across the cluster, rather than one at a time. Some common techniques for avoiding
+        hotspotting are described below, along with some of their advantages and drawbacks.</p><p title="Salting"><b>Salting.&nbsp;</b>Salting in this sense has nothing to do with cryptography, but refers to adding random
+          data to the start of a row key. In this case, salting refers to adding a randomly-assigned
+          prefix to the row key to cause it to sort differently than it otherwise would. The number
+          of possible prefixes correspond to the number of regions you want to spread the data
+          across. Salting can be helpful if you have a few "hot" row key patterns which come up over
+          and over amongst other more evenly-distributed rows. Consider the following example, which
+          shows that salting can spread write load across multiple regionservers, and illustrates
+          some of the negative implications for reads.</p><div class="example"><a name="d2109e75"></a><p class="title"><b>Example&nbsp;1.1.&nbsp;Salting Example</b></p><div class="example-contents"><p>Suppose you have the following list of row keys, and your table is split such that
+          there is one region for each letter of the alphabet. Prefix 'a' is one region, prefix 'b'
+          is another. In this table, all rows starting with 'f' are in the same region. This example
+          focuses on rows with keys like the following:</p><pre class="screen">
+foo0001
+foo0002
+foo0003
+foo0004          
+        </pre><p>Now, imagine that you would like to spread these across four different regions. You
+          decide to use four different salts: <code class="literal">a</code>, <code class="literal">b</code>,
+            <code class="literal">c</code>, and <code class="literal">d</code>. In this scenario, each of these letter
+          prefixes will be on a different region. After applying the salts, you have the following
+          rowkeys instead. Since you can now write to four separate regions, you theoretically have
+          four times the throughput when writing that you would have if all the writes were going to
+          the same region.</p><pre class="screen">
+a-foo0003
+b-foo0001
+c-foo0004
+d-foo0002          
+        </pre><p>Then, if you add another row, it will randomly be assigned one of the four possible
+          salt values and end up near one of the existing rows.</p><pre class="screen">
+a-foo0003
+b-foo0001
+<span class="emphasis"><em>c-foo0003</em></span>
+c-foo0004
+d-foo0002        
+        </pre><p>Since this assignment will be random, you will need to do more work if you want to
+          retrieve the rows in lexicographic order. In this way, salting attempts to increase
+          throughput on writes, but has a cost during reads.</p></div></div><br class="example-break"><p></p><p title="Hashing"><b>Hashing.&nbsp;</b>Instead of a random assignment, you could use a one-way <em class="firstterm">hash</em>
+          that would cause a given row to always be "salted" with the same prefix, in a way that
+          would spread the load across the regionservers, but allow for predictability during reads.
+          Using a deterministic hash allows the client to reconstruct the complete rowkey and use a
+          Get operation to retrieve that row as normal.</p><div class="example"><a name="d2109e116"></a><p class="title"><b>Example&nbsp;1.2.&nbsp;Hashing Example</b></p><div class="example-contents"><p>Given the same situation in the salting example above, you could instead apply a
+          one-way hash that would cause the row with key <code class="literal">foo0003</code> to always, and
+          predictably, receive the <code class="literal">a</code> prefix. Then, to retrieve that row, you
+          would already know the key. You could also optimize things so that certain pairs of keys
+          were always in the same region, for instance.</p></div></div><br class="example-break"><p title="Reversing the Key"><b>Reversing the Key.&nbsp;</b>A third common trick for preventing hotspotting is to reverse a fixed-width or numeric
+        row key so that the part that changes the most often (the least significant digit) is first.
+        This effectively randomizes row keys, but sacrifices row ordering properties.</p><p>See <a class="link" href="https://communities.intel.com/community/itpeernetwork/datastack/blog/2013/11/10/discussion-on-designing-hbase-tables" target="_top">https://communities.intel.com/community/itpeernetwork/datastack/blog/2013/11/10/discussion-on-designing-hbase-tables</a>,
+        and <a class="link" href="http://phoenix.apache.org/salted.html" target="_top">article on Salted Tables</a>
+        from the Phoenix project, and the discussion in the comments of <a class="link" href="https://issues.apache.org/jira/browse/HBASE-11682" target="_top">HBASE-11682</a> for more
+        information about avoiding hotspotting.</p></div><div class="section" title="1.3.2.&nbsp; Monotonically Increasing Row Keys/Timeseries Data"><div class="titlepage"><div><div><h3 class="title"><a name="timeseries"></a>1.3.2.&nbsp; Monotonically Increasing Row Keys/Timeseries Data </h3></div></div></div><p> In the HBase chapter of Tom White's book <a class="link" href="http://oreilly.com/catalog/9780596521981" target="_top">Hadoop: The Definitive Guide</a>
+        (O'Reilly) there is a an optimization note on watching out for a phenomenon where an import
+        process walks in lock-step with all clients in concert pounding one of the table's regions
+        (and thus, a single node), then moving onto the next region, etc. With monotonically
+        increasing row-keys (i.e., using a timestamp), this will happen. See this comic by IKai Lan
+        on why monotonically increasing row keys are problematic in BigTable-like datastores: <a class="link" href="http://ikaisays.com/2011/01/25/app-engine-datastore-tip-monotonically-increasing-values-are-bad/" target="_top">monotonically
+          increasing values are bad</a>. The pile-up on a single region brought on by
+        monotonically increasing keys can be mitigated by randomizing the input records to not be in
+        sorted order, but in general it's best to avoid using a timestamp or a sequence (e.g. 1, 2,
+        3) as the row-key. </p><p>If you do need to upload time series data into HBase, you should study <a class="link" href="http://opentsdb.net/" target="_top">OpenTSDB</a> as a successful example. It has a page
+        describing the <a class="link" href=" http://opentsdb.net/schema.html" target="_top">schema</a> it uses in HBase. The key
+        format in OpenTSDB is effectively [metric_type][event_timestamp], which would appear at
+        first glance to contradict the previous advice about not using a timestamp as the key.
+        However, the difference is that the timestamp is not in the <span class="emphasis"><em>lead</em></span>
+        position of the key, and the design assumption is that there are dozens or hundreds (or
+        more) of different metric types. Thus, even with a continual stream of input data with a mix
+        of metric types, the Puts are distributed across various points of regions in the table. </p><p>See <a class="xref" href="schema.casestudies.html" title="1.11.&nbsp;Schema Design Case Studies">Section&nbsp;1.11, &#8220;Schema Design Case Studies&#8221;</a> for some rowkey design examples. </p></div><div class="section" title="1.3.3.&nbsp;Try to minimize row and column sizes"><div class="titlepage"><div><div><h3 class="title"><a name="keysize"></a>1.3.3.&nbsp;Try to minimize row and column sizes</h3></div><div><h4 class="subtitle">Or why are my StoreFile indices large?</h4></div></div></div><p>In HBase, values are always freighted with their coordinates; as a cell value passes
+        through the system, it'll be accompanied by its row, column name, and timestamp - always. If
+        your rows and column names are large, especially compared to the size of the cell value,
+        then you may run up against some interesting scenarios. One such is the case described by
+        Marc Limotte at the tail of <a class="link" href="https://issues.apache.org/jira/browse/HBASE-3551?page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel&amp;focusedCommentId=13005272#comment-13005272" target="_top">HBASE-3551</a>
+        (recommended!). Therein, the indices that are kept on HBase storefiles (<a class="xref" href="">???</a>) to facilitate random access may end up occupyng large chunks of the
+        HBase allotted RAM because the cell value coordinates are large. Mark in the above cited
+        comment suggests upping the block size so entries in the store file index happen at a larger
+        interval or modify the table schema so it makes for smaller rows and column names.
+        Compression will also make for larger indices. See the thread <a class="link" href="http://search-hadoop.com/m/hemBv1LiN4Q1/a+question+storefileIndexSize&amp;subj=a+question+storefileIndexSize" target="_top">a
+          question storefileIndexSize</a> up on the user mailing list. </p><p>Most of the time small inefficiencies don't matter all that much. Unfortunately, this is
+        a case where they do. Whatever patterns are selected for ColumnFamilies, attributes, and
+        rowkeys they could be repeated several billion times in your data. </p><p>See <a class="xref" href="">???</a> for more information on HBase stores data internally to see why this
+        is important.</p><div class="section" title="1.3.3.1.&nbsp;Column Families"><div class="titlepage"><div><div><h4 class="title"><a name="keysize.cf"></a>1.3.3.1.&nbsp;Column Families</h4></div></div></div><p>Try to keep the ColumnFamily names as small as possible, preferably one character
+          (e.g. "d" for data/default). </p><p>See <a class="xref" href="">???</a> for more information on HBase stores data internally to see why
+          this is important.</p></div><div class="section" title="1.3.3.2.&nbsp;Attributes"><div class="titlepage"><div><div><h4 class="title"><a name="keysize.attributes"></a>1.3.3.2.&nbsp;Attributes</h4></div></div></div><p>Although verbose attribute names (e.g., "myVeryImportantAttribute") are easier to
+          read, prefer shorter attribute names (e.g., "via") to store in HBase. </p><p>See <a class="xref" href="">???</a> for more information on HBase stores data internally to see why
+          this is important.</p></div><div class="section" title="1.3.3.3.&nbsp;Rowkey Length"><div class="titlepage"><div><div><h4 class="title"><a name="keysize.row"></a>1.3.3.3.&nbsp;Rowkey Length</h4></div></div></div><p>Keep them as short as is reasonable such that they can still be useful for required
+          data access (e.g., Get vs. Scan). A short key that is useless for data access is not
+          better than a longer key with better get/scan properties. Expect tradeoffs when designing
+          rowkeys. </p></div><div class="section" title="1.3.3.4.&nbsp;Byte Patterns"><div class="titlepage"><div><div><h4 class="title"><a name="keysize.patterns"></a>1.3.3.4.&nbsp;Byte Patterns</h4></div></div></div><p>A long is 8 bytes. You can store an unsigned number up to 18,446,744,073,709,551,615
+          in those eight bytes. If you stored this number as a String -- presuming a byte per
+          character -- you need nearly 3x the bytes. </p><p>Not convinced? Below is some sample code that you can run on your own.</p><pre class="programlisting">
+// long
+//
+long l = 1234567890L;
+byte[] lb = Bytes.toBytes(l);
+System.out.println("long bytes length: " + lb.length);   // returns 8
+
+String s = "" + l;
+byte[] sb = Bytes.toBytes(s);
+System.out.println("long as string length: " + sb.length);    // returns 10
+
+// hash
+//
+MessageDigest md = MessageDigest.getInstance("MD5");
+byte[] digest = md.digest(Bytes.toBytes(s));
+System.out.println("md5 digest bytes length: " + digest.length);    // returns 16
+
+String sDigest = new String(digest);
+byte[] sbDigest = Bytes.toBytes(sDigest);
+System.out.println("md5 digest as string length: " + sbDigest.length);    // returns 26
+        </pre><p>Unfortunately, using a binary representation of a type will make your data harder to
+          read outside of your code. For example, this is what you will see in the shell when you
+          increment a value:</p><pre class="programlisting">
+hbase(main):001:0&gt; incr 't', 'r', 'f:q', 1
+COUNTER VALUE = 1
+
+hbase(main):002:0&gt; get 't', 'r'
+COLUMN                                        CELL
+ f:q                                          timestamp=1369163040570, value=\x00\x00\x00\x00\x00\x00\x00\x01
+1 row(s) in 0.0310 seconds
+        </pre><p>The shell makes a best effort to print a string, and it this case it decided to just
+          print the hex. The same will happen to your row keys inside the region names. It can be
+          okay if you know what's being stored, but it might also be unreadable if arbitrary data
+          can be put in the same cells. This is the main trade-off. </p></div></div><div class="section" title="1.3.4.&nbsp;Reverse Timestamps"><div class="titlepage"><div><div><h3 class="title"><a name="reverse.timestamp"></a>1.3.4.&nbsp;Reverse Timestamps</h3></div></div></div><div class="note" title="Reverse Scan API" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Reverse Scan API</h3><p>
+          <a class="link" href="https://issues.apache.org/jira/browse/HBASE-4811" target="_top">HBASE-4811</a>
+          implements an API to scan a table or a range within a table in reverse, reducing the need
+          to optimize your schema for forward or reverse scanning. This feature is available in
+          HBase 0.98 and later. See <a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/client/Scan.html#setReversed%28boolean" target="_top">https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/client/Scan.html#setReversed%28boolean</a>
+          for more information. </p></div><p>A common problem in database processing is quickly finding the most recent version of a
+        value. A technique using reverse timestamps as a part of the key can help greatly with a
+        special case of this problem. Also found in the HBase chapter of Tom White's book Hadoop:
+        The Definitive Guide (O'Reilly), the technique involves appending (<code class="code">Long.MAX_VALUE -
+          timestamp</code>) to the end of any key, e.g., [key][reverse_timestamp]. </p><p>The most recent value for [key] in a table can be found by performing a Scan for [key]
+        and obtaining the first record. Since HBase keys are in sorted order, this key sorts before
+        any older row-keys for [key] and thus is first. </p><p>This technique would be used instead of using <a class="xref" href="schema.versions.html" title="1.4.&nbsp; Number of Versions">Section&nbsp;1.4, &#8220; Number of Versions &#8221;</a> where the intent is to hold onto all versions "forever" (or a
+        very long time) and at the same time quickly obtain access to any other version by using the
+        same Scan technique. </p></div><div class="section" title="1.3.5.&nbsp;Rowkeys and ColumnFamilies"><div class="titlepage"><div><div><h3 class="title"><a name="rowkey.scope"></a>1.3.5.&nbsp;Rowkeys and ColumnFamilies</h3></div></div></div><p>Rowkeys are scoped to ColumnFamilies. Thus, the same rowkey could exist in each
+        ColumnFamily that exists in a table without collision. </p></div><div class="section" title="1.3.6.&nbsp;Immutability of Rowkeys"><div class="titlepage"><div><div><h3 class="title"><a name="changing.rowkeys"></a>1.3.6.&nbsp;Immutability of Rowkeys</h3></div></div></div><p>Rowkeys cannot be changed. The only way they can be "changed" in a table is if the row
+        is deleted and then re-inserted. This is a fairly common question on the HBase dist-list so
+        it pays to get the rowkeys right the first time (and/or before you've inserted a lot of
+        data). </p></div><div class="section" title="1.3.7.&nbsp;Relationship Between RowKeys and Region Splits"><div class="titlepage"><div><div><h3 class="title"><a name="rowkey.regionsplits"></a>1.3.7.&nbsp;Relationship Between RowKeys and Region Splits</h3></div></div></div><p>If you pre-split your table, it is <span class="emphasis"><em>critical</em></span> to understand how your
+        rowkey will be distributed across the region boundaries. As an example of why this is
+        important, consider the example of using displayable hex characters as the lead position of
+        the key (e.g., "0000000000000000" to "ffffffffffffffff"). Running those key ranges through
+          <code class="code">Bytes.split</code> (which is the split strategy used when creating regions in
+          <code class="code">HBaseAdmin.createTable(byte[] startKey, byte[] endKey, numRegions)</code> for 10
+        regions will generate the following splits...</p><pre class="screen">
+48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48                                // 0
+54 -10 -10 -10 -10 -10 -10 -10 -10 -10 -10 -10 -10 -10 -10 -10                 // 6
+61 -67 -67 -67 -67 -67 -67 -67 -67 -67 -67 -67 -67 -67 -67 -68                 // =
+68 -124 -124 -124 -124 -124 -124 -124 -124 -124 -124 -124 -124 -124 -124 -126  // D
+75 75 75 75 75 75 75 75 75 75 75 75 75 75 75 72                                // K
+82 18 18 18 18 18 18 18 18 18 18 18 18 18 18 14                                // R
+88 -40 -40 -40 -40 -40 -40 -40 -40 -40 -40 -40 -40 -40 -40 -44                 // X
+95 -97 -97 -97 -97 -97 -97 -97 -97 -97 -97 -97 -97 -97 -97 -102                // _
+102 102 102 102 102 102 102 102 102 102 102 102 102 102 102 102                // f
+      </pre><p>... (note: the lead byte is listed to the right as a comment.) Given that the first
+        split is a '0' and the last split is an 'f', everything is great, right? Not so fast. </p><p>The problem is that all the data is going to pile up in the first 2 regions and the last
+        region thus creating a "lumpy" (and possibly "hot") region problem. To understand why, refer
+        to an <a class="link" href="http://www.asciitable.com" target="_top">ASCII Table</a>. '0' is byte 48, and 'f' is byte
+        102, but there is a huge gap in byte values (bytes 58 to 96) that will <span class="emphasis"><em>never
+          appear in this keyspace</em></span> because the only values are [0-9] and [a-f]. Thus, the
+        middle regions regions will never be used. To make pre-spliting work with this example
+        keyspace, a custom definition of splits (i.e., and not relying on the built-in split method)
+        is required. </p><p>Lesson #1: Pre-splitting tables is generally a best practice, but you need to pre-split
+        them in such a way that all the regions are accessible in the keyspace. While this example
+        demonstrated the problem with a hex-key keyspace, the same problem can happen with
+          <span class="emphasis"><em>any</em></span> keyspace. Know your data. </p><p>Lesson #2: While generally not advisable, using hex-keys (and more generally,
+        displayable data) can still work with pre-split tables as long as all the created regions
+        are accessible in the keyspace. </p><p>To conclude this example, the following is an example of how appropriate splits can be
+        pre-created for hex-keys:. </p><pre class="programlisting">public static boolean createTable(HBaseAdmin admin, HTableDescriptor table, byte[][] splits)
+throws IOException {
+  try {
+    admin.createTable( table, splits );
+    return true;
+  } catch (TableExistsException e) {
+    logger.info("table " + table.getNameAsString() + " already exists");
+    // the table already exists...
+    return false;
+  }
+}
+
+public static byte[][] getHexSplits(String startKey, String endKey, int numRegions) {
+  byte[][] splits = new byte[numRegions-1][];
+  BigInteger lowestKey = new BigInteger(startKey, 16);
+  BigInteger highestKey = new BigInteger(endKey, 16);
+  BigInteger range = highestKey.subtract(lowestKey);
+  BigInteger regionIncrement = range.divide(BigInteger.valueOf(numRegions));
+  lowestKey = lowestKey.add(regionIncrement);
+  for(int i=0; i &lt; numRegions-1;i++) {
+    BigInteger key = lowestKey.add(regionIncrement.multiply(BigInteger.valueOf(i)));
+    byte[] b = String.format("%016x", key).getBytes();
+    splits[i] = b;
+  }
+  return splits;
+}</pre></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="number.of.cfs.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="schema.versions.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">1.2.&nbsp; On the number of column families &nbsp;</td><td width="20%" align="center"><a accesskey="h" href="schema_design.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;1.4.&nbsp; Number of Versions </td></tr></table></div></body></html>

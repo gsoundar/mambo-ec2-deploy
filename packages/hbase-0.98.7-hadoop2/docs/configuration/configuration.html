@@ -1,0 +1,213 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>Chapter&nbsp;1.&nbsp;Apache HBase Configuration</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="configuration.html" title="Chapter&nbsp;1.&nbsp;Apache HBase Configuration"><link rel="next" href="standalone_dist.html" title="1.2.&nbsp;HBase run modes: Standalone and Distributed"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;1.&nbsp;Apache HBase Configuration</th></tr><tr><td width="20%" align="left">&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="standalone_dist.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/configuration.html';
+    </script><div class="chapter" title="Chapter&nbsp;1.&nbsp;Apache HBase Configuration"><div class="titlepage"><div><div><h2 class="title"><a name="configuration"></a>Chapter&nbsp;1.&nbsp;Apache HBase Configuration</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="configuration.html#basic.prerequisites">1.1. Basic Prerequisites</a></span></dt><dd><dl><dt><span class="section"><a href="configuration.html#hadoop">1.1.1. Hadoop</a></span></dt></dl></dd><dt><span class="section"><a href="standalone_dist.html">1.2. HBase run modes: Standalone and Distributed</a></span></dt><dd><dl><dt><span class="section"><a href="standalone_dist.html#standalone">1.2.1. Standalone HBase</a></span></dt><dt><span class="section"><a href="standalone_dist.html#distributed">1.2.2. Distributed</a></span></dt><dt><span class="section"><a href="standalone_dist.html#fully_dist">1.2.3. Fully-distributed</a></span></dt></dl></dd><dt><span class="section"><a href="confirm.html">1.3. Running and Confirming Your Installation</a></span></dt><dt><span class="section"><a href="config.files.html">1.4. Configuration Files</a></span></dt><dd><dl><dt><span class="section"><a href="config.files.html#hbase.site">1.4.1. <code class="filename">hbase-site.xml</code> and <code class="filename">hbase-default.xml</code></a></span></dt><dt><span class="section"><a href="config.files.html#hbase.env.sh">1.4.2. <code class="filename">hbase-env.sh</code></a></span></dt><dt><span class="section"><a href="config.files.html#log4j">1.4.3. <code class="filename">log4j.properties</code></a></span></dt><dt><span class="section"><a href="config.files.html#client_dependencies">1.4.4. Client configuration and dependencies connecting to an HBase cluster</a></span></dt></dl></dd><dt><span class="section"><a href="example_config.html">1.5. Example Configurations</a></span></dt><dd><dl><dt><span class="section"><a href="example_config.html#d1560e3075">1.5.1. Basic Distributed HBase Install</a></span></dt></dl></dd><dt><span class="section"><a href="important_configurations.html">1.6. The Important Configurations</a></span></dt><dd><dl><dt><span class="section"><a href="important_configurations.html#required_configuration">1.6.1. Required Configurations</a></span></dt><dt><span class="section"><a href="important_configurations.html#recommended_configurations">1.6.2. Recommended Configurations</a></span></dt><dt><span class="section"><a href="important_configurations.html#other_configuration">1.6.3. Other Configurations</a></span></dt></dl></dd></dl></div><p>This chapter expands upon the <a class="xref" href="">???</a> chapter to further explain
+    configuration of Apache HBase. Please read this chapter carefully, especially <a class="xref" href="configuration.html#basic.prerequisites" title="1.1.&nbsp;Basic Prerequisites">Section&nbsp;1.1, &#8220;Basic Prerequisites&#8221;</a> to ensure that your HBase testing and deployment goes
+    smoothly, and prevent data loss.</p><p> Apache HBase uses the same configuration system as Apache Hadoop. All configuration files
+    are located in the <code class="filename">conf/</code> directory, which needs to be kept in sync for each
+    node on your cluster.</p><div class="variablelist" title="HBase Configuration Files"><p class="title"><b>HBase Configuration Files</b></p><dl><dt><span class="term"><code class="filename">backup-masters</code></span></dt><dd><p>Not present by default. A plain-text file which lists hosts on which the Master should
+          start a backup Master process, one host per line.</p></dd><dt><span class="term"><code class="filename">hadoop-metrics2-hbase.properties</code></span></dt><dd><p>Used to connect HBase Hadoop's Metrics2 framework. See the <a class="link" href="http://wiki.apache.org/hadoop/HADOOP-6728-MetricsV2" target="_top">Hadoop Wiki
+            entry</a> for more information on Metrics2. Contains only commented-out examples by
+          default.</p></dd><dt><span class="term"><code class="filename">hbase-env.cmd</code> and <code class="filename">hbase-env.sh</code></span></dt><dd><p>Script for Windows and Linux / Unix environments to set up the working environment for
+        HBase, including the location of Java, Java options, and other environment variables. The
+        file contains many commented-out examples to provide guidance.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>In HBase 0.98.5 and newer, you must set <code class="envar">JAVA_HOME</code> on each node of
+            your cluster. <code class="filename">hbase-env.sh</code> provides a handy mechanism to do
+            this.</p></div></dd><dt><span class="term"><code class="filename">hbase-policy.xml</code></span></dt><dd><p>The default policy configuration file used by RPC servers to make authorization
+          decisions on client requests. Only used if HBase security (<a class="xref" href="">???</a>) is enabled.</p></dd><dt><span class="term"><code class="filename">hbase-site.xml</code></span></dt><dd><p>The main HBase configuration file. This file specifies configuration options which
+          override HBase's default configuration. You can view (but do not edit) the default
+          configuration file at <code class="filename">docs/hbase-default.xml</code>. You can also view the
+          entire effective configuration for your cluster (defaults and overrides) in the
+            <span class="guilabel">HBase Configuration</span> tab of the HBase Web UI.</p></dd><dt><span class="term"><code class="filename">log4j.properties</code></span></dt><dd><p>Configuration file for HBase logging via <code class="code">log4j</code>.</p></dd><dt><span class="term"><code class="filename">regionservers</code></span></dt><dd><p>A plain-text file containing a list of hosts which should run a RegionServer in your
+          HBase cluster. By default this file contains the single entry
+          <code class="literal">localhost</code>. It should contain a list of hostnames or IP addresses, one
+          per line, and should only contain <code class="literal">localhost</code> if each node in your
+          cluster will run a RegionServer on its <code class="literal">localhost</code> interface.</p></dd></dl></div><div class="tip" title="Checking XML Validity" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Checking XML Validity</h3><p>When you edit XML, it is a good idea to use an XML-aware editor to be sure that your
+      syntax is correct and your XML is well-formed. You can also use the <span class="command"><strong>xmllint</strong></span>
+      utility to check that your XML is well-formed. By default, <span class="command"><strong>xmllint</strong></span> re-flows
+      and prints the XML to standard output. To check for well-formedness and only print output if
+      errors exist, use the command <span class="command"><strong>xmllint -noout
+        <em class="replaceable"><code>filename.xml</code></em></strong></span>.</p></div><div class="warning" title="Keep Configuration In Sync Across the Cluster" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Keep Configuration In Sync Across the Cluster</h3><p>When running in distributed mode, after you make an edit to an HBase configuration, make
+      sure you copy the content of the <code class="filename">conf/</code> directory to all nodes of the
+      cluster. HBase will not do this for you. Use <span class="command"><strong>rsync</strong></span>, <span class="command"><strong>scp</strong></span>,
+      or another secure mechanism for copying the configuration files to your nodes. For most
+      configuration, a restart is needed for servers to pick up changes An exception is dynamic
+      configuration. to be described later below.</p></div><div class="section" title="1.1.&nbsp;Basic Prerequisites"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="basic.prerequisites"></a>1.1.&nbsp;Basic Prerequisites</h2></div></div></div><p>This section lists required services and some required system configuration. </p><div class="table"><a name="java"></a><p class="title"><b>Table&nbsp;1.1.&nbsp;Java</b></p><div class="table-contents"><table summary="Java" border="1"><colgroup><col><col><col><col></colgroup><thead><tr><th>HBase Version</th><th>JDK 6</th><th>JDK 7</th><th>JDK 8</th></tr></thead><tbody><tr><td>1.0</td><td><a class="link" href="http://search-hadoop.com/m/DHED4Zlz0R1" target="_top">Not Supported</a></td><td>yes</td><td><p>Running with JDK 8 will work but is not well tested.</p></td></tr><tr><td>0.98</td><td>yes</td><td>yes</td><td><p>Running with JDK 8 works but is not well tested. Building with JDK 8 would
+                require removal of the deprecated remove() method of the PoolMap class and is under
+                consideration. See ee <a class="link" href="https://issues.apache.org/jira/browse/HBASE-7608" target="_top">HBASE-7608</a>
+                for more information about JDK 8 support.</p></td></tr><tr><td>0.96</td><td>yes</td><td>yes</td><td>&nbsp;</td></tr><tr><td>0.94</td><td>yes</td><td>yes</td><td>&nbsp;</td></tr></tbody></table></div><div class="longdesc-link" align="right"><br clear="all"><span class="longdesc-link">[<a href="java.html" target="longdesc">D</a>]</span></div></div><br class="table-break"><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>In HBase 0.98.5 and newer, you must set <code class="envar">JAVA_HOME</code> on each node of
+        your cluster. <code class="filename">hbase-env.sh</code> provides a handy mechanism to do
+        this.</p></div><div class="variablelist" title="Operating System Utilities"><a name="os"></a><p class="title"><b>Operating System Utilities</b></p><dl><dt><a name="ssh"></a><span class="term">ssh</span></dt><dd><p>HBase uses the Secure Shell (ssh) command and utilities extensively to communicate
+            between cluster nodes. Each server in the cluster must be running <span class="command"><strong>ssh</strong></span>
+            so that the Hadoop and HBase daemons can be managed. You must be able to connect to all
+            nodes via SSH, including the local node, from the Master as well as any backup Master,
+            using a shared key rather than a password. You can see the basic methodology for such a
+            set-up in Linux or Unix systems at <a class="xref" href="">???</a>. If your cluster nodes use OS X, see the
+            section, <a class="link" href="http://wiki.apache.org/hadoop/Running_Hadoop_On_OS_X_10.5_64-bit_%28Single-Node_Cluster%29" target="_top">SSH:
+              Setting up Remote Desktop and Enabling Self-Login</a> on the Hadoop wiki.</p></dd><dt><a name="dns"></a><span class="term">DNS</span></dt><dd><p>HBase uses the local hostname to self-report its IP address. Both forward and
+            reverse DNS resolving must work in versions of HBase previous to 0.92.0. The <a class="link" href="https://github.com/sujee/hadoop-dns-checker" target="_top">hadoop-dns-checker</a>
+                tool can be used to verify DNS is working correctly on the cluster. The project
+                README file provides detailed instructions on usage. </p><p>If your server has multiple network interfaces, HBase defaults to using the
+            interface that the primary hostname resolves to. To override this behavior, set the
+              <code class="code">hbase.regionserver.dns.interface</code> property to a different interface. This
+            will only work if each server in your cluster uses the same network interface
+            configuration.</p><p>To choose a different DNS nameserver than the system default, set the
+              <code class="varname">hbase.regionserver.dns.nameserver</code> property to the IP address of
+            that nameserver.</p></dd><dt><a name="loopback.ip"></a><span class="term">Loopback IP</span></dt><dd><p>Prior to hbase-0.96.0, HBase only used the IP address
+              <code class="systemitem">127.0.0.1</code> to refer to <code class="code">localhost</code>, and this could
+            not be configured. See <a class="xref" href="configuration.html#loopback.ip">Loopback IP</a>.</p></dd><dt><a name="ntp"></a><span class="term">NTP</span></dt><dd><p>The clocks on cluster nodes should be synchronized. A small amount of variation is
+            acceptable, but larger amounts of skew can cause erratic and unexpected behavior. Time
+            synchronization is one of the first things to check if you see unexplained problems in
+            your cluster. It is recommended that you run a Network Time Protocol (NTP) service, or
+            another time-synchronization mechanism, on your cluster, and that all nodes look to the
+            same service for time synchronization. See the <a class="link" href="http://www.tldp.org/LDP/sag/html/basic-ntp-config.html" target="_top">Basic NTP
+              Configuration</a> at <em class="citetitle">The Linux Documentation Project (TLDP)</em>
+            to set up NTP.</p></dd><dt><a name="ulimit"></a><span class="term">Limits on Number of Files and Processes (<span class="command"><strong>ulimit</strong></span>)
+          <a class="indexterm" name="d1560e276"></a><a class="indexterm" name="d1560e279"></a>
+        </span></dt><dd><p>Apache HBase is a database. It requires the ability to open a large number of files
+            at once. Many Linux distributions limit the number of files a single user is allowed to
+            open to <code class="literal">1024</code> (or <code class="literal">256</code> on older versions of OS X).
+            You can check this limit on your servers by running the command <span class="command"><strong>ulimit
+              -n</strong></span> when logged in as the user which runs HBase. See <a class="xref" href="">???</a> for some of the problems you may
+            experience if the limit is too low. You may also notice errors such as the
+            following:</p><pre class="screen">
+2010-04-06 03:04:37,542 INFO org.apache.hadoop.hdfs.DFSClient: Exception increateBlockOutputStream java.io.EOFException
+2010-04-06 03:04:37,542 INFO org.apache.hadoop.hdfs.DFSClient: Abandoning block blk_-6935524980745310745_1391901
+          </pre><p>It is recommended to raise the ulimit to at least 10,000, but more likely 10,240,
+            because the value is usually expressed in multiples of 1024. Each ColumnFamily has at
+            least one StoreFile, and possibly more than 6 StoreFiles if the region is under load.
+            The number of open files required depends upon the number of ColumnFamilies and the
+            number of regions. The following is a rough formula for calculating the potential number
+            of open files on a RegionServer. </p><div class="example"><a name="d1560e301"></a><p class="title"><b>Example&nbsp;1.1.&nbsp;Calculate the Potential Number of Open Files</b></p><div class="example-contents"><pre class="screen">(StoreFiles per ColumnFamily) x (regions per RegionServer)</pre></div></div><br class="example-break"><p>For example, assuming that a schema had 3 ColumnFamilies per region with an average
+            of 3 StoreFiles per ColumnFamily, and there are 100 regions per RegionServer, the JVM
+            will open 3 * 3 * 100 = 900 file descriptors, not counting open JAR files, configuration
+            files, and others. Opening a file does not take many resources, and the risk of allowing
+            a user to open too many files is minimal.</p><p>Another related setting is the number of processes a user is allowed to run at once.
+            In Linux and Unix, the number of processes is set using the <span class="command"><strong>ulimit -u</strong></span>
+            command. This should not be confused with the <span class="command"><strong>nproc</strong></span> command, which
+            controls the number of CPUs available to a given user. Under load, a
+              <code class="varname">nproc</code> that is too low can cause OutOfMemoryError exceptions. See
+            Jack Levin's <a class="link" href="http://thread.gmane.org/gmane.comp.java.hadoop.hbase.user/16374" target="_top">major
+              hdfs issues</a> thread on the hbase-users mailing list, from 2011.</p><p>Configuring the fmaximum number of ile descriptors and processes for the user who is
+            running the HBase process is an operating system configuration, rather than an HBase
+            configuration. It is also important to be sure that the settings are changed for the
+            user that actually runs HBase. To see which user started HBase, and that user's ulimit
+            configuration, look at the first line of the HBase log for that instance. A useful read
+            setting config on you hadoop cluster is Aaron Kimballs' <a class="link" href="http://www.cloudera.com/blog/2009/03/configuration-parameters-what-can-you-just-ignore/" target="_top">Configuration Parameters: What can you just ignore?</a></p><p title="ulimit Settings on Ubuntu"><a name="ulimit_ubuntu"></a><b><span class="command"><strong>ulimit</strong></span> Settings on Ubuntu.&nbsp;</b>To configure <span class="command"><strong>ulimit</strong></span> settings on Ubuntu, edit
+                <code class="filename">/etc/security/limits.conf</code>, which is a space-delimited file with
+              four columns. Refer to the <a class="link" href="http://manpages.ubuntu.com/manpages/lucid/man5/limits.conf.5.html" target="_top">man
+                page for limits.conf</a> for details about the format of this file. In the
+              following example, the first line sets both soft and hard limits for the number of
+              open files (<code class="literal">nofile</code>) to <code class="literal">32768</code> for the operating
+              system user with the username <code class="literal">hadoop</code>. The second line sets the
+              number of processes to 32000 for the same user.</p><pre class="screen">
+hadoop  -       nofile  32768
+hadoop  -       nproc   32000
+          </pre><p>The settings are only applied if the Pluggable Authentication Module (PAM)
+            environment is directed to use them. To configure PAM to use these limits, be sure that
+            the <code class="filename">/etc/pam.d/common-session</code> file contains the following line:</p><pre class="screen">session required  pam_limits.so</pre></dd><dt><a name="windows"></a><span class="term">Windows</span></dt><dd><p>Prior to HBase 0.96, testing for running HBase on Microsoft Windows was limited.
+            Running a on Windows nodes is not recommended for production systems.</p><p>To run versions of HBase prior to 0.96 on Microsoft Windows, you must install <a class="link" href="http://cygwin.com/" target="_top">Cygwin</a> and run HBase within the Cygwin
+          environment. This provides support for Linux/Unix commands and scripts. The full details are explained in the <a class="link" href="http://hbase.apache.org/cygwin.html" target="_top">Windows Installation</a> guide. Also <a class="link" href="http://search-hadoop.com/?q=hbase+windows&amp;fc_project=HBase&amp;fc_type=mail+_hash_+dev" target="_top">search
+            our user mailing list</a> to pick up latest fixes figured by Windows users.</p><p>Post-hbase-0.96.0, hbase runs natively on windows with supporting
+            <span class="command"><strong>*.cmd</strong></span> scripts bundled. </p></dd></dl></div><div class="section" title="1.1.1.&nbsp;Hadoop"><div class="titlepage"><div><div><h3 class="title"><a name="hadoop"></a>1.1.1.&nbsp;<a class="link" href="http://hadoop.apache.org" target="_top">Hadoop</a><a class="indexterm" name="d1560e387"></a></h3></div></div></div><p>The following table summarizes the versions of Hadoop supported with each version of
+        HBase. Based on the version of HBase, you should select the most
+        appropriate version of Hadoop. You can use Apache Hadoop, or a vendor's distribution of
+        Hadoop. No distinction is made here. See <a class="link" href="http://wiki.apache.org/hadoop/Distributions%20and%20Commercial%20Support" target="_top">http://wiki.apache.org/hadoop/Distributions%20and%20Commercial%20Support</a>
+        for information about vendors of Hadoop.</p><div class="tip" title="Hadoop 2.x is recommended." style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Hadoop 2.x is recommended.</h3><p>Hadoop 2.x is faster and includes features, such as short-circuit reads, which will
+          help improve your HBase random read profile. Hadoop 2.x also includes important bug fixes
+          that will improve your overall HBase experience. HBase 0.98 deprecates use of Hadoop 1.x,
+          and HBase 1.0 will not support Hadoop 1.x.</p></div><p>Use the following legend to interpret this table:</p><table border="0" summary="Simple list" class="simplelist"><tr><td>S = supported and tested,</td></tr><tr><td>X = not supported,</td></tr><tr><td>NT = it should run, but not tested enough.</td></tr></table><div class="table"><a name="d1560e408"></a><p class="title"><b>Table&nbsp;1.2.&nbsp;Hadoop version support matrix</b></p><div class="table-contents"><table summary="Hadoop version support matrix" border="1"><colgroup><col align="left" class="c1"><col align="center" class="c2"><col align="center" class="c3"><col align="center" class="c4"><col align="center" class="c5"><col align="center" class="c6"></colgroup><thead><tr><th align="left"> </th><th align="center">HBase-0.92.x</th><th align="center">HBase-0.94.x</th><th align="center">HBase-0.96.x</th><th align="center"><p>HBase-0.98.x (Support for Hadoop 1.x is deprecated.)</p></th><th align="center"><p>HBase-1.0.x (Hadoop 1.x is NOT supported)</p></th></tr></thead><tbody><tr><td align="left">Hadoop-0.20.205</td><td align="center">S</td><td align="center">X</td><td align="center">X</td><td align="center">X</td><td align="center">X</td></tr><tr><td align="left">Hadoop-0.22.x </td><td align="center">S</td><td align="center">X</td><td align="center">X</td><td align="center">X</td><td align="center">X</td></tr><tr><td align="left"><p>Hadoop-1.0.0-1.0.2 (HBase requires hadoop 1.0.3 at a minimum; there is an
+                  issue where we cannot find KerberosUtil compiling against earlier versions of
+                  Hadoop.)</p></td><td align="center">X</td><td align="center">X</td><td align="center">X</td><td align="center">X</td><td align="center">X</td></tr><tr><td align="left">Hadoop-1.0.3+</td><td align="center">S</td><td align="center">S</td><td align="center">S</td><td align="center">X</td><td align="center">X</td></tr><tr><td align="left">Hadoop-1.1.x </td><td align="center">NT</td><td align="center">S</td><td align="center">S</td><td align="center">X</td><td align="center">X</td></tr><tr><td align="left">Hadoop-0.23.x </td><td align="center">X</td><td align="center">S</td><td align="center">NT</td><td align="center">X</td><td align="center">X</td></tr><tr><td align="left">Hadoop-2.0.x-alpha </td><td align="center">X</td><td align="center">NT</td><td align="center">X</td><td align="center">X</td><td align="center">X</td></tr><tr><td align="left">Hadoop-2.1.0-beta </td><td align="center">X</td><td align="center">NT</td><td align="center">S</td><td align="center">X</td><td align="center">X</td></tr><tr><td align="left">Hadoop-2.2.0 </td><td align="center">X</td><td align="center"><p>NT - To get 0.94.x to run on hadoop 2.2.0, you need to change the hadoop
+                  2 and protobuf versions in the <code class="filename">pom.xml</code>: Here is a diff with
+                  pom.xml changes: </p>
+                  <pre class="programlisting">$ svn diff pom.xml
+Index: pom.xml
+===================================================================
+--- pom.xml     (revision 1545157)
++++ pom.xml     (working copy)
+@@ -1034,7 +1034,7 @@
+     &lt;slf4j.version&gt;1.4.3&lt;/slf4j.version&gt;
+     &lt;log4j.version&gt;1.2.16&lt;/log4j.version&gt;
+     &lt;mockito-all.version&gt;1.8.5&lt;/mockito-all.version&gt;
+-    &lt;protobuf.version&gt;2.4.0a&lt;/protobuf.version&gt;
++    &lt;protobuf.version&gt;2.5.0&lt;/protobuf.version&gt;
+     &lt;stax-api.version&gt;1.0.1&lt;/stax-api.version&gt;
+     &lt;thrift.version&gt;0.8.0&lt;/thrift.version&gt;
+     &lt;zookeeper.version&gt;3.4.5&lt;/zookeeper.version&gt;
+@@ -2241,7 +2241,7 @@
+         &lt;/property&gt;
+       &lt;/activation&gt;
+       &lt;properties&gt;
+-        &lt;hadoop.version&gt;2.0.0-alpha&lt;/hadoop.version&gt;
++        &lt;hadoop.version&gt;2.2.0&lt;/hadoop.version&gt;
+         &lt;slf4j.version&gt;1.6.1&lt;/slf4j.version&gt;
+       &lt;/properties&gt;
+       &lt;dependencies&gt;
+                   </pre>
+                  <p>The next step is to regenerate Protobuf files and assuming that the Protobuf
+                    has been installed:</p>
+                  <div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Go to the hbase root folder, using the command line;</p></li><li class="listitem"><p>Type the following commands:</p><p>
+                        </p><pre class="programlisting">$ protoc -Isrc/main/protobuf --java_out=src/main/java src/main/protobuf/hbase.proto</pre><p>
+                      </p><p>
+                        </p><pre class="programlisting">$ protoc -Isrc/main/protobuf --java_out=src/main/java src/main/protobuf/ErrorHandling.proto</pre><p>
+                      </p></li></ul></div>
+                  <p> Building against the hadoop 2 profile by running something like the
+                    following command: </p>
+                  <pre class="screen">$  mvn clean install assembly:single -Dhadoop.profile=2.0 -DskipTests</pre></td><td align="center">S</td><td align="center">S</td><td align="center">NT</td></tr><tr><td align="left">Hadoop-2.3.x</td><td align="center">X</td><td align="center">NT</td><td align="center">S</td><td align="center">S</td><td align="center">NT</td></tr><tr><td align="left">Hadoop-2.4.x</td><td align="center">X</td><td align="center">NT</td><td align="center">S</td><td align="center">S</td><td align="center">S</td></tr><tr><td align="left">Hadoop-2.5.x</td><td align="center">X</td><td align="center">NT</td><td align="center">S</td><td align="center">S</td><td align="center">S</td></tr></tbody></table></div></div><br class="table-break"><div class="note" title="Replace the Hadoop Bundled With HBase!" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title"><a name="replace.hadoop"></a>Replace the Hadoop Bundled With HBase!</h3><p> Because HBase depends on Hadoop, it bundles an instance of the Hadoop jar under its
+            <code class="filename">lib</code> directory. The bundled jar is ONLY for use in standalone mode.
+          In distributed mode, it is <span class="emphasis"><em>critical</em></span> that the version of Hadoop that
+          is out on your cluster match what is under HBase. Replace the hadoop jar found in the
+          HBase lib directory with the hadoop jar you are running on your cluster to avoid version
+          mismatch issues. Make sure you replace the jar in HBase everywhere on your cluster. Hadoop
+          version mismatch issues have various manifestations but often all looks like its hung up.
+        </p></div><div class="section" title="1.1.1.1.&nbsp;Apache HBase 0.92 and 0.94"><div class="titlepage"><div><div><h4 class="title"><a name="hadoop.hbase-0.94"></a>1.1.1.1.&nbsp;Apache HBase 0.92 and 0.94</h4></div></div></div><p>HBase 0.92 and 0.94 versions can work with Hadoop versions, 0.20.205, 0.22.x, 1.0.x,
+          and 1.1.x. HBase-0.94 can additionally work with Hadoop-0.23.x and 2.x, but you may have
+          to recompile the code using the specific maven profile (see top level pom.xml)</p></div><div class="section" title="1.1.1.2.&nbsp;Apache HBase 0.96"><div class="titlepage"><div><div><h4 class="title"><a name="hadoop.hbase-0.96"></a>1.1.1.2.&nbsp;Apache HBase 0.96</h4></div></div></div><p> As of Apache HBase 0.96.x, Apache Hadoop 1.0.x at least is required. Hadoop 2 is
+          strongly encouraged (faster but also has fixes that help MTTR). We will no longer run
+          properly on older Hadoops such as 0.20.205 or branch-0.20-append. Do not move to Apache
+          HBase 0.96.x if you cannot upgrade your Hadoop.. See <a class="link" href="http://search-hadoop.com/m/7vFVx4EsUb2" target="_top">HBase, mail # dev - DISCUSS:
+                Have hbase require at least hadoop 1.0.0 in hbase 0.96.0?</a></p></div><div class="section" title="1.1.1.3.&nbsp;Hadoop versions 0.20.x - 1.x"><div class="titlepage"><div><div><h4 class="title"><a name="hadoop.older.versions"></a>1.1.1.3.&nbsp;Hadoop versions 0.20.x - 1.x</h4></div></div></div><p> HBase will lose data unless it is running on an HDFS that has a durable
+            <code class="code">sync</code> implementation. DO NOT use Hadoop 0.20.2, Hadoop 0.20.203.0, and
+          Hadoop 0.20.204.0 which DO NOT have this attribute. Currently only Hadoop versions
+          0.20.205.x or any release in excess of this version -- this includes hadoop-1.0.0 -- have
+          a working, durable sync. The Cloudera blog post <a class="link" href="http://www.cloudera.com/blog/2012/01/an-update-on-apache-hadoop-1-0/" target="_top">An
+            update on Apache Hadoop 1.0</a> by Charles Zedlweski has a nice exposition on how all
+          the Hadoop versions relate. Its worth checking out if you are having trouble making sense
+          of the Hadoop version morass. </p><p>Sync has to be explicitly enabled by setting
+            <code class="varname">dfs.support.append</code> equal to true on both the client side -- in
+            <code class="filename">hbase-site.xml</code> -- and on the serverside in
+            <code class="filename">hdfs-site.xml</code> (The sync facility HBase needs is a subset of the
+          append code path).</p><pre class="programlisting">  
+&lt;property&gt;
+  &lt;name&gt;dfs.support.append&lt;/name&gt;
+  &lt;value&gt;true&lt;/value&gt;
+&lt;/property&gt;</pre><p> You will have to restart your cluster after making this edit. Ignore the
+          chicken-little comment you'll find in the <code class="filename">hdfs-default.xml</code> in the
+          description for the <code class="varname">dfs.support.append</code> configuration. </p></div><div class="section" title="1.1.1.4.&nbsp;Apache HBase on Secure Hadoop"><div class="titlepage"><div><div><h4 class="title"><a name="hadoop.security"></a>1.1.1.4.&nbsp;Apache HBase on Secure Hadoop</h4></div></div></div><p>Apache HBase will run on any Hadoop 0.20.x that incorporates Hadoop security features
+          as long as you do as suggested above and replace the Hadoop jar that ships with HBase with
+          the secure version. If you want to read more about how to setup Secure HBase, see <a class="xref" href="">???</a>.</p></div><div class="section" title="1.1.1.5.&nbsp;dfs.datanode.max.transfer.threads"><div class="titlepage"><div><div><h4 class="title"><a name="dfs.datanode.max.transfer.threads"></a>1.1.1.5.&nbsp;<code class="varname">dfs.datanode.max.transfer.threads</code><a class="indexterm" name="d1560e692"></a></h4></div></div></div><p>An HDFS datanode has an upper bound on the number of files that it will serve
+          at any one time. Before doing any loading, make sure you have configured
+          Hadoop's <code class="filename">conf/hdfs-site.xml</code>, setting the
+          <code class="varname">dfs.datanode.max.transfer.threads</code> value to at least the following:
+        </p><pre class="programlisting">
+&lt;property&gt;
+  &lt;name&gt;dfs.datanode.max.transfer.threads&lt;/name&gt;
+  &lt;value&gt;4096&lt;/value&gt;
+&lt;/property&gt;
+      </pre><p>Be sure to restart your HDFS after making the above configuration.</p><p>Not having this configuration in place makes for strange-looking failures. One
+        manifestation is a complaint about missing blocks. For example:</p><pre class="screen">10/12/08 20:10:31 INFO hdfs.DFSClient: Could not obtain block
+          blk_XXXXXXXXXXXXXXXXXXXXXX_YYYYYYYY from any node: java.io.IOException: No live nodes
+          contain current block. Will get new block locations from namenode and retry...</pre><p>See also <a class="xref" href="">???</a> and note that this
+          property was previously known as <code class="varname">dfs.datanode.max.xcievers</code> (e.g.
+          <a class="link" href="http://ccgtech.blogspot.com/2010/02/hadoop-hdfs-deceived-by-xciever.html" target="_top">
+            Hadoop HDFS: Deceived by Xciever</a>).
+        </p></div></div></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left">&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="standalone_dist.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right" valign="top">&nbsp;1.2.&nbsp;HBase run modes: Standalone and Distributed</td></tr></table></div></body></html>

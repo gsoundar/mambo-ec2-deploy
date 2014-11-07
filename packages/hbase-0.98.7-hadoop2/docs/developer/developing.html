@@ -1,0 +1,250 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>1.10.&nbsp;Developer Guidelines</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="developer.html" title="Chapter&nbsp;1.&nbsp;Building and Developing Apache HBase"><link rel="up" href="developer.html" title="Chapter&nbsp;1.&nbsp;Building and Developing Apache HBase"><link rel="prev" href="hbase.tests.html" title="1.9.&nbsp;Tests"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1.10.&nbsp;Developer Guidelines</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="hbase.tests.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;</td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/developing.html';
+    </script><div class="section" title="1.10.&nbsp;Developer Guidelines"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="developing"></a>1.10.&nbsp;Developer Guidelines</h2></div></div></div><div class="section" title="1.10.1.&nbsp;Codelines"><div class="titlepage"><div><div><h3 class="title"><a name="codelines"></a>1.10.1.&nbsp;Codelines</h3></div></div></div><p>Most development is done on the master branch, which is named
+              <code class="literal">master</code> in the Git repository. Previously, HBase used Subversion, in
+              which the master branch was called <code class="literal">TRUNK</code>. Branches exist for minor
+              releases, and important features and bug fixes are often back-ported.</p></div><div class="section" title="1.10.2.&nbsp;Release Managers"><div class="titlepage"><div><div><h3 class="title"><a name="d8376e1627"></a>1.10.2.&nbsp;Release Managers</h3></div></div></div><p>Each maintained release branch has a release manager, who volunteers to coordinate
+                new features and bug fixes are backported to that release. The release managers are
+                    <a class="link" href="https://hbase.apache.org/team-list.html" target="_top">committers</a>. If
+                you would like your feature or bug fix to be included in a given release,
+                communicate with that release manager. If this list goes out of date or you can't
+                reach the listed person, reach out to someone else on the list.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>End-of-life releases are not included in this list.</p></div><div class="table"><a name="d8376e1638"></a><p class="title"><b>Table&nbsp;1.1.&nbsp;Release Managers</b></p><div class="table-contents"><table summary="Release Managers" border="1"><colgroup><col><col></colgroup><thead><tr><th>Release</th><th>Release Manager</th></tr></thead><tbody><tr><td><p>0.98</p></td><td><p><a class="link" href="https://issues.apache.org/jira/secure/ViewProfile.jspa?name=apurtell" target="_top">Andrew Purtell</a></p></td></tr><tr><td><p>1.0</p></td><td><p><a class="link" href="https://issues.apache.org/jira/secure/ViewProfile.jspa?name=enis" target="_top">Enis Soztutar</a></p></td></tr></tbody></table></div></div><br class="table-break"></div><div class="section" title="1.10.3.&nbsp;Code Standards"><div class="titlepage"><div><div><h3 class="title"><a name="code.standards"></a>1.10.3.&nbsp;Code Standards</h3></div></div></div><p>See <a class="xref" href="ides.html#eclipse.code.formatting" title="1.3.1.1.&nbsp;Code Formatting">Section&nbsp;1.3.1.1, &#8220;Code Formatting&#8221;</a> and <a class="xref" href="developing.html#common.patch.feedback" title="1.10.3.2.&nbsp;Code Formatting Conventions">Section&nbsp;1.10.3.2, &#8220;Code Formatting Conventions&#8221;</a>. </p><div class="section" title="1.10.3.1.&nbsp;Interface Classifications"><div class="titlepage"><div><div><h4 class="title"><a name="d8376e1674"></a>1.10.3.1.&nbsp;Interface Classifications</h4></div></div></div><p> Interfaces are classified both by audience and by stability level. These
+                    labels appear at the head of a class. The conventions followed by HBase are
+                    inherited by its parent project, Hadoop. </p><p>The following interface classifications are commonly used: </p><div class="variablelist" title="@InterfaceAudience"><p class="title"><b>@InterfaceAudience</b></p><dl><dt><span class="term"><code class="code">@InterfaceAudience.Public</code></span></dt><dd><p>APIs for users and HBase applications. These APIs will be
+                                deprecated through major versions of HBase.</p></dd><dt><span class="term"><code class="code">@InterfaceAudience.Private</code></span></dt><dd><p>APIs for HBase internals developers. No guarantees on
+                                compatibility or availability in future versions. Private interfaces
+                                do not need an <code class="code">@InterfaceStability</code>
+                                classification.</p></dd><dt><span class="term"><code class="code">@InterfaceAudience.LimitedPrivate(HBaseInterfaceAudience.COPROC)</code></span></dt><dd><p>APIs for HBase coprocessor writers. As of HBase
+                                0.92/0.94/0.96/0.98 this api is still unstable. No guarantees on
+                                compatibility with future versions.</p></dd><dt><span class="term">No <code class="code">@InterfaceAudience</code> Classification</span></dt><dd><p>Packages without an <code class="code">@InterfaceAudience</code> label are
+                                considered private. Mark your new packages if publicly
+                                accessible.</p></dd></dl></div><div class="note" title="Excluding Non-Public Interfaces from API Documentation" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Excluding Non-Public Interfaces from API Documentation</h3><p> Only interfaces classified <code class="code">@InterfaceAudience.Public</code> should
+                        be included in API documentation (Javadoc). Committers must add new package
+                        excludes <code class="code">ExcludePackageNames</code> section of the
+                            <code class="filename">pom.xml</code> for new packages which do not contain
+                        public classes. </p></div><div class="variablelist" title="@InterfaceStability"><p class="title"><b>@InterfaceStability</b></p><p><code class="code">@InterfaceStability</code> is important for packages marked
+                            <code class="code">@InterfaceAudience.Public</code>.</p><dl><dt><span class="term"><code class="code">@InterfaceStability.Stable</code></span></dt><dd><p>Public packages marked as stable cannot be changed without a
+                                deprecation path or a very good reason.</p></dd><dt><span class="term"><code class="code">@InterfaceStability.Unstable</code></span></dt><dd><p>Public packages marked as unstable can be changed without a
+                                deprecation path.</p></dd><dt><span class="term"><code class="code">@InterfaceStability.Evolving</code></span></dt><dd><p>Public packages marked as evolving may be changed, but it is
+                                discouraged.</p></dd><dt><span class="term">No <code class="code">@InterfaceStability</code> Label</span></dt><dd><p>Public classes with no <code class="code">@InterfaceStability</code> label are
+                                discouraged, and should be considered implicitly unstable.</p></dd></dl></div><p> If you are unclear about how to mark packages, ask on the development list.
+                </p></div><div class="section" title="1.10.3.2.&nbsp;Code Formatting Conventions"><div class="titlepage"><div><div><h4 class="title"><a name="common.patch.feedback"></a>1.10.3.2.&nbsp;Code Formatting Conventions</h4></div></div></div><p>Please adhere to the following guidelines so that your patches can be reviewed
+                    more quickly. These guidelines have been developed based upon common feedback on
+                    patches from new contributors.</p><p> See the <a class="link" href="http://www.oracle.com/technetwork/java/index-135089.html" target="_top">Code
+                    Conventions for the Java Programming Language</a> for more information on
+                    coding conventions in Java.</p><div class="section" title="1.10.3.2.1.&nbsp;Space Invaders"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.space.invaders"></a>1.10.3.2.1.&nbsp;Space Invaders</h5></div></div></div><p>Do not use extra spaces around brackets. Use the second style, rather than
+                        the first.</p><pre class="programlisting">
+if ( foo.equals( bar ) ) {     // don't do this
+</pre><pre class="programlisting">
+if (foo.equals(bar)) {
+</pre><pre class="programlisting">
+foo = barArray[ i ];     // don't do this
+</pre><pre class="programlisting">
+foo = barArray[i];
+</pre></div><div class="section" title="1.10.3.2.2.&nbsp;Auto Generated Code"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.autogen"></a>1.10.3.2.2.&nbsp;Auto Generated Code</h5></div></div></div><p>Auto-generated code in Eclipse often uses bad variable names such as
+                        <code class="literal">arg0</code>. Use more informative variable names. Use code
+                        like the second example here.</p><pre class="programlisting">
+ public void readFields(DataInput arg0) throws IOException {    // don't do this
+   foo = arg0.readUTF();                                       // don't do this
+</pre><pre class="programlisting">
+ public void readFields(DataInput di) throws IOException {
+   foo = di.readUTF();
+</pre></div><div class="section" title="1.10.3.2.3.&nbsp;Long Lines"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.longlines"></a>1.10.3.2.3.&nbsp;Long Lines</h5></div></div></div><p> Keep lines less than 100 characters. You can configure your IDE to do
+                        this automatically.</p><pre class="programlisting">
+Bar bar = foo.veryLongMethodWithManyArguments(argument1, argument2, argument3, argument4, argument5, argument6, argument7, argument8, argument9);  // don't do this
+</pre><pre class="programlisting">
+Bar bar = foo.veryLongMethodWithManyArguments(
+ argument1, argument2, argument3,argument4, argument5, argument6, argument7, argument8, argument9);
+</pre></div><div class="section" title="1.10.3.2.4.&nbsp;Trailing Spaces"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.trailingspaces"></a>1.10.3.2.4.&nbsp;Trailing Spaces</h5></div></div></div><p> Trailing spaces are a common problem. Be sure there is a line break after
+                        the end of your code, and avoid lines with nothing but whitespace. This
+                        makes diffs more meaningful. You can configure your IDE to help with
+                        this.</p><pre class="programlisting">
+Bar bar = foo.getBar();     &lt;--- imagine there is an extra space(s) after the semicolon.
+</pre></div><div class="section" title="1.10.3.2.5.&nbsp;API Documentation (Javadoc)"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.javadoc"></a>1.10.3.2.5.&nbsp;API Documentation (Javadoc)</h5></div></div></div><p>This is also a very common feedback item. Don't forget Javadoc!</p><p>Javadoc warnings are checked during precommit. If the precommit tool gives
+                        you a '-1', please fix the javadoc issue. Your patch won't be committed if
+                        it adds such warnings. </p></div><div class="section" title="1.10.3.2.6.&nbsp;Findbugs"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.findbugs"></a>1.10.3.2.6.&nbsp;Findbugs</h5></div></div></div><p>
+                        <code class="code">Findbugs</code> is used to detect common bugs pattern. It is checked
+                        during the precommit build by Apache's Jenkins. If errors are found, please
+                        fix them. You can run findbugs locally with <span class="command"><strong>mvn
+                            findbugs:findbugs</strong></span>, which will generate the
+                        <code class="code">findbugs</code> files locally. Sometimes, you may have to write
+                        code smarter than <code class="code">findbugs</code>. You can annotate your code to tell
+                        <code class="code">findbugs</code> you know what you're doing, by annotating your
+                        class with the following annotation:</p><pre class="programlisting">@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+value="HE_EQUALS_USE_HASHCODE",
+justification="I know what I'm doing")</pre><p> It is important to use the Apache-licensed version of the annotations.
+                    </p></div><div class="section" title="1.10.3.2.7.&nbsp;Javadoc - Useless Defaults"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.javadoc.defaults"></a>1.10.3.2.7.&nbsp;Javadoc - Useless Defaults</h5></div></div></div><p>Don't just leave the @param arguments the way your IDE generated
+                        them.:</p><pre class="programlisting">
+  /**
+   *
+   * @param bar             &lt;---- don't do this!!!!
+   * @return                &lt;---- or this!!!!
+   */
+  public Foo getFoo(Bar bar);
+</pre><p>Either add something descriptive to the @<code class="code">param</code> and
+                        @<code class="code">return</code> lines, or just remove them. The preference is to
+                        add something descriptive and useful.</p></div><div class="section" title="1.10.3.2.8.&nbsp;One Thing At A Time, Folks"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.onething"></a>1.10.3.2.8.&nbsp;One Thing At A Time, Folks</h5></div></div></div><p>If you submit a patch for one thing, don't do auto-reformatting or
+                        unrelated reformatting of code on a completely different area of code. </p><p>Likewise, don't add unrelated cleanup or refactorings outside the scope of
+                        your Jira. </p></div><div class="section" title="1.10.3.2.9.&nbsp;Ambigious Unit Tests"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.tests"></a>1.10.3.2.9.&nbsp;Ambigious Unit Tests</h5></div></div></div><p>Make sure that you're clear about what you are testing in your unit tests
+                        and why. </p></div><div class="section" title="1.10.3.2.10.&nbsp;Implementing Writable"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.writable"></a>1.10.3.2.10.&nbsp;Implementing Writable</h5></div></div></div><div class="note" title="Applies pre-0.96 only" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Applies pre-0.96 only</h3><p>In 0.96, HBase moved to protocol buffers (protobufs). The below
+                            section on Writables applies to 0.94.x and previous, not to 0.96 and
+                            beyond. </p></div><p>Every class returned by RegionServers must implement the
+                        <code class="code">Writable</code> interface. If you are creating a new class that
+                        needs to implement this interface, do not forget the default constructor.
+                    </p></div></div></div><div class="section" title="1.10.4.&nbsp;Invariants"><div class="titlepage"><div><div><h3 class="title"><a name="design.invariants"></a>1.10.4.&nbsp;Invariants</h3></div></div></div><p>We don't have many but what we have we list below.  All are subject to challenge of
+           course but until then, please hold to the rules of the road.
+           </p><div class="section" title="1.10.4.1.&nbsp;No permanent state in ZooKeeper"><div class="titlepage"><div><div><h4 class="title"><a name="design.invariants.zk.data"></a>1.10.4.1.&nbsp;No permanent state in ZooKeeper</h4></div></div></div><p>ZooKeeper state should transient (treat it like memory). If ZooKeeper state is
+                    deleted, hbase should be able to recover and essentially be in the same
+                    state.</p><div class="itemizedlist" title="Exceptions"><p class="title"><b>Exceptions</b></p><ul class="itemizedlist" type="disc"><li class="listitem"><p>There are currently a few exceptions that we need to fix around
+                            whether a table is enabled or disabled.</p></li><li class="listitem"><p>Replication data is currently stored only in ZooKeeper. Deleting
+                            ZooKeeper data related to replication may cause replication to be
+                            disabled. Do not delete the replication tree,
+                                <code class="filename">/hbase/replication/</code>.</p><div class="warning" title="Warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Warning</h3><p>Replication may be disrupted and data loss may occur if you delete
+                                the replication tree (<code class="filename">/hbase/replication/</code>) from
+                                ZooKeeper. Follow progress on this issue at <a class="link" href="https://issues.apache.org/jira/browse/HBASE-10295" target="_top">HBASE-10295</a>.</p></div></li></ul></div></div></div><div class="section" title="1.10.5.&nbsp;Running In-Situ"><div class="titlepage"><div><div><h3 class="title"><a name="run.insitu"></a>1.10.5.&nbsp;Running In-Situ</h3></div></div></div><p>If you are developing Apache HBase, frequently it is useful to test your changes against a more-real cluster than what you find in unit tests. In this case, HBase can be run directly from the source in local-mode.
+           All you need to do is run:
+           </p><pre class="programlisting">${HBASE_HOME}/bin/start-hbase.sh</pre><p>
+           This will spin up a full local-cluster, just as if you had packaged up HBase and installed it on your machine.
+           </p><p>Keep in mind that you will need to have installed HBase into your local maven repository for the in-situ cluster to work properly. That is, you will need to run:</p><pre class="programlisting">mvn clean install -DskipTests</pre><p>to ensure that maven can find the correct classpath and dependencies. Generally, the above command
+           is just a good thing to try running first, if maven is acting oddly.</p></div><div class="section" title="1.10.6.&nbsp;Adding Metrics"><div class="titlepage"><div><div><h3 class="title"><a name="add.metrics"></a>1.10.6.&nbsp;Adding Metrics</h3></div></div></div><p>
+                  After adding a new feature a developer might want to add metrics.  HBase exposes
+                  metrics using the Hadoop Metrics 2 system, so adding a new metric involves
+                  exposing that metric to the hadoop system.  Unfortunately the API of metrics2
+                  changed from hadoop 1 to hadoop 2.  In order to get around this a set of
+                  interfaces and implementations have to be loaded at runtime.  To get an in-depth
+                  look at the reasoning and structure of these classes you can read the blog post
+                  located <a class="link" href="https://blogs.apache.org/hbase/entry/migration_to_the_new_metrics" target="_top">here</a>.
+                  To add a metric to an existing MBean follow the short guide below:
+              </p><div class="section" title="1.10.6.1.&nbsp;Add Metric name and Function to Hadoop Compat Interface."><div class="titlepage"><div><div><h4 class="title"><a name="d8376e1958"></a>1.10.6.1.&nbsp;Add Metric name and Function to Hadoop Compat Interface.</h4></div></div></div><p>
+                     Inside of the source interface the corresponds to where the metrics are
+                     generated (eg MetricsMasterSource for things coming from HMaster) create new
+                     static strings for metric name and description.  Then add a new method that
+                     will be called to add new reading.
+                  </p></div><div class="section" title="1.10.6.2.&nbsp;Add the Implementation to Both Hadoop 1 and Hadoop 2 Compat modules."><div class="titlepage"><div><div><h4 class="title"><a name="d8376e1963"></a>1.10.6.2.&nbsp;Add the Implementation to Both Hadoop 1 and Hadoop 2 Compat modules.</h4></div></div></div><p>
+                      Inside of the implementation of the source (eg. MetricsMasterSourceImpl
+                      in the above example) create a new histogram, counter, gauge, or stat in the
+                      init method.  Then in the method that was added to the interface wire up the
+                      parameter passed in to the histogram.
+                  </p><p>
+                      Now add tests that make sure the data is correctly exported to the metrics 2
+                      system. For this the MetricsAssertHelper is provided.
+                  </p></div></div><div class="section" title="1.10.7.&nbsp;Submitting Patches"><div class="titlepage"><div><div><h3 class="title"><a name="submitting.patches"></a>1.10.7.&nbsp;Submitting Patches</h3></div></div></div><p>HBase moved to GIT from SVN. Until we develop our own documentation for how to
+                contribute patches in our new GIT context, caveat the fact that we have a different
+                branching model and that we don't currently do the merge practice described in the
+                following, the <a class="link" href="http://accumulo.apache.org/git.html" target="_top">accumulo doc
+                    on how to contribute and develop</a> after our move to GIT is worth a read. </p><p>If you are new to submitting patches to open source or new to submitting patches
+                to Apache, start by reading the <a class="link" href="http://commons.apache.org/patches.html" target="_top">On Contributing
+                    Patches</a> page from <a class="link" href="http://commons.apache.org/" target="_top">Apache
+                    Commons Project</a>. It provides a nice overview that applies equally to the
+                Apache HBase Project.</p><div class="section" title="1.10.7.1.&nbsp;Create Patch"><div class="titlepage"><div><div><h4 class="title"><a name="submitting.patches.create"></a>1.10.7.1.&nbsp;Create Patch</h4></div></div></div><div class="itemizedlist" title="Patching Workflow"><p class="title"><b>Patching Workflow</b></p><ul class="itemizedlist" type="disc"><li class="listitem"><p><a name="patch.master.first"></a>Always patch against the master branch
+                            first, even if you want to patch in another branch. HBase committers
+                            always apply patches first to the master branch, and backport if
+                            necessary.</p></li><li class="listitem"><p>Submit one single patch for a fix. If necessary, squash local commits
+                            to merge local commits into a single one first. See this <a class="link" href="http://stackoverflow.com/questions/5308816/how-to-use-git-merge-squash" target="_top">Stack Overflow question</a> for more information about squashing
+                            commits.</p></li><li class="listitem"><p><a name="submitting.patches.naming"></a>The patch should have the JIRA ID in the name. If you are generating
+                            from a branch, include the target branch in the filename. A common
+                            naming scheme for patches is:</p><pre class="screen">HBASE-<em class="replaceable"><code>XXXX</code></em>.patch</pre><pre class="screen">HBASE-<em class="replaceable"><code>XXXX</code></em>-0.90.patch     # to denote that the patch is against branch 0.90</pre><pre class="screen">HBASE-<em class="replaceable"><code>XXXX</code></em>-v3.patch       # to denote that this is the third version of the patch</pre></li><li class="listitem"><p><a name="submitting.patches.jira"></a>To submit a patch, first create it using one of the methods in <a class="xref" href="developing.html#patching.methods" title="Methods to Create Patches">Methods to Create Patches</a>. Next, attach the patch to the JIRA
+                            (one patch for the whole fix), using the <span class="guimenu">More</span> &#8594; <span class="guimenuitem">Attach Files</span> dialog. Next, click the <span class="guibutton">Patch
+                                Available</span> button, which triggers the Hudson job which
+                            checks the patch for validity.</p><p>Please understand that not every patch may get committed, and that
+                            feedback will likely be provided on the patch.</p></li><li class="listitem"><p>If your patch is longer than a single screen, also attach a Review
+                            Board to the case. See <a class="xref" href="developing.html#reviewboard" title="1.10.7.4.&nbsp;ReviewBoard">Section&nbsp;1.10.7.4, &#8220;ReviewBoard&#8221;</a>.</p></li><li class="listitem"><p>If you need to revise your patch, leave the previous patch file(s)
+                            attached to the JIRA, and upload the new one, following the naming
+                            conventions in <a class="xref" href="developing.html#submitting.patches.create" title="1.10.7.1.&nbsp;Create Patch">Section&nbsp;1.10.7.1, &#8220;Create Patch&#8221;</a>. Cancel the
+                            Patch Available flag and then re-trigger it, by toggling the
+                                <span class="guibutton">Patch Available</span> button in JIRA. JIRA sorts
+                            attached files by the time they were attached, and has no problem with
+                            multiple attachments with the same name. However, at times it is easier
+                            to refer to different version of a patch if you add
+                                <code class="literal">-vX</code>, where the <em class="replaceable"><code>X</code></em> is
+                            the version (starting with 2).</p></li><li class="listitem"><p>If you need to submit your patch against multiple branches, rather
+                            than just master, name each version of the patch with the branch it is
+                            for, following the naming conventions in <a class="xref" href="developing.html#submitting.patches.create" title="1.10.7.1.&nbsp;Create Patch">Section&nbsp;1.10.7.1, &#8220;Create Patch&#8221;</a>.</p></li></ul></div><div class="variablelist" title="Methods to Create Patches"><a name="patching.methods"></a><p class="title"><b>Methods to Create Patches</b></p><dl><dt><span class="term">Eclipse</span></dt><dd><p>Select the <span class="guimenu">Team</span> &#8594; <span class="guimenuitem">Create Patch</span> menu item.</p></dd><dt><span class="term">Git</span></dt><dd><p><code class="code">git format-patch</code> is preferred because it preserves
+                                commit messages. Use <code class="code">git squash</code> first, to combine
+                                smaller commits into a single larger one.</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><pre class="screen">git format-patch --no-prefix origin/master --stdout &gt; HBASE-XXXX.patch</pre></li><li class="listitem"><pre class="screen">git diff --no-prefix origin/master &gt; HBASE-XXXX.patch</pre></li></ul></div></dd><dt><span class="term">Subversion</span></dt><dd><pre class="screen">svn diff &gt; HBASE-XXXX.patch</pre></dd></dl></div><p>Make sure you review <a class="xref" href="ides.html#eclipse.code.formatting" title="1.3.1.1.&nbsp;Code Formatting">Section&nbsp;1.3.1.1, &#8220;Code Formatting&#8221;</a> and <a class="xref" href="developing.html#common.patch.feedback" title="1.10.3.2.&nbsp;Code Formatting Conventions">Section&nbsp;1.10.3.2, &#8220;Code Formatting Conventions&#8221;</a> for code style. </p></div><div class="section" title="1.10.7.2.&nbsp;Unit Tests"><div class="titlepage"><div><div><h4 class="title"><a name="submitting.patches.tests"></a>1.10.7.2.&nbsp;Unit Tests</h4></div></div></div><p>Yes, please. Please try to include unit tests with every code patch (and
+                    especially new classes and large changes). Make sure unit tests pass locally
+                    before submitting the patch.</p><p>Also, see <a class="xref" href="">???</a>.</p><p>If you are creating a new unit test class, notice how other unit test classes
+                    have classification/sizing annotations at the top and a static method on the
+                    end. Be sure to include these in any new unit test files you generate. See <a class="xref" href="hbase.tests.html" title="1.9.&nbsp;Tests">Section&nbsp;1.9, &#8220;Tests&#8221;</a> for more on how the annotations work. </p></div><div class="section" title="1.10.7.3.&nbsp;Integration Tests"><div class="titlepage"><div><div><h4 class="title"><a name="d8376e2117"></a>1.10.7.3.&nbsp;Integration Tests</h4></div></div></div><p>Significant new features should provide an integration test in addition to
+                    unit tests, suitable for exercising the new feature at different points in its
+                    configuration space.</p></div><div class="section" title="1.10.7.4.&nbsp;ReviewBoard"><div class="titlepage"><div><div><h4 class="title"><a name="reviewboard"></a>1.10.7.4.&nbsp;ReviewBoard</h4></div></div></div><p>Patches larger than one screen, or patches that will be tricky to review,
+                    should go through <a class="link" href="http://reviews.apache.org" target="_top">ReviewBoard</a>. </p><div class="procedure" title="Procedure&nbsp;1.3.&nbsp;Use ReviewBoard"><a name="d8376e2131"></a><p class="title"><b>Procedure&nbsp;1.3.&nbsp;Use ReviewBoard</b></p><ol class="procedure" type="1"><li class="step" title="Step 1"><p>Register for an account if you don't already have one. It does not use
+                            the credentials from <a class="link" href="http://issues.apache.org" target="_top">issues.apache.org</a>. Log in.</p></li><li class="step" title="Step 2"><p>Click <span class="guilabel">New Review Request</span>. </p></li><li class="step" title="Step 3"><p>Choose the <code class="literal">hbase-git</code> repository. Click Choose File
+                            to select the diff and optionally a parent diff. Click <span class="guibutton">Create
+                                Review Request</span>.</p></li><li class="step" title="Step 4"><p>Fill in the fields as required. At the minimum, fill in the
+                                <span class="guilabel">Summary</span> and choose <code class="literal">hbase</code> as
+                            the <span class="guilabel">Review Group</span>. If you fill in the
+                                <span class="guilabel">Bugs</span> field, the review board links back to the
+                            relevant JIRA. The more fields you fill in, the better. Click
+                                <span class="guibutton">Publish</span> to make your review request public.
+                            An email will be sent to everyone in the <code class="literal">hbase</code> group,
+                            to review the patch.</p></li><li class="step" title="Step 5"><p>Back in your JIRA, click <span class="guimenu">More</span> &#8594; <span class="guisubmenu">Link</span> &#8594; <span class="guimenuitem">Web Link</span>, and paste in the URL of your ReviewBoard request. This
+                            attaches the ReviewBoard to the JIRA, for easy access.</p></li><li class="step" title="Step 6"><p>To cancel the request, click <span class="guimenu">Close</span> &#8594; <span class="guimenuitem">Discarded</span>.</p></li></ol></div><p>For more information on how to use ReviewBoard, see <a class="link" href="http://www.reviewboard.org/docs/manual/1.5/" target="_top">the ReviewBoard
+                        documentation</a>. </p></div><div class="section" title="1.10.7.5.&nbsp;Guide for HBase Committers"><div class="titlepage"><div><div><h4 class="title"><a name="d8376e2201"></a>1.10.7.5.&nbsp;Guide for HBase Committers</h4></div></div></div><div class="section" title="1.10.7.5.1.&nbsp;New committers"><div class="titlepage"><div><div><h5 class="title"><a name="d8376e2204"></a>1.10.7.5.1.&nbsp;New committers</h5></div></div></div><p>New committers are encouraged to first read Apache's generic committer
+                        documentation: </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><a class="link" href="http://www.apache.org/dev/new-committers-guide.html" target="_top">Apache New Committer Guide</a>
+                            </p></li><li class="listitem"><p><a class="link" href="http://www.apache.org/dev/committers.html" target="_top">Apache Committer FAQ</a>
+                            </p></li></ul></div></div><div class="section" title="1.10.7.5.2.&nbsp;Review"><div class="titlepage"><div><div><h5 class="title"><a name="d8376e2220"></a>1.10.7.5.2.&nbsp;Review</h5></div></div></div><p>HBase committers should, as often as possible, attempt to review patches
+                        submitted by others. Ideally every submitted patch will get reviewed by a
+                        committer <span class="emphasis"><em>within a few days</em></span>. If a committer reviews a
+                        patch they have not authored, and believe it to be of sufficient quality,
+                        then they can commit the patch, otherwise the patch should be cancelled with
+                        a clear explanation for why it was rejected. </p><p>The list of submitted patches is in the <a class="link" href="https://issues.apache.org/jira/secure/IssueNavigator.jspa?mode=hide&amp;requestId=12312392" target="_top">HBase Review Queue</a>, which is ordered by time of last
+                        modification. Committers should scan the list from top to bottom, looking
+                        for patches that they feel qualified to review and possibly commit. </p><p>For non-trivial changes, it is required to get another committer to review
+                        your own patches before commit. Use the <span class="guibutton">Submit Patch</span>
+                        button in JIRA, just like other contributors, and then wait for a
+                            <code class="literal">+1</code> response from another committer before committing.
+                    </p></div><div class="section" title="1.10.7.5.3.&nbsp;Reject"><div class="titlepage"><div><div><h5 class="title"><a name="d8376e2241"></a>1.10.7.5.3.&nbsp;Reject</h5></div></div></div><p>Patches which do not adhere to the guidelines in <a class="link" href="https://wiki.apache.org/hadoop/Hbase/HowToCommit/hadoop/Hbase/HowToContribute#" target="_top">HowToContribute</a> and to the <a class="link" href="https://wiki.apache.org/hadoop/Hbase/HowToCommit/hadoop/CodeReviewChecklist#" target="_top">code review checklist</a> should be rejected. Committers should
+                        always be polite to contributors and try to instruct and encourage them to
+                        contribute better patches. If a committer wishes to improve an unacceptable
+                        patch, then it should first be rejected, and a new patch should be attached
+                        by the committer for review. </p></div><div class="section" title="1.10.7.5.4.&nbsp;Commit"><div class="titlepage"><div><div><h5 class="title"><a name="committing.patches"></a>1.10.7.5.4.&nbsp;Commit</h5></div></div></div><p>Committers commit patches to the Apache HBase GIT repository. </p><div class="note" title="Before you commit!!!!" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Before you commit!!!!</h3><p>Make sure your local configuration is correct, especially your
+                            identity and email. Examine the output of the <span class="command"><strong>$ git config
+                                --list</strong></span> command and be sure it is correct. See this GitHub
+                            article, <a class="link" href="https://help.github.com/articles/set-up-git" target="_top">Set Up Git</a> if you need pointers. </p></div><p>When you commit a patch, please: </p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Include the Jira issue id in the commit message, along with a
+                                short description of the change and the name of the contributor if
+                                it is not you. Be sure to get the issue id right, as this causes
+                                Jira to link to the change in Subversion (use the issue's
+                                "All" tab to see these). </p></li><li class="listitem"><p>Resolve the issue as fixed, thanking the contributor. Always set
+                                the "Fix Version" at this point, but please only set a
+                                single fix version, the earliest release in which the change will
+                                appear. </p></li></ol></div><div class="section" title="1.10.7.5.4.1.&nbsp;Commit Message Format"><div class="titlepage"><div><div><h6 class="title"><a name="d8376e2277"></a>1.10.7.5.4.1.&nbsp;Commit Message Format</h6></div></div></div><p>The commit message should contain the JIRA ID and a description of
+                            what the patch does. The preferred commit message format is:</p><pre class="screen">&lt;jira-id&gt; &lt;jira-title&gt; (&lt;contributor-name-if-not-commit-author&gt;)</pre><pre class="screen">HBASE-12345 Fix All The Things (jane@example.com)</pre><p>If the contributor used <span class="command"><strong>git format-patch</strong></span> to
+                            generate the patch, their commit message is in their patch and you can
+                            use that, but be sure the JIRA ID is at the front of the commit message,
+                            even if the contributor left it out.</p></div><div class="section" title="1.10.7.5.4.2.&nbsp;Add Amending-Author when a conflict cherrypick backporting"><div class="titlepage"><div><div><h6 class="title"><a name="committer.amending.author"></a>1.10.7.5.4.2.&nbsp;Add Amending-Author when a conflict cherrypick backporting</h6></div></div></div><p> We've established the practice of committing to trunk and then cherry
+                            picking back to branches whenever possible. When there is a minor
+                            conflict we can fix it up and just proceed with the commit. The
+                            resulting commit retains the original author. When the amending author
+                            is different from the original committer, add notice of this at the end
+                            of the commit message as: <code class="varname">Amending-Author: Author
+                                &lt;committer&amp;apache&gt;</code> See discussion at <a class="link" href="http://search-hadoop.com/m/DHED4wHGYS" target="_top">HBase, mail # dev
+                                - [DISCUSSION] Best practice when amending commits cherry picked
+                                from master to branch</a>. </p></div><div class="section" title="1.10.7.5.4.3.&nbsp;Committers are responsible for making sure commits do not break the build or tests"><div class="titlepage"><div><div><h6 class="title"><a name="committer.tests"></a>1.10.7.5.4.3.&nbsp;Committers are responsible for making sure commits do not break the
+                            build or tests</h6></div></div></div><p> If a committer commits a patch, it is their responsibility to make
+                            sure it passes the test suite. It is helpful if contributors keep an eye
+                            out that their patch does not break the hbase build and/or tests, but
+                            ultimately, a contributor cannot be expected to be aware of all the
+                            particular vagaries and interconnections that occur in a project like
+                            HBase. A committer should. </p></div><div class="section" title="1.10.7.5.4.4.&nbsp;Patching Etiquette"><div class="titlepage"><div><div><h6 class="title"><a name="git.patch.flow"></a>1.10.7.5.4.4.&nbsp;Patching Etiquette</h6></div></div></div><p>In the thread <a class="link" href="http://search-hadoop.com/m/DHED4EiwOz" target="_top">HBase, mail # dev - ANNOUNCEMENT: Git Migration In Progress (WAS =&gt;
+                                Re: Git Migration)</a>, it was agreed on the following patch flow </p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Develop and commit the patch against trunk/master
+                                        first.</p></li><li class="listitem"><p>Try to cherry-pick the patch when backporting if
+                                        possible.</p></li><li class="listitem"><p>If this does not work, manually commit the patch to the
+                                        branch.</p></li></ol></div><p>
+                        </p></div><div class="section" title="1.10.7.5.4.5.&nbsp;Merge Commits"><div class="titlepage"><div><div><h6 class="title"><a name="d8376e2326"></a>1.10.7.5.4.5.&nbsp;Merge Commits</h6></div></div></div><p>Avoid merge commits, as they create problems in the git
+                            history.</p></div><div class="section" title="1.10.7.5.4.6.&nbsp;Committing Documentation"><div class="titlepage"><div><div><h6 class="title"><a name="d8376e2331"></a>1.10.7.5.4.6.&nbsp;Committing Documentation</h6></div></div></div><p>See <a class="xref" href="">???</a>.</p></div></div></div><div class="section" title="1.10.7.6.&nbsp;Dialog"><div class="titlepage"><div><div><h4 class="title"><a name="d8376e2338"></a>1.10.7.6.&nbsp;Dialog</h4></div></div></div><p>Committers should hang out in the #hbase room on irc.freenode.net for
+                    real-time discussions. However any substantive discussion (as with any off-list
+                    project-related discussion) should be re-iterated in Jira or on the developer
+                    list. </p></div><div class="section" title="1.10.7.7.&nbsp;Do not edit JIRA comments"><div class="titlepage"><div><div><h4 class="title"><a name="d8376e2343"></a>1.10.7.7.&nbsp;Do not edit JIRA comments</h4></div></div></div><p>Misspellings and/or bad grammar is preferable to the disruption a JIRA comment
+                    edit causes: See the discussion at <a class="link" href="http://search-hadoop.com/?q=%5BReopened%5D+%28HBASE-451%29+Remove+HTableDescriptor+from+HRegionInfo&amp;fc_project=HBase" target="_top">Re:(HBASE-451) Remove HTableDescriptor from HRegionInfo</a>
+                </p></div></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="hbase.tests.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;</td></tr><tr><td width="40%" align="left" valign="top">1.9.&nbsp;Tests&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="developer.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;</td></tr></table></div></body></html>

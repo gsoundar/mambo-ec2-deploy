@@ -1,0 +1,938 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>Chapter&nbsp;1.&nbsp;Building and Developing Apache HBase</title><link rel="stylesheet" type="text/css" href="css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/developer.html';
+    </script><div class="chapter" title="Chapter&nbsp;1.&nbsp;Building and Developing Apache HBase"><div class="titlepage"><div><div><h2 class="title"><a name="developer"></a>Chapter&nbsp;1.&nbsp;Building and Developing Apache HBase</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#getting.involved">1.1. Getting Involved</a></span></dt><dd><dl><dt><span class="section"><a href="#mailing.list">1.1.1. Mailing Lists</a></span></dt><dt><span class="section"><a href="#irc">1.1.2. Internet Relay Chat (IRC)</a></span></dt><dt><span class="section"><a href="#jira">1.1.3. Jira</a></span></dt></dl></dd><dt><span class="section"><a href="#repos">1.2. Apache HBase Repositories</a></span></dt><dt><span class="section"><a href="#ides">1.3. IDEs</a></span></dt><dd><dl><dt><span class="section"><a href="#eclipse">1.3.1. Eclipse</a></span></dt><dt><span class="section"><a href="#d8376e324">1.3.2. IntelliJ IDEA</a></span></dt><dt><span class="section"><a href="#d8376e361">1.3.3. Other IDEs</a></span></dt></dl></dd><dt><span class="section"><a href="#build">1.4. Building Apache HBase</a></span></dt><dd><dl><dt><span class="section"><a href="#build.basic">1.4.1. Basic Compile</a></span></dt></dl></dd><dt><span class="section"><a href="#releasing">1.5. Releasing Apache HBase</a></span></dt><dd><dl><dt><span class="section"><a href="#d8376e570">1.5.1. Building against HBase 0.96-0.98</a></span></dt><dt><span class="section"><a href="#maven.release">1.5.2. Making a Release Candidate</a></span></dt><dt><span class="section"><a href="#maven.snapshot">1.5.3. Publishing a SNAPSHOT to maven</a></span></dt></dl></dd><dt><span class="section"><a href="#hbase.rc.voting">1.6. Voting on Release Candidates</a></span></dt><dt><span class="section"><a href="#documentation">1.7. Generating the HBase Reference Guide</a></span></dt><dt><span class="section"><a href="#hbase.org">1.8. Updating hbase.apache.org</a></span></dt><dd><dl><dt><span class="section"><a href="#hbase.org.site.contributing">1.8.1. Contributing to hbase.apache.org</a></span></dt><dt><span class="section"><a href="#hbase.org.site.publishing">1.8.2. Publishing hbase.apache.org</a></span></dt></dl></dd><dt><span class="section"><a href="#hbase.tests">1.9. Tests</a></span></dt><dd><dl><dt><span class="section"><a href="#hbase.moduletests">1.9.1. Apache HBase Modules</a></span></dt><dt><span class="section"><a href="#hbase.unittests">1.9.2. Unit Tests</a></span></dt><dt><span class="section"><a href="#hbase.unittests.cmds">1.9.3. Running tests</a></span></dt><dt><span class="section"><a href="#hbase.tests.writing">1.9.4. Writing Tests</a></span></dt><dt><span class="section"><a href="#integration.tests">1.9.5. Integration Tests</a></span></dt></dl></dd><dt><span class="section"><a href="#developing">1.10. Developer Guidelines</a></span></dt><dd><dl><dt><span class="section"><a href="#codelines">1.10.1. Codelines</a></span></dt><dt><span class="section"><a href="#d8376e1627">1.10.2. Release Managers</a></span></dt><dt><span class="section"><a href="#code.standards">1.10.3. Code Standards</a></span></dt><dt><span class="section"><a href="#design.invariants">1.10.4. Invariants</a></span></dt><dt><span class="section"><a href="#run.insitu">1.10.5. Running In-Situ</a></span></dt><dt><span class="section"><a href="#add.metrics">1.10.6. Adding Metrics</a></span></dt><dt><span class="section"><a href="#submitting.patches">1.10.7. Submitting Patches</a></span></dt></dl></dd></dl></div><p>This chapter contains information and guidelines for building and releasing HBase code and
+        documentation. Being familiar with these guidelines will help the HBase committers to use
+        your contributions more easily.</p><div class="section" title="1.1.&nbsp;Getting Involved"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="getting.involved"></a>1.1.&nbsp;Getting Involved</h2></div></div></div><p>Apache HBase gets better only when people contribute! If you are looking to contribute
+            to Apache HBase, look for <a class="link" href="https://issues.apache.org/jira/issues/?jql=project%20%3D%20HBASE%20AND%20labels%20in%20(beginner)" target="_top">issues in JIRA tagged with the label 'beginner'</a>. These are issues HBase
+            contributors have deemed worthy but not of immediate priority and a good way to ramp on
+            HBase internals. See <a class="link" href="http://search-hadoop.com/m/DHED43re96" target="_top">What label
+                is used for issues that are good on ramps for new contributors?</a> from the dev
+            mailing list for background.</p><p>Before you get started submitting code to HBase, please refer to <a class="xref" href="#developing" title="1.10.&nbsp;Developer Guidelines">Section&nbsp;1.10, &#8220;Developer Guidelines&#8221;</a>.</p><p>As Apache HBase is an Apache Software Foundation project, see <a class="xref" href="#">???</a>
+            for more information about how the ASF functions. </p><div class="section" title="1.1.1.&nbsp;Mailing Lists"><div class="titlepage"><div><div><h3 class="title"><a name="mailing.list"></a>1.1.1.&nbsp;Mailing Lists</h3></div></div></div><p>Sign up for the dev-list and the user-list.  See the
+                <a class="link" href="http://hbase.apache.org/mail-lists.html" target="_top">mailing lists</a> page.
+                Posing questions - and helping to answer other people's questions - is encouraged!
+                There are varying levels of experience on both lists so patience and politeness are encouraged (and please
+                stay on topic.)
+            </p></div><div class="section" title="1.1.2.&nbsp;Internet Relay Chat (IRC)"><div class="titlepage"><div><div><h3 class="title"><a name="irc"></a>1.1.2.&nbsp;Internet Relay Chat (IRC)</h3></div></div></div><p>For real-time questions and discussions, use the <code class="literal">#hbase</code> IRC
+                channel on the <a class="link" href="https://freenode.net/" target="_top">FreeNode</a> IRC network.
+                FreeNode offers a web-based client, but most people prefer a native client, and
+                several clients are available for each operating system.</p></div><div class="section" title="1.1.3.&nbsp;Jira"><div class="titlepage"><div><div><h3 class="title"><a name="jira"></a>1.1.3.&nbsp;Jira</h3></div></div></div><p>Check for existing issues in <a class="link" href="https://issues.apache.org/jira/browse/HBASE" target="_top">Jira</a>. If it's
+                either a new feature request, enhancement, or a bug, file a ticket. </p><p>To check for existing issues which you can tackle as a beginner, search for <a class="link" href="https://issues.apache.org/jira/issues/?jql=project%20%3D%20HBASE%20AND%20labels%20in%20(beginner)" target="_top">issues in JIRA tagged with the label 'beginner'</a>.</p><div class="itemizedlist" title="JIRA Priorities"><a name="jira.priorities"></a><p class="title"><b>JIRA Priorities</b></p><ul class="itemizedlist" type="disc"><li class="listitem"><p>Blocker: Should only be used if the issue WILL cause data loss or cluster
+                        instability reliably.</p></li><li class="listitem"><p>Critical: The issue described can cause data loss or cluster instability
+                        in some cases.</p></li><li class="listitem"><p>Major: Important but not tragic issues, like updates to the client API
+                        that will add a lot of much-needed functionality or significant bugs that
+                        need to be fixed but that don't cause data loss.</p></li><li class="listitem"><p>Minor: Useful enhancements and annoying but not damaging bugs.</p></li><li class="listitem"><p>Trivial: Useful enhancements but generally cosmetic.</p></li></ul></div><div class="example"><a name="submitting.patches.jira.code"></a><p class="title"><b>Example&nbsp;1.1.&nbsp;Code Blocks in Jira Comments</b></p><div class="example-contents"><p>A commonly used macro in Jira is {code}. Everything inside the tags is
+                    preformatted, as in this example.</p><pre class="programlisting">
+{code}
+code snippet
+{code}
+            </pre></div></div><br class="example-break"></div></div><div class="section" title="1.2.&nbsp;Apache HBase Repositories"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="repos"></a>1.2.&nbsp;Apache HBase Repositories</h2></div></div></div><p>There are two different repositories for Apache HBase: Subversion (SVN) and Git. GIT
+            is our repository of record for all but the Apache HBase website. We used to be on SVN.
+            We migrated. See <a class="link" href="https://issues.apache.org/jira/browse/INFRA-7768" target="_top">Migrate Apache HBase SVN Repos to Git</a>. Updating hbase.apache.org still
+            requires use of SVN (See <a class="xref" href="#hbase.org" title="1.8.&nbsp;Updating hbase.apache.org">Section&nbsp;1.8, &#8220;Updating hbase.apache.org&#8221;</a>). See <a class="link" href="http://hbase.apache.org/source-repository.html" target="_top">Source Code
+                Management</a> page for contributor and committer links or seach for HBase on the
+                <a class="link" href="http://git.apache.org/" target="_top">Apache Git</a> page.</p></div><div class="section" title="1.3.&nbsp;IDEs"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ides"></a>1.3.&nbsp;IDEs</h2></div></div></div><div class="section" title="1.3.1.&nbsp;Eclipse"><div class="titlepage"><div><div><h3 class="title"><a name="eclipse"></a>1.3.1.&nbsp;Eclipse</h3></div></div></div><div class="section" title="1.3.1.1.&nbsp;Code Formatting"><div class="titlepage"><div><div><h4 class="title"><a name="eclipse.code.formatting"></a>1.3.1.1.&nbsp;Code Formatting</h4></div></div></div><p>Under the <code class="filename">dev-support/</code> folder, you will find
+                        <code class="filename">hbase_eclipse_formatter.xml</code>. We encourage you to have
+                    this formatter in place in eclipse when editing HBase code.</p><div class="procedure" title="Procedure&nbsp;1.1.&nbsp;Load the HBase Formatter Into Eclipse"><a name="d8376e118"></a><p class="title"><b>Procedure&nbsp;1.1.&nbsp;Load the HBase Formatter Into Eclipse</b></p><ol class="procedure" type="1"><li class="step" title="Step 1"><p>Open the <span class="guimenu">Eclipse</span> &#8594; <span class="guimenuitem">Preferences</span> menu item.</p></li><li class="step" title="Step 2"><p>In Preferences, click the <span class="guimenu">Java</span> &#8594; <span class="guisubmenu">Code Style</span> &#8594; <span class="guimenuitem">Formatter</span> menu item.</p></li><li class="step" title="Step 3"><p>Click <span class="guibutton">Import</span> and browse to the location of the
+                                <code class="filename">hbase_eclipse_formatter.xml</code> file, which is in
+                            the <code class="filename">dev-support/</code> directory. Click
+                                <span class="guibutton">Apply</span>.</p></li><li class="step" title="Step 4"><p>Still in Preferences, click <span class="guimenu">Java Editor</span> &#8594; <span class="guimenuitem">Save Actions</span>. Be sure the following options are selected:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Perform the selected actions on save</p></li><li class="listitem"><p>Format source code</p></li><li class="listitem"><p>Format edited lines</p></li></ul></div><p>Click <span class="guibutton">Apply</span>. Close all dialog boxes and return
+                            to the main window.</p></li></ol></div><p>In addition to the automatic formatting, make sure you follow the style
+                    guidelines explained in <a class="xref" href="#common.patch.feedback" title="1.10.3.2.&nbsp;Code Formatting Conventions">Section&nbsp;1.10.3.2, &#8220;Code Formatting Conventions&#8221;</a></p><p>Also, no <code class="code">@author</code> tags - that's a rule. Quality Javadoc comments
+                    are appreciated. And include the Apache license.</p></div><div class="section" title="1.3.1.2.&nbsp;Eclipse Git Plugin"><div class="titlepage"><div><div><h4 class="title"><a name="eclipse.git.plugin"></a>1.3.1.2.&nbsp;Eclipse Git Plugin</h4></div></div></div><p>If you cloned the project via git, download and install the Git plugin (EGit).
+                    Attach to your local git repo (via the <span class="guilabel">Git Repositories</span>
+                    window) and you'll be able to see file revision history, generate patches,
+                    etc.</p></div><div class="section" title="1.3.1.3.&nbsp;HBase Project Setup in Eclipse using m2eclipse"><div class="titlepage"><div><div><h4 class="title"><a name="eclipse.maven.setup"></a>1.3.1.3.&nbsp;HBase Project Setup in Eclipse using <code class="code">m2eclipse</code></h4></div></div></div><p>The easiest way is to use the <span class="command"><strong>m2eclipse</strong></span> plugin for Eclipse.
+                    Eclipse Indigo or newer includes <span class="command"><strong>m2eclipse</strong></span>, or you can
+                    download it from <a class="link" href="http://www.eclipse.org/m2e/" target="_top">http://www.eclipse.org/m2e/</a>/. It provides Maven integration for
+                    Eclipse, and even lets you use the direct Maven commands from within Eclipse to
+                    compile and test your project.</p><p>To import the project, click <span class="guimenu">File</span> &#8594; <span class="guisubmenu">Import</span> &#8594; <span class="guisubmenu">Maven</span> &#8594; <span class="guimenuitem">Existing Maven Projects</span> and select the HBase root directory. <code class="code">m2eclipse</code>
+                    locates all the hbase modules for you.</p><p>If you install <span class="command"><strong>m2eclipse</strong></span> and import HBase in your
+                    workspace, do the following to fix your eclipse Build Path. </p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Remove <code class="filename">target</code> folder</p></li><li class="listitem"><p>Add <code class="filename">target/generated-jamon</code> and
+                                <code class="filename">target/generated-sources/java</code> folders.</p></li><li class="listitem"><p>Remove from your Build Path the exclusions on the
+                                <code class="filename">src/main/resources</code> and
+                                <code class="filename">src/test/resources</code> to avoid error message in
+                            the console, such as the following:</p><pre class="screen">Failed to execute goal 
+org.apache.maven.plugins:maven-antrun-plugin:1.6:run (default) on project hbase:
+'An Ant BuildException has occured: Replace: source file .../target/classes/hbase-default.xml 
+doesn't exist</pre><p>This will also reduce the eclipse build cycles and make your life
+                            easier when developing. </p></li></ol></div></div><div class="section" title="1.3.1.4.&nbsp;HBase Project Setup in Eclipse Using the Command Line"><div class="titlepage"><div><div><h4 class="title"><a name="eclipse.commandline"></a>1.3.1.4.&nbsp;HBase Project Setup in Eclipse Using the Command Line</h4></div></div></div><p>Instead of using <code class="code">m2eclipse</code>, you can generate the Eclipse files
+                    from the command line. </p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>First, run the following command, which builds HBase. You only need to
+                            do this once.</p><pre class="programlisting">mvn clean install -DskipTests</pre></li><li class="listitem"><p>Close Eclipse, and execute the following command from the terminal, in
+                            your local HBase project directory, to generate new
+                                <code class="filename">.project</code> and <code class="filename">.classpath</code>
+                            files.</p><pre class="programlisting">mvn eclipse:eclipse</pre></li><li class="listitem"><p>Reopen Eclipse and import the <code class="filename">.project</code> file in
+                            the HBase directory to a workspace.</p></li></ol></div></div><div class="section" title="1.3.1.5.&nbsp;Maven Classpath Variable"><div class="titlepage"><div><div><h4 class="title"><a name="eclipse.maven.class"></a>1.3.1.5.&nbsp;Maven Classpath Variable</h4></div></div></div><p>The <code class="varname">$M2_REPO</code> classpath variable needs to be set up for the
+                    project. This needs to be set to your local Maven repository, which is usually
+                        <code class="filename">~/.m2/repository</code></p><p>If this classpath variable is not configured, you will see compile errors in
+                    Eclipse like this: </p><pre class="screen">
+Description	Resource	Path	Location	Type
+The project cannot be built until build path errors are resolved	hbase		Unknown	Java Problem
+Unbound classpath variable: 'M2_REPO/asm/asm/3.1/asm-3.1.jar' in project 'hbase'	hbase		Build path	Build Path Problem
+Unbound classpath variable: 'M2_REPO/com/google/guava/guava/r09/guava-r09.jar' in project 'hbase'	hbase		Build path	Build Path Problem
+Unbound classpath variable: 'M2_REPO/com/google/protobuf/protobuf-java/2.3.0/protobuf-java-2.3.0.jar' in project 'hbase'	hbase		Build path	Build Path Problem Unbound classpath variable:
+                </pre></div><div class="section" title="1.3.1.6.&nbsp;Eclipse Known Issues"><div class="titlepage"><div><div><h4 class="title"><a name="eclipse.issues"></a>1.3.1.6.&nbsp;Eclipse Known Issues</h4></div></div></div><p>Eclipse will currently complain about <code class="filename">Bytes.java</code>. It is
+                    not possible to turn these errors off.</p><pre class="screen">
+Description	Resource	Path	Location	Type
+Access restriction: The method arrayBaseOffset(Class) from the type Unsafe is not accessible due to restriction on required library /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar	Bytes.java	/hbase/src/main/java/org/apache/hadoop/hbase/util	line 1061	Java Problem
+Access restriction: The method arrayIndexScale(Class) from the type Unsafe is not accessible due to restriction on required library /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar	Bytes.java	/hbase/src/main/java/org/apache/hadoop/hbase/util	line 1064	Java Problem
+Access restriction: The method getLong(Object, long) from the type Unsafe is not accessible due to restriction on required library /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar	Bytes.java	/hbase/src/main/java/org/apache/hadoop/hbase/util	line 1111	Java Problem
+             </pre></div><div class="section" title="1.3.1.7.&nbsp;Eclipse - More Information"><div class="titlepage"><div><div><h4 class="title"><a name="eclipse.more"></a>1.3.1.7.&nbsp;Eclipse - More Information</h4></div></div></div><p>For additional information on setting up Eclipse for HBase development on
+                    Windows, see <a class="link" href="http://michaelmorello.blogspot.com/2011/09/hbase-subversion-eclipse-windows.html" target="_top">Michael Morello's blog</a> on the topic. </p></div></div><div class="section" title="1.3.2.&nbsp;IntelliJ IDEA"><div class="titlepage"><div><div><h3 class="title"><a name="d8376e324"></a>1.3.2.&nbsp;IntelliJ IDEA</h3></div></div></div><p>You can set up IntelliJ IDEA for similar functinoality as Eclipse. Follow these steps.</p><div class="orderedlist" title="Project Setup in IntelliJ IDEA"><p class="title"><b>Project Setup in IntelliJ IDEA</b></p><ol class="orderedlist" type="1"><li class="listitem"><p>Select <span class="guimenu">Import Project</span> &#8594; <span class="guisubmenu">Import Project From External Model</span> &#8594; <span class="guimenuitem">Maven</span></p></li><li class="listitem"><p>You do not need to select a profile. Be sure <span class="guilabel">Maven project
+                            required</span> is selected, and click
+                        <span class="guibutton">Next</span>.</p></li><li class="listitem"><p>Select the location for the JDK.</p></li></ol></div><p title="Using the HBase Formatter in IntelliJ IDEA"><b>Using the HBase Formatter in IntelliJ IDEA.&nbsp;</b>Using the Eclipse Code Formatter plugin for IntelliJ IDEA, you can import the
+                    HBase code formatter described in <a class="xref" href="#eclipse.code.formatting" title="1.3.1.1.&nbsp;Code Formatting">Section&nbsp;1.3.1.1, &#8220;Code Formatting&#8221;</a>.</p></div><div class="section" title="1.3.3.&nbsp;Other IDEs"><div class="titlepage"><div><div><h3 class="title"><a name="d8376e361"></a>1.3.3.&nbsp;Other IDEs</h3></div></div></div><p>It would be userful to mirror the <a class="xref" href="#eclipse" title="1.3.1.&nbsp;Eclipse">Section&nbsp;1.3.1, &#8220;Eclipse&#8221;</a> set-up instructions
+                for other IDEs. If you would like to assist, please have a look at <a class="link" href="https://issues.apache.org/jira/browse/HBASE-11704" target="_top">HBASE-11704</a>.</p></div></div><div class="section" title="1.4.&nbsp;Building Apache HBase"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="build"></a>1.4.&nbsp;Building Apache HBase</h2></div></div></div><div class="section" title="1.4.1.&nbsp;Basic Compile"><div class="titlepage"><div><div><h3 class="title"><a name="build.basic"></a>1.4.1.&nbsp;Basic Compile</h3></div></div></div><p>HBase is compiled using Maven. You must use Maven 3.x. To check your Maven
+                version, run the command <span class="command"><strong>mvn -version</strong></span>.</p><div class="note" title="JDK Version Requirements" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">JDK Version Requirements</h3><p> Starting with HBase 1.0 you must use Java 7 or later to build from source
+                    code. See <a class="xref" href="#">???</a> for more complete information about supported
+                    JDK versions. </p></div><div class="section" title="1.4.1.1.&nbsp;Maven Build Commands"><div class="titlepage"><div><div><h4 class="title"><a name="maven.build.commands"></a>1.4.1.1.&nbsp;Maven Build Commands</h4></div></div></div><p>All commands are executed from the local HBase project directory. </p><div class="section" title="1.4.1.1.1.&nbsp;Package"><div class="titlepage"><div><div><h5 class="title"><a name="d8376e394"></a>1.4.1.1.1.&nbsp;Package</h5></div></div></div><p>The simplest command to compile HBase from its java source code is to use
+                        the <code class="code">package</code> target, which builds JARs with the compiled
+                        files.</p><pre class="programlisting">mvn package -DskipTests</pre><p>Or, to clean up before compiling:</p><pre class="programlisting">mvn clean package -DskipTests</pre><p>With Eclipse set up as explained above in <a class="xref" href="#eclipse" title="1.3.1.&nbsp;Eclipse">Section&nbsp;1.3.1, &#8220;Eclipse&#8221;</a>, you
+                        can also use the <span class="guimenu">Build</span> command in Eclipse. To create the
+                        full installable HBase package takes a little bit more work, so read on.
+                    </p></div><div class="section" title="1.4.1.1.2.&nbsp;Compile"><div class="titlepage"><div><div><h5 class="title"><a name="maven.build.commands.compile"></a>1.4.1.1.2.&nbsp;Compile</h5></div></div></div><p>The <code class="code">compile</code> target does not create the JARs with the compiled
+                        files.</p><pre class="programlisting">mvn compile</pre><pre class="programlisting">mvn clean compile</pre></div><div class="section" title="1.4.1.1.3.&nbsp;Install"><div class="titlepage"><div><div><h5 class="title"><a name="d8376e427"></a>1.4.1.1.3.&nbsp;Install</h5></div></div></div><p>To install the JARs in your <code class="filename">~/.m2/</code> directory, use the
+                            <code class="code">install</code> target.</p><pre class="programlisting">mvn install</pre><pre class="programlisting">mvn clean install</pre><pre class="programlisting">mvn clean install -DskipTests</pre></div></div><div class="section" title="1.4.1.2.&nbsp;Running all or individual Unit Tests"><div class="titlepage"><div><div><h4 class="title"><a name="maven.build.commands.unitall"></a>1.4.1.2.&nbsp;Running all or individual Unit Tests</h4></div></div></div><p>See the <a class="xref" href="#hbase.unittests.cmds" title="1.9.3.&nbsp;Running tests">Section&nbsp;1.9.3, &#8220;Running tests&#8221;</a> section in <a class="xref" href="#hbase.unittests" title="1.9.2.&nbsp;Unit Tests">Section&nbsp;1.9.2, &#8220;Unit Tests&#8221;</a></p></div><div class="section" title="1.4.1.3.&nbsp;Building against various hadoop versions."><div class="titlepage"><div><div><h4 class="title"><a name="maven.build.hadoop"></a>1.4.1.3.&nbsp;Building against various hadoop versions.</h4></div></div></div><p>As of 0.96, Apache HBase supports building against Apache Hadoop versions:
+                    1.0.3, 2.0.0-alpha and 3.0.0-SNAPSHOT. By default, in 0.96 and earlier, we will
+                    build with Hadoop-1.0.x. As of 0.98, Hadoop 1.x is deprecated and Hadoop 2.x is
+                    the default. To change the version to build against, add a hadoop.profile
+                    property when you invoke <span class="command"><strong>mvn</strong></span>:</p><pre class="programlisting">mvn -Dhadoop.profile=1.0 ...</pre><p> The above will build against whatever explicit hadoop 1.x version we have in
+                    our <code class="filename">pom.xml</code> as our '1.0' version. Tests may not all pass so
+                    you may need to pass <code class="code">-DskipTests</code> unless you are inclined to fix the
+                    failing tests.</p><div class="note" title="'dependencyManagement.dependencies.dependency.artifactId' for org.apache.hbase:${compat.module}:test-jar with value '${compat.module}' does not match a valid id pattern" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title"><a name="maven.build.passing.default.profile"></a>'dependencyManagement.dependencies.dependency.artifactId' for
+                        org.apache.hbase:${compat.module}:test-jar with value '${compat.module}'
+                        does not match a valid id pattern</h3><p>You will see ERRORs like the above title if you pass the
+                            <span class="emphasis"><em>default</em></span> profile; e.g. if you pass
+                            <span class="property">hadoop.profile=1.1</span> when building 0.96 or
+                            <span class="property">hadoop.profile=2.0</span> when building hadoop 0.98; just
+                        drop the hadoop.profile stipulation in this case to get your build to run
+                        again. This seems to be a maven pecularity that is probably fixable but
+                        we've not spent the time trying to figure it.</p></div><p> Similarly, for 3.0, you would just replace the profile value. Note that
+                    Hadoop-3.0.0-SNAPSHOT does not currently have a deployed maven artificat - you
+                    will need to build and install your own in your local maven repository if you
+                    want to run against this profile. </p><p> In earilier versions of Apache HBase, you can build against older versions of
+                    Apache Hadoop, notably, Hadoop 0.22.x and 0.23.x. If you are running, for
+                    example HBase-0.94 and wanted to build against Hadoop 0.23.x, you would run
+                    with:</p><pre class="programlisting">mvn -Dhadoop.profile=22 ...</pre></div><div class="section" title="1.4.1.4.&nbsp;Build Protobuf"><div class="titlepage"><div><div><h4 class="title"><a name="build.protobuf"></a>1.4.1.4.&nbsp;Build Protobuf</h4></div></div></div><p>You may need to change the protobuf definitions that reside in the
+                        <code class="filename">hbase-protocol</code> module or other modules.</p><p> The protobuf files are located
+                        <code class="filename">hbase-protocol/src/main/protobuf</code>. For the change to be
+                    effective, you will need to regenerate the classes. You can use maven profile
+                        <code class="code">compile-protobuf</code> to do this.</p><pre class="programlisting">mvn compile -Pcompile-protobuf</pre><p>You may also want to define <code class="varname">protoc.path</code> for the protoc
+                    binary, using the following command:</p><pre class="programlisting">
+mvn compile -Pcompile-protobuf -Dprotoc.path=/opt/local/bin/protoc
+             </pre><p>Read the <code class="filename">hbase-protocol/README.txt</code> for more details.
+                </p></div><div class="section" title="1.4.1.5.&nbsp;Build a Tarball"><div class="titlepage"><div><div><h4 class="title"><a name="d8376e520"></a>1.4.1.5.&nbsp;Build a Tarball</h4></div></div></div><p>You can build a tarball without going through the release process described in
+                        <a class="xref" href="#releasing" title="1.5.&nbsp;Releasing Apache HBase">Section&nbsp;1.5, &#8220;Releasing Apache HBase&#8221;</a>, by running the following command:</p><pre class="screen">mvn -DskipTests clean install &amp;&amp; mvn -DskipTests package assembly:single</pre><p>The distribution tarball is built in
+                            <code class="filename">hbase-assembly/target/hbase-<em class="replaceable"><code>&lt;version&gt;</code></em>-bin.tar.gz</code>.</p></div><div class="section" title="1.4.1.6.&nbsp;Build Gotchas"><div class="titlepage"><div><div><h4 class="title"><a name="build.gotchas"></a>1.4.1.6.&nbsp;Build Gotchas</h4></div></div></div><p>If you see <code class="code">Unable to find resource 'VM_global_library.vm'</code>, ignore
+                    it. Its not an error. It is <a class="link" href="http://jira.codehaus.org/browse/MSITE-286" target="_top">officially
+                        ugly</a> though. </p></div><div class="section" title="1.4.1.7.&nbsp;Building in snappy compression support"><div class="titlepage"><div><div><h4 class="title"><a name="build.snappy"></a>1.4.1.7.&nbsp;Building in snappy compression support</h4></div></div></div><p>Pass <code class="code">-Psnappy</code> to trigger the <code class="code">hadoop-snappy</code> maven profile
+                    for building Google Snappy native libraries into HBase. See also <a class="xref" href="#">???</a></p></div></div></div><div class="section" title="1.5.&nbsp;Releasing Apache HBase"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="releasing"></a>1.5.&nbsp;Releasing Apache HBase</h2></div></div></div><div class="note" title="Building against HBase 1.x" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Building against HBase 1.x</h3><p>HBase 1.x requires Java 7 to build. See <a class="xref" href="#">???</a> for Java
+                requirements per HBase release.</p></div><div class="section" title="1.5.1.&nbsp;Building against HBase 0.96-0.98"><div class="titlepage"><div><div><h3 class="title"><a name="d8376e570"></a>1.5.1.&nbsp;Building against HBase 0.96-0.98</h3></div></div></div><p>HBase 0.96.x will run on Hadoop 1.x or Hadoop 2.x. HBase 0.98 still runs on both,
+                but HBase 0.98 deprecates use of Hadoop 1. HBase 1.x will <span class="emphasis"><em>not</em></span>
+                run on Hadoop 1. In the following procedures, we make a distinction between HBase
+                1.x builds and the awkward process involved building HBase 0.96/0.98 for either
+                Hadoop 1 or Hadoop 2 targets. </p><p>You must choose which Hadoop to build against. It is not possible to build a
+                single HBase binary that runs against both Hadoop 1 and Hadoop 2. Hadoop is included
+                in the build, because it is needed to run HBase in standalone mode. Therefore, the
+                set of modules included in the tarball changes, depending on the build target. To
+                determine which HBase you have, look at the HBase version. The Hadoop version is
+                embedded within it.</p><p>Maven, our build system, natively does not allow a single product to be built
+                against different dependencies. Also, Maven cannot change the set of included
+                modules and write out the correct <code class="filename">pom.xml</code> files with
+                appropriate dependencies, even using two build targets, one for Hadoop 1 and another
+                for Hadoop 2. A prerequisite step is required, which takes as input the current
+                    <code class="filename">pom.xml</code>s and generates Hadoop 1 or Hadoop 2 versions using
+                a script in the <code class="filename">dev-tools/</code> directory, called
+                        <code class="filename">generate-hadoop<em class="replaceable"><code>X</code></em>-poms.sh</code>
+                where <em class="replaceable"><code>X</code></em> is either <code class="literal">1</code> or
+                    <code class="literal">2</code>. You then reference these generated poms when you build.
+                For now, just be aware of the difference between HBase 1.x builds and those of HBase
+                0.96-0.98. This difference is important to the build instructions.</p><div class="example"><a name="mvn.settings.file"></a><p class="title"><b>Example&nbsp;1.2.&nbsp;Example <code class="filename">~/.m2/settings.xml</code> File</b></p><div class="example-contents"><p>Publishing to maven requires you sign the artifacts you want to upload. For
+                    the build to sign them for you, you a properly configured
+                        <code class="filename">settings.xml</code> in your local repository under
+                        <code class="filename">.m2</code>, such as the following.</p><pre class="programlisting">&lt;settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      http://maven.apache.org/xsd/settings-1.0.0.xsd"&gt;
+  &lt;servers&gt;
+    &lt;!- To publish a snapshot of some part of Maven --&gt;
+    &lt;server&gt;
+      &lt;id&gt;apache.snapshots.https&lt;/id&gt;
+      &lt;username&gt;YOUR_APACHE_ID
+      &lt;/username&gt;
+      &lt;password&gt;YOUR_APACHE_PASSWORD
+      &lt;/password&gt;
+    &lt;/server&gt;
+    &lt;!-- To publish a website using Maven --&gt;
+    &lt;!-- To stage a release of some part of Maven --&gt;
+    &lt;server&gt;
+      &lt;id&gt;apache.releases.https&lt;/id&gt;
+      &lt;username&gt;YOUR_APACHE_ID
+      &lt;/username&gt;
+      &lt;password&gt;YOUR_APACHE_PASSWORD
+      &lt;/password&gt;
+    &lt;/server&gt;
+  &lt;/servers&gt;
+  &lt;profiles&gt;
+    &lt;profile&gt;
+      &lt;id&gt;apache-release&lt;/id&gt;
+      &lt;properties&gt;
+    &lt;gpg.keyname&gt;YOUR_KEYNAME&lt;/gpg.keyname&gt;
+    &lt;!--Keyname is something like this ... 00A5F21E... do gpg --list-keys to find it--&gt;
+    &lt;gpg.passphrase&gt;YOUR_KEY_PASSWORD
+    &lt;/gpg.passphrase&gt;
+      &lt;/properties&gt;
+    &lt;/profile&gt;
+  &lt;/profiles&gt;
+&lt;/settings&gt;
+                </pre></div></div><br class="example-break"></div><div class="section" title="1.5.2.&nbsp;Making a Release Candidate"><div class="titlepage"><div><div><h3 class="title"><a name="maven.release"></a>1.5.2.&nbsp;Making a Release Candidate</h3></div></div></div><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>These instructions are for building HBase 1.0.x. For building earlier
+                    versions, the process is different. See this section under the respective
+                    release documentation folders. </p></div><p title="Point Releases"><b>Point Releases.&nbsp;</b>If you are making a point release (for example to quickly address a critical
+                    incompatability or security problem) off of a release branch instead of a
+                    development branch, the tagging instructions are slightly different. I'll prefix
+                    those special steps with <span class="emphasis"><em>Point Release Only</em></span>. </p><p title="Before You Begin"><b>Before You Begin.&nbsp;</b>Before you make a release candidate, do a practice run by deploying a
+                    snapshot. Before you start, check to be sure recent builds have been passing for
+                    the branch from where you are going to take your release. You should also have
+                    tried recent branch tips out on a cluster under load, perhaps by running the
+                        <code class="code">hbase-it</code> integration test suite for a few hours to 'burn in'
+                    the near-candidate bits. </p><div class="note" title="Point Release Only" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Point Release Only</h3><p>At this point you should tag the previous release branch (ex: 0.96.1) with the
+                    new point release tag (e.g. 0.96.1.1 tag). Any commits with changes for the
+                    point release should be appled to the new tag. </p></div><p>The Hadoop <a class="link" href="http://wiki.apache.org/hadoop/HowToRelease" target="_top">How To
+                    Release</a> wiki page is used as a model for most of the instructions below,
+                and may have more detail on particular sections, so it is worth review.</p><div class="note" title="Specifying the Heap Space for Maven on OSX" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Specifying the Heap Space for Maven on OSX</h3><p>On OSX, you may need to specify the heap space for Maven commands, by setting
+                    the <code class="varname">MAVEN_OPTS</code> variable to <code class="literal">-Xmx3g</code>. You can
+                    prefix the variable to the Maven command, as in the following example:</p><pre class="screen">MAVEN_OPTS="-Xmx2g" mvn package</pre><p>You could also set this in an environment variable or alias in your
+                    shell.</p></div><div class="procedure" title="Procedure&nbsp;1.2.&nbsp;Release Procedure"><a name="d8376e669"></a><p class="title"><b>Procedure&nbsp;1.2.&nbsp;Release Procedure</b></p><p>The script <code class="filename">dev-support/make_rc.sh</code> automates many of these
+                    steps. It does not do the modification of the <code class="filename">CHANGES.txt</code>
+                    for the release, the close of the staging repository in Apache Maven (human
+                    intervention is needed here), the checking of the produced artifacts to ensure
+                    they are 'good' -- e.g. extracting the produced tarballs, verifying that they
+                    look right, then starting HBase and checking that everything is running
+                    correctly, then the signing and pushing of the tarballs to <a class="link" href="http://people.apache.org" target="_top">people.apache.org</a>. The script
+                    handles everything else, and comes in handy.</p><ol class="procedure" type="1"><li class="step" title="Update the CHANGES.txt file and the POM files."><p class="title"><b>Update the <code class="filename">CHANGES.txt</code> file and the POM files.</b></p><p>Update <code class="filename">CHANGES.txt</code> with the changes since the last
+                        release. Make sure the URL to the JIRA points to the proper location which
+                        lists fixes for this release. Adjust the version in all the POM files
+                        appropriately. If you are making a release candidate, you must remove the
+                            <code class="literal">-SNAPSHOT</code> label from all versions. If you are running
+                        this receipe to publish a snapshot, you must keep the
+                            <code class="literal">-SNAPSHOT</code> suffix on the hbase version. The <a class="link" href="http://mojo.codehaus.org/versions-maven-plugin/" target="_top">Versions
+                            Maven Plugin</a> can be of use here. To set a version in all the many
+                        poms of the hbase multi-module project, use a command like the
+                        following:</p><pre class="programlisting">
+$ mvn clean org.codehaus.mojo:versions-maven-plugin:1.3.1:set -DnewVersion=0.96.0
+                    </pre><p>Checkin the <code class="filename">CHANGES.txt</code> and any version
+                        changes.</p></li><li class="step" title="Update the documentation."><p class="title"><b>Update the documentation.</b></p><p> Update the documentation under <code class="filename">src/main/docbkx</code>. This
+                        usually involves copying the latest from trunk and making version-particular
+                        adjustments to suit this release candidate version. </p></li><li class="step" title="Build the source tarball."><p class="title"><b>Build the source tarball.</b></p><p>Now, build the source tarball. This tarball is Hadoop-version-independent.
+                        It is just the pure source code and documentation without a particular
+                        hadoop taint, etc. Add the <code class="varname">-Prelease</code> profile when
+                        building. It checks files for licenses and will fail the build if unlicensed
+                        files are present.</p><pre class="programlisting">
+$ mvn clean install -DskipTests assembly:single -Dassembly.file=hbase-assembly/src/main/assembly/src.xml -Prelease
+                        </pre><p>Extract the tarball and make sure it looks good. A good test for the src
+                        tarball being 'complete' is to see if you can build new tarballs from this
+                        source bundle. If the source tarball is good, save it off to a
+                            <span class="emphasis"><em>version directory</em></span>, a directory somewhere where you
+                        are collecting all of the tarballs you will publish as part of the release
+                        candidate. For example if you were building a hbase-0.96.0 release
+                        candidate, you might call the directory
+                        <code class="filename">hbase-0.96.0RC0</code>. Later you will publish this directory
+                        as our release candidate up on <a class="link" href="people.apache.org/~YOU" target="_top">people.apache.org/<em class="replaceable"><code>~YOU</code></em>/</a>. </p></li><li class="step" title="Build the binary tarball."><p class="title"><b>Build the binary tarball.</b></p><p>Next, build the binary tarball. Add the <code class="varname">-Prelease</code>
+                        profile when building. It checks files for licenses and will fail the build
+                        if unlicensed files are present. Do it in two steps.</p><ol type="a" class="substeps"><li class="step" title="Step 4.a"><p>First install into the local repository</p><pre class="programlisting">
+$ mvn clean install -DskipTests -Prelease</pre></li><li class="step" title="Step 4.b"><p>Next, generate documentation and assemble the tarball.</p><pre class="programlisting">
+$ mvn install -DskipTests site assembly:single -Prelease</pre></li></ol><p> Otherwise, the build complains that hbase modules are not in the maven
+                        repository when you try to do it at once, especially on fresh repository. It
+                        seems that you need the install goal in both steps.</p><p>Extract the generated tarball and check it out. Look at the documentation,
+                        see if it runs, etc. If good, copy the tarball to the above mentioned
+                            <span class="emphasis"><em>version directory</em></span>. </p></li><li class="step" title="Create a new tag."><p class="title"><b>Create a new tag.</b></p><div class="note" title="Point Release Only" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Point Release Only</h3><p>The following step that creates a new tag can be skipped since you've
+                            already created the point release tag</p></div><p>Tag the release at this point since it looks good. If you find an issue
+                        later, you can delete the tag and start over. Release needs to be tagged for
+                        the next step.</p></li><li class="step" title="Deploy to the Maven Repository."><p class="title"><b>Deploy to the Maven Repository.</b></p><p>Next, deploy HBase to the Apache Maven repository, using the
+                            <code class="varname">apache-release</code> profile instead of the
+                            <code class="varname">release</code> profile when running the <span class="command"><strong>mvn
+                            deploy</strong></span> command. This profile invokes the Apache pom referenced
+                        by our pom files, and also signs your artifacts published to Maven, as long
+                        as the <code class="filename">settings.xml</code> is configured correctly, as
+                        described in <a class="xref" href="#mvn.settings.file" title="Example&nbsp;1.2.&nbsp;Example ~/.m2/settings.xml File">Example&nbsp;1.2, &#8220;Example <code class="filename">~/.m2/settings.xml</code> File&#8221;</a>.</p><pre class="programlisting">
+$ mvn deploy -DskipTests -Papache-release</pre><p>This command copies all artifacts up to a temporary staging Apache mvn
+                        repository in an 'open' state. More work needs to be done on these maven
+                        artifacts to make them generally available. </p></li><li class="step" title="Make the Release Candidate available."><p class="title"><b>Make the Release Candidate available.</b></p><p>The artifacts are in the maven repository in the staging area in the
+                        'open' state. While in this 'open' state you can check out what you've
+                        published to make sure all is good. To do this, login at <a class="link" href="http://repository.apache.org" target="_top">repository.apache.org</a>
+                        using your Apache ID. Find your artifacts in the staging repository. Browse
+                        the content. Make sure all artifacts made it up and that the poms look
+                        generally good. If it checks out, 'close' the repo. This will make the
+                        artifacts publically available. You will receive an email with the URL to
+                        give out for the temporary staging repository for others to use trying out
+                        this new release candidate. Include it in the email that announces the
+                        release candidate. Folks will need to add this repo URL to their local poms
+                        or to their local <code class="filename">settings.xml</code> file to pull the
+                        published release candidate artifacts. If the published artifacts are
+                        incomplete or have problems, just delete the 'open' staged artifacts.</p><div class="note" title="hbase-downstreamer" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">hbase-downstreamer</h3><p> See the <a class="link" href="https://github.com/saintstack/hbase-downstreamer" target="_top">hbase-downstreamer</a> test for a simple example of a project
+                            that is downstream of HBase an depends on it. Check it out and run its
+                            simple test to make sure maven artifacts are properly deployed to the
+                            maven repository. Be sure to edit the pom to point to the proper staging
+                            repository. Make sure you are pulling from the repository when tests run
+                            and that you are not getting from your local repository, by either
+                            passing the <code class="code">-U</code> flag or deleting your local repo content and
+                            check maven is pulling from remote out of the staging repository.
+                        </p></div><p>See <a class="link" href="http://www.apache.org/dev/publishing-maven-artifacts.html" target="_top">Publishing Maven Artifacts</a> for some pointers on this maven
+                        staging process.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>We no longer publish using the maven release plugin. Instead we do
+                                <span class="command"><strong>mvn deploy</strong></span>. It seems to give us a backdoor to
+                            maven release publishing. If there is no <span class="emphasis"><em>-SNAPSHOT</em></span>
+                            on the version string, then we are 'deployed' to the apache maven
+                            repository staging directory from which we can publish URLs for
+                            candidates and later, if they pass, publish as release (if a
+                                <span class="emphasis"><em>-SNAPSHOT</em></span> on the version string, deploy will
+                            put the artifacts up into apache snapshot repos). </p></div><p>If the HBase version ends in <code class="varname">-SNAPSHOT</code>, the artifacts
+                        go elsewhere. They are put into the Apache snapshots repository directly and
+                        are immediately available. Making a SNAPSHOT release, this is what you want
+                        to happen.</p></li><li class="step" title="If you used the make_rc.sh script instead of doing the above manually, do your sanity checks now."><p class="title"><b>If you used the <code class="filename">make_rc.sh</code> script instead of doing
+                        the above manually, do your sanity checks now.</b></p><p> At this stage, you have two tarballs in your 'version directory' and a
+                        set of artifacts in a staging area of the maven repository, in the 'closed'
+                        state. These are publicly accessible in a temporary staging repository whose
+                        URL you should have gotten in an email. The above mentioned script,
+                            <code class="filename">make_rc.sh</code> does all of the above for you minus the
+                        check of the artifacts built, the closing of the staging repository up in
+                        maven, and the tagging of the release. If you run the script, do your checks
+                        at this stage verifying the src and bin tarballs and checking what is up in
+                        staging using hbase-downstreamer project. Tag before you start the build.
+                        You can always delete it if the build goes haywire. </p></li><li class="step" title="Sign and upload your version directory to people.apache.org."><p class="title"><b>Sign and upload your version directory to <a class="link" href="http://people.apache.org" target="_top">people.apache.org</a>.</b></p><p> If all checks out, next put the <span class="emphasis"><em>version directory</em></span> up
+                        on <a class="link" href="http://people.apache.org" target="_top">people.apache.org</a>. You
+                        will need to sign and fingerprint them before you push them up. In the
+                            <span class="emphasis"><em>version directory</em></span> run the following commands:
+                    </p><pre class="programlisting">
+$ for i in *.tar.gz; do echo $i; gpg --print-mds $i &gt; $i.mds ; done
+$ for i in *.tar.gz; do echo $i; gpg --armor --output $i.asc --detach-sig $i  ; done
+$ cd ..
+# Presuming our 'version directory' is named 0.96.0RC0, now copy it up to people.apache.org.
+$ rsync -av 0.96.0RC0 people.apache.org:public_html
+                    </pre><p>Make sure the <a class="link" href="http://people.apache.org" target="_top">people.apache.org</a> directory is showing and that the mvn repo
+                        URLs are good. Announce the release candidate on the mailing list and call a
+                        vote. </p></li></ol></div></div><div class="section" title="1.5.3.&nbsp;Publishing a SNAPSHOT to maven"><div class="titlepage"><div><div><h3 class="title"><a name="maven.snapshot"></a>1.5.3.&nbsp;Publishing a SNAPSHOT to maven</h3></div></div></div><p>Make sure your <code class="filename">settings.xml</code> is set up properly, as in <a class="xref" href="#mvn.settings.file" title="Example&nbsp;1.2.&nbsp;Example ~/.m2/settings.xml File">Example&nbsp;1.2, &#8220;Example <code class="filename">~/.m2/settings.xml</code> File&#8221;</a>. Make sure the hbase version includes
+                    <code class="varname">-SNAPSHOT</code> as a suffix. Following is an example of publishing
+                SNAPSHOTS of a release that had an hbase version of 0.96.0 in its poms.</p><pre class="programlisting">
+ $ mvn clean install -DskipTests  javadoc:aggregate site assembly:single -Prelease
+ $ mvn -DskipTests  deploy -Papache-release</pre><p>The <code class="filename">make_rc.sh</code> script mentioned above (see <a class="xref" href="#maven.release" title="1.5.2.&nbsp;Making a Release Candidate">Section&nbsp;1.5.2, &#8220;Making a Release Candidate&#8221;</a>) can help you publish <code class="varname">SNAPSHOTS</code>.
+                Make sure your <code class="varname">hbase.version</code> has a <code class="varname">-SNAPSHOT</code>
+                suffix before running the script. It will put a snapshot up into the apache snapshot
+                repository for you. </p></div></div><div class="section" title="1.6.&nbsp;Voting on Release Candidates"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="hbase.rc.voting"></a>1.6.&nbsp;Voting on Release Candidates</h2></div></div></div><p> Everyone is encouraged to try and vote on HBase release candidates. Only the votes of
+            PMC members are binding. PMC members, please read this WIP doc on policy voting for a
+            release candidate, <a class="link" href="https://github.com/rectang/asfrelease/blob/master/release.md" target="_top">Release
+                Policy</a>. <span class="quote">&#8220;<span class="quote">Before casting +1 binding votes, individuals are required to
+                download the signed source code package onto their own hardware, compile it as
+                provided, and test the resulting executable on their own platform, along with also
+                validating cryptographic signatures and verifying that the package meets the
+                requirements of the ASF policy on releases.</span>&#8221;</span> Regards the latter, run
+                <span class="command"><strong>mvn apache-rat:check</strong></span> to verify all files are suitably licensed.
+            See <a class="link" href="http://search-hadoop.com/m/DHED4dhFaU" target="_top">HBase, mail # dev - On
+                recent discussion clarifying ASF release policy</a>. for how we arrived at this
+            process. </p></div><div class="section" title="1.7.&nbsp;Generating the HBase Reference Guide"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="documentation"></a>1.7.&nbsp;Generating the HBase Reference Guide</h2></div></div></div><p>The manual is marked up using <a class="link" href="http://www.docbook.org/" target="_top">docbook</a>. We then use the <a class="link" href="http://code.google.com/p/docbkx-tools/" target="_top">docbkx maven plugin</a> to
+            transform the markup to html. This plugin is run when you specify the
+                <span class="command"><strong>site</strong></span> goal as in when you run <span class="command"><strong>mvn site</strong></span> or you
+            can call the plugin explicitly to just generate the manual by doing <span class="command"><strong>mvn
+                docbkx:generate-html</strong></span>. When you run <span class="command"><strong>mvn site</strong></span>, the
+            documentation is generated twice, once to generate the multipage manual and then again
+            for the single page manual, which is easier to search. See <a class="xref" href="#">???</a> for more information on building
+            the documentation. </p></div><div class="section" title="1.8.&nbsp;Updating hbase.apache.org"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="hbase.org"></a>1.8.&nbsp;Updating <a class="link" href="http://hbase.apache.org" target="_top">hbase.apache.org</a></h2></div></div></div><div class="section" title="1.8.1.&nbsp;Contributing to hbase.apache.org"><div class="titlepage"><div><div><h3 class="title"><a name="hbase.org.site.contributing"></a>1.8.1.&nbsp;Contributing to hbase.apache.org</h3></div></div></div><p>See <a class="xref" href="#">???</a> for more information
+                on contributing to the documentation or website.</p></div><div class="section" title="1.8.2.&nbsp;Publishing hbase.apache.org"><div class="titlepage"><div><div><h3 class="title"><a name="hbase.org.site.publishing"></a>1.8.2.&nbsp;Publishing <a class="link" href="http://hbase.apache.org" target="_top">hbase.apache.org</a></h3></div></div></div><p>As of <a class="link" href="https://issues.apache.org/jira/browse/INFRA-5680" target="_top">INFRA-5680 Migrate apache hbase website</a>, to publish the website, build
+                it using Maven, and then deploy it over a checkout of
+                    <code class="filename">https://svn.apache.org/repos/asf/hbase/hbase.apache.org/trunk</code>
+                and check in your changes. The script
+                    <code class="filename">dev-scripts/publish_hbase_website.sh</code> is provided to
+                automate this process and to be sure that stale files are removed from SVN. Review
+                the script even if you decide to publish the website manually. Use the script as
+                follows:</p><pre class="screen">$ <strong class="userinput"><code>publish_hbase_website.sh -h</code></strong>
+Usage: publish_hbase_website.sh [-i | -a] [-g &lt;dir&gt;] [-s &lt;dir&gt;]
+ -h          Show this message
+ -i          Prompts the user for input
+ -a          Does not prompt the user. Potentially dangerous.
+ -g          The local location of the HBase git repository
+ -s          The local location of the HBase svn checkout
+ Either --interactive or --silent is required.
+ Edit the script to set default Git and SVN directories.
+            </pre><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>The SVN commit takes a long time.</p></div></div></div><div class="section" title="1.9.&nbsp;Tests"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="hbase.tests"></a>1.9.&nbsp;Tests</h2></div></div></div><p> Developers, at a minimum, should familiarize themselves with the unit test detail;
+            unit tests in HBase have a character not usually seen in other projects.</p><p>This information is about unit tests for HBase itself. For developing unit tests for
+            your HBase applications, see <a class="xref" href="#">???</a>.</p><div class="section" title="1.9.1.&nbsp;Apache HBase Modules"><div class="titlepage"><div><div><h3 class="title"><a name="hbase.moduletests"></a>1.9.1.&nbsp;Apache HBase Modules</h3></div></div></div><p>As of 0.96, Apache HBase is split into multiple modules. This creates
+                "interesting" rules for how and where tests are written. If you are writing code for
+                    <code class="classname">hbase-server</code>, see <a class="xref" href="#hbase.unittests" title="1.9.2.&nbsp;Unit Tests">Section&nbsp;1.9.2, &#8220;Unit Tests&#8221;</a> for
+                how to write your tests. These tests can spin up a minicluster and will need to be
+                categorized. For any other module, for example <code class="classname">hbase-common</code>,
+                the tests must be strict unit tests and just test the class under test - no use of
+                the HBaseTestingUtility or minicluster is allowed (or even possible given the
+                dependency tree).</p><div class="section" title="1.9.1.1.&nbsp;Testing the HBase Shell"><div class="titlepage"><div><div><h4 class="title"><a name="hbase.moduletest.shell"></a>1.9.1.1.&nbsp;Testing the HBase Shell</h4></div></div></div><p>
+      The HBase shell and its tests are predominantly written in jruby. In order to make these
+      tests run as a part of the standard build, there is a single JUnit test,
+      <code class="classname">TestShell</code>, that takes care of loading the jruby implemented tests and
+      running them. You can run all of these tests from the top level with:
+    </p><pre class="programlisting">
+      mvn clean test -Dtest=TestShell
+    </pre><p>
+      Alternatively, you may limit the shell tests that run using the system variable
+      <code class="classname">shell.test</code>. This value may specify a particular test case by name. For
+      example, the tests that cover the shell commands for altering tables are contained in the test
+      case <code class="classname">AdminAlterTableTest</code> and you can run them with:
+    </p><pre class="programlisting">
+      mvn clean test -Dtest=TestShell -Dshell.test=AdminAlterTableTest
+    </pre><p>
+      You may also use a <a class="link" href="http://docs.ruby-doc.com/docs/ProgrammingRuby/html/language.html#UJ" target="_top">Ruby Regular Expression
+      literal</a> (in the <code class="classname">/pattern/</code> style) to select a set of test cases.
+      You can run all of the HBase admin related tests, including both the normal administration and
+      the security administration, with the command:
+    </p><pre class="programlisting">
+      mvn clean test -Dtest=TestShell -Dshell.test=/.*Admin.*Test/
+    </pre><p>
+      In the event of a test failure, you can see details by examining the XML version of the
+      surefire report results
+    </p><pre class="programlisting">
+      vim hbase-shell/target/surefire-reports/TEST-org.apache.hadoop.hbase.client.TestShell.xml
+    </pre></div><div class="section" title="1.9.1.2.&nbsp;Running Tests in other Modules"><div class="titlepage"><div><div><h4 class="title"><a name="hbase.moduletest.run"></a>1.9.1.2.&nbsp;Running Tests in other Modules</h4></div></div></div><p>If the module you are developing in has no other dependencies on other HBase modules, then
+  you can cd into that module and just run:</p><pre class="programlisting">mvn test</pre><p>which will just run the tests IN THAT MODULE. If there are other dependencies on other modules,
+  then you will have run the command from the ROOT HBASE DIRECTORY. This will run the tests in the other
+  modules, unless you specify to skip the tests in that module. For instance, to skip the tests in the hbase-server module,
+  you would run:</p><pre class="programlisting">mvn clean test -PskipServerTests</pre><p>from the top level directory to run all the tests in modules other than hbase-server. Note that you
+  can specify to skip tests in multiple modules as well as just for a single module. For example, to skip
+  the tests in <code class="classname">hbase-server</code> and <code class="classname">hbase-common</code>, you would run:</p><pre class="programlisting">mvn clean test -PskipServerTests -PskipCommonTests</pre><p>Also, keep in mind that if you are running tests in the <code class="classname">hbase-server</code> module you will need to
+  apply the maven profiles discussed in <a class="xref" href="#hbase.unittests.cmds" title="1.9.3.&nbsp;Running tests">Section&nbsp;1.9.3, &#8220;Running tests&#8221;</a> to get the tests to run properly.</p></div></div><div class="section" title="1.9.2.&nbsp;Unit Tests"><div class="titlepage"><div><div><h3 class="title"><a name="hbase.unittests"></a>1.9.2.&nbsp;Unit Tests</h3></div></div></div><p>Apache HBase unit tests are subdivided into four categories: small, medium, large, and
+integration with corresponding JUnit <a class="link" href="http://www.junit.org/node/581" target="_top">categories</a>:
+<code class="classname">SmallTests</code>, <code class="classname">MediumTests</code>,
+<code class="classname">LargeTests</code>, <code class="classname">IntegrationTests</code>.
+JUnit categories are denoted using java annotations and look like this in your unit test code.</p><pre class="programlisting">...
+@Category(SmallTests.class)
+public class TestHRegionInfo {
+  @Test
+  public void testCreateHRegionInfoName() throws Exception {
+    // ...
+  }
+}</pre><p>The above example shows how to mark a unit test as belonging to the
+                    <code class="literal">small</code> category. All unit tests in HBase have a
+                categorization. </p><p> The first three categories, <code class="literal">small</code>, <code class="literal">medium</code>,
+                and <code class="literal">large</code>, are for tests run when you type <code class="code">$ mvn
+                    test</code>. In other words, these three categorizations are for HBase unit
+                tests. The <code class="literal">integration</code> category is not for unit tests, but for
+                integration tests. These are run when you invoke <code class="code">$ mvn verify</code>.
+                Integration tests are described in <a class="xref" href="#integration.tests" title="1.9.5.&nbsp;Integration Tests">Section&nbsp;1.9.5, &#8220;Integration Tests&#8221;</a>.</p><p>HBase uses a patched maven surefire plugin and maven profiles to implement
+                its unit test characterizations. </p><p>Keep reading to figure which annotation of the set small, medium, and large to
+                put on your new HBase unit test. </p><div class="variablelist" title="Categorizing Tests"><p class="title"><b>Categorizing Tests</b></p><dl><dt><a name="hbase.unittests.small"></a><span class="term">Small Tests<a class="indexterm" name="d8376e1132"></a></span></dt><dd><p>
+                            <span class="emphasis"><em>Small</em></span> tests are executed in a shared JVM. We put in
+                            this category all the tests that can be executed quickly in a shared
+                            JVM. The maximum execution time for a small test is 15 seconds, and
+                            small tests should not use a (mini)cluster.</p></dd><dt><a name="hbase.unittests.medium"></a><span class="term">Medium Tests<a class="indexterm" name="d8376e1144"></a></span></dt><dd><p><span class="emphasis"><em>Medium</em></span> tests represent tests that must be
+                            executed before proposing a patch. They are designed to run in less than
+                            30 minutes altogether, and are quite stable in their results. They are
+                            designed to last less than 50 seconds individually. They can use a
+                            cluster, and each of them is executed in a separate JVM. </p></dd><dt><a name="hbase.unittests.large"></a><span class="term">Large Tests<a class="indexterm" name="d8376e1155"></a></span></dt><dd><p><span class="emphasis"><em>Large</em></span> tests are everything else. They are
+                            typically large-scale tests, regression tests for specific bugs, timeout
+                            tests, performance tests. They are executed before a commit on the
+                            pre-integration machines. They can be run on the developer machine as
+                            well. </p></dd><dt><a name="hbase.unittests.integration"></a><span class="term">Integration
+                            Tests<a class="indexterm" name="d8376e1166"></a></span></dt><dd><p><span class="emphasis"><em>Integration</em></span> tests are system level tests. See
+                                <a class="xref" href="#integration.tests" title="1.9.5.&nbsp;Integration Tests">Section&nbsp;1.9.5, &#8220;Integration Tests&#8221;</a> for more info. </p></dd></dl></div></div><div class="section" title="1.9.3.&nbsp;Running tests"><div class="titlepage"><div><div><h3 class="title"><a name="hbase.unittests.cmds"></a>1.9.3.&nbsp;Running tests</h3></div></div></div><div class="section" title="1.9.3.1.&nbsp;Default: small and medium category tests"><div class="titlepage"><div><div><h4 class="title"><a name="hbase.unittests.cmds.test"></a>1.9.3.1.&nbsp;Default: small and medium category tests </h4></div></div></div><p>Running <code class="code">mvn test</code> will
+                    execute all small tests in a single JVM (no fork) and then medium tests in a
+                    separate JVM for each test instance. Medium tests are NOT executed if there is
+                    an error in a small test. Large tests are NOT executed. There is one report for
+                    small tests, and one report for medium tests if they are executed. </p></div><div class="section" title="1.9.3.2.&nbsp;Running all tests"><div class="titlepage"><div><div><h4 class="title"><a name="hbase.unittests.cmds.test.runAllTests"></a>1.9.3.2.&nbsp;Running all tests</h4></div></div></div><p>Running
+                    <code class="code">mvn test -P runAllTests</code> will
+                    execute small tests in a single JVM then medium and large tests in a separate
+                    JVM for each test. Medium and large tests are NOT executed if there is an error
+                    in a small test. Large tests are NOT executed if there is an error in a small or
+                    medium test. There is one report for small tests, and one report for medium and
+                    large tests if they are executed. </p></div><div class="section" title="1.9.3.3.&nbsp;Running a single test or all tests in a package"><div class="titlepage"><div><div><h4 class="title"><a name="hbase.unittests.cmds.test.localtests.mytest"></a>1.9.3.3.&nbsp;Running a single test or all tests in a package</h4></div></div></div><p>To run an individual test, e.g. <code class="classname">MyTest</code>, rum <code class="code">mvn test -Dtest=MyTest</code> You can also pass multiple,
+                    individual tests as a comma-delimited list: <code class="code">mvn test
+                        -Dtest=MyTest1,MyTest2,MyTest3</code> You can also pass a package, which
+                    will run all tests under the package: <code class="code">mvn test
+                        '-Dtest=org.apache.hadoop.hbase.client.*'</code>
+                </p><p> When <code class="code">-Dtest</code> is specified, the <code class="code">localTests</code> profile
+                    will be used. It will use the official release of maven surefire, rather than
+                    our custom surefire plugin, and the old connector (The HBase build uses a
+                    patched version of the maven surefire plugin). Each junit test is executed in a
+                    separate JVM (A fork per test class). There is no parallelization when tests are
+                    running in this mode. You will see a new message at the end of the -report:
+                        <code class="literal">"[INFO] Tests are skipped"</code>. It's harmless. However, you
+                    need to make sure the sum of <code class="code">Tests run:</code> in the <code class="code">Results
+                        :</code> section of test reports matching the number of tests you specified
+                    because no error will be reported when a non-existent test case is specified.
+                </p></div><div class="section" title="1.9.3.4.&nbsp;Other test invocation permutations"><div class="titlepage"><div><div><h4 class="title"><a name="hbase.unittests.cmds.test.profiles"></a>1.9.3.4.&nbsp;Other test invocation permutations</h4></div></div></div><p>Running <span class="command"><strong>mvn test -P runSmallTests</strong></span> will execute "small"
+                    tests only, using a single JVM. </p><p>Running <span class="command"><strong>mvn test -P runMediumTests</strong></span> will execute "medium"
+                    tests only, launching a new JVM for each test-class. </p><p>Running <span class="command"><strong>mvn test -P runLargeTests</strong></span> will execute "large"
+                    tests only, launching a new JVM for each test-class. </p><p>For convenience, you can run <span class="command"><strong>mvn test -P runDevTests</strong></span> to
+                    execute both small and medium tests, using a single JVM. </p></div><div class="section" title="1.9.3.5.&nbsp;Running tests faster"><div class="titlepage"><div><div><h4 class="title"><a name="hbase.unittests.test.faster"></a>1.9.3.5.&nbsp;Running tests faster</h4></div></div></div><p> By default, <code class="code">$ mvn test -P runAllTests</code> runs 5 tests in parallel.
+                    It can be increased on a developer's machine. Allowing that you can have 2 tests
+                    in parallel per core, and you need about 2GB of memory per test (at the
+                    extreme), if you have an 8 core, 24GB box, you can have 16 tests in parallel.
+                    but the memory available limits it to 12 (24/2), To run all tests with 12 tests
+                    in parallel, do this: <span class="command"><strong>mvn test -P runAllTests
+                        -Dsurefire.secondPartForkCount=12</strong></span>. If using a version earlier than 
+                    2.0, do: <span class="command"><strong>mvn test -P runAllTests -Dsurefire.secondPartThreadCount=12
+                    </strong></span>. To increase the speed, you can as well use a ramdisk. You will need 2GB 
+                    of memory to run all tests. You will also need to delete the files between two 
+                    test run. The typical way to configure a ramdisk on Linux is:</p><pre class="screen">$ sudo mkdir /ram2G
+sudo mount -t tmpfs -o size=2048M tmpfs /ram2G</pre><p>You can then use it to run all HBase tests on 2.0 with the command: </p><pre class="screen">mvn test
+                        -P runAllTests -Dsurefire.secondPartForkCount=12
+                        -Dtest.build.data.basedirectory=/ram2G</pre><p>On earlier versions, use: </p><pre class="screen">mvn test
+                        -P runAllTests -Dsurefire.secondPartThreadCount=12
+                        -Dtest.build.data.basedirectory=/ram2G</pre></div><div class="section" title="1.9.3.6.&nbsp;hbasetests.sh"><div class="titlepage"><div><div><h4 class="title"><a name="hbase.unittests.cmds.test.hbasetests"></a>1.9.3.6.&nbsp;<span class="command"><strong>hbasetests.sh</strong></span></h4></div></div></div><p>It's also possible to use the script <span class="command"><strong>hbasetests.sh</strong></span>. This
+                    script runs the medium and large tests in parallel with two maven instances, and
+                    provides a single report. This script does not use the hbase version of surefire
+                    so no parallelization is being done other than the two maven instances the
+                    script sets up. It must be executed from the directory which contains the
+                        <code class="filename">pom.xml</code>.</p><p>For example running <span class="command"><strong>./dev-support/hbasetests.sh</strong></span> will
+                    execute small and medium tests. Running <span class="command"><strong>./dev-support/hbasetests.sh
+                        runAllTests</strong></span> will execute all tests. Running
+                        <span class="command"><strong>./dev-support/hbasetests.sh replayFailed</strong></span> will rerun the
+                    failed tests a second time, in a separate jvm and without parallelisation.
+                </p></div><div class="section" title="1.9.3.7.&nbsp;Test Resource Checker"><div class="titlepage"><div><div><h4 class="title"><a name="hbase.unittests.resource.checker"></a>1.9.3.7.&nbsp;Test Resource Checker<a class="indexterm" name="d8376e1302"></a></h4></div></div></div><p> A custom Maven SureFire plugin listener checks a number of resources before
+                    and after each HBase unit test runs and logs its findings at the end of the test
+                    output files which can be found in <code class="filename">target/surefire-reports</code>
+                    per Maven module (Tests write test reports named for the test class into this
+                    directory. Check the <code class="filename">*-out.txt</code> files). The resources
+                    counted are the number of threads, the number of file descriptors, etc. If the
+                    number has increased, it adds a <span class="emphasis"><em>LEAK?</em></span> comment in the logs.
+                    As you can have an HBase instance running in the background, some threads can be
+                    deleted/created without any specific action in the test. However, if the test
+                    does not work as expected, or if the test should not impact these resources,
+                    it's worth checking these log lines
+                        <code class="computeroutput">...hbase.ResourceChecker(157): before...</code>
+                    and <code class="computeroutput">...hbase.ResourceChecker(157): after...</code>.
+                    For example: </p><pre class="screen">2012-09-26 09:22:15,315 INFO [pool-1-thread-1]
+hbase.ResourceChecker(157): after:
+regionserver.TestColumnSeeking#testReseeking Thread=65 (was 65),
+OpenFileDescriptor=107 (was 107), MaxFileDescriptor=10240 (was 10240),
+ConnectionCount=1 (was 1) </pre></div></div><div class="section" title="1.9.4.&nbsp;Writing Tests"><div class="titlepage"><div><div><h3 class="title"><a name="hbase.tests.writing"></a>1.9.4.&nbsp;Writing Tests</h3></div></div></div><div class="section" title="1.9.4.1.&nbsp;General rules"><div class="titlepage"><div><div><h4 class="title"><a name="hbase.tests.rules"></a>1.9.4.1.&nbsp;General rules</h4></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>As much as possible, tests should be written as category small
+                            tests.</p></li><li class="listitem"><p>All tests must be written to support parallel execution on the same
+                            machine, hence they should not use shared resources as fixed ports or
+                            fixed file names.</p></li><li class="listitem"><p>Tests should not overlog. More than 100 lines/second makes the logs
+                            complex to read and use i/o that are hence not available for the other
+                            tests.</p></li><li class="listitem"><p>Tests can be written with <code class="classname">HBaseTestingUtility</code>.
+                            This class offers helper functions to create a temp directory and do the
+                            cleanup, or to start a cluster.</p></li></ul></div></div><div class="section" title="1.9.4.2.&nbsp;Categories and execution time"><div class="titlepage"><div><div><h4 class="title"><a name="hbase.tests.categories"></a>1.9.4.2.&nbsp;Categories and execution time</h4></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>All tests must be categorized, if not they could be skipped.</p></li><li class="listitem"><p>All tests should be written to be as fast as possible.</p></li><li class="listitem"><p>Small category tests should last less than 15 seconds, and must not
+                            have any side effect.</p></li><li class="listitem"><p>Medium category tests should last less than 50 seconds.</p></li><li class="listitem"><p>Large category tests should last less than 3 minutes. This should
+                            ensure a good parallelization for people using it, and ease the analysis
+                            when the test fails.</p></li></ul></div></div><div class="section" title="1.9.4.3.&nbsp;Sleeps in tests"><div class="titlepage"><div><div><h4 class="title"><a name="hbase.tests.sleeps"></a>1.9.4.3.&nbsp;Sleeps in tests</h4></div></div></div><p>Whenever possible, tests should not use <code class="methodname">Thread.sleep</code>,
+                    but rather waiting for the real event they need. This is faster and clearer for
+                    the reader. Tests should not do a <code class="methodname">Thread.sleep</code> without
+                    testing an ending condition. This allows understanding what the test is waiting
+                    for. Moreover, the test will work whatever the machine performance is. Sleep
+                    should be minimal to be as fast as possible. Waiting for a variable should be
+                    done in a 40ms sleep loop. Waiting for a socket operation should be done in a
+                    200 ms sleep loop. </p></div><div class="section" title="1.9.4.4.&nbsp;Tests using a cluster"><div class="titlepage"><div><div><h4 class="title"><a name="hbase.tests.cluster"></a>1.9.4.4.&nbsp;Tests using a cluster </h4></div></div></div><p>Tests using a HRegion do not have to start a cluster: A region can use the
+                    local file system. Start/stopping a cluster cost around 10 seconds. They should
+                    not be started per test method but per test class. Started cluster must be
+                    shutdown using <code class="methodname">HBaseTestingUtility#shutdownMiniCluster</code>,
+                    which cleans the directories. As most as possible, tests should use the default
+                    settings for the cluster. When they don't, they should document it. This will
+                    allow to share the cluster later. </p></div></div><div class="section" title="1.9.5.&nbsp;Integration Tests"><div class="titlepage"><div><div><h3 class="title"><a name="integration.tests"></a>1.9.5.&nbsp;Integration Tests</h3></div></div></div><p>HBase integration/system tests are tests that are beyond HBase unit tests. They
+                are generally long-lasting, sizeable (the test can be asked to 1M rows or 1B rows),
+                targetable (they can take configuration that will point them at the ready-made
+                cluster they are to run against; integration tests do not include cluster start/stop
+                code), and verifying success, integration tests rely on public APIs only; they do
+                not attempt to examine server internals asserting success/fail. Integration tests
+                are what you would run when you need to more elaborate proofing of a release
+                candidate beyond what unit tests can do. They are not generally run on the Apache
+                Continuous Integration build server, however, some sites opt to run integration
+                tests as a part of their continuous testing on an actual cluster. </p><p> Integration tests currently live under the <code class="filename">src/test</code>
+                directory in the hbase-it submodule and will match the regex:
+                    <code class="filename">**/IntegrationTest*.java</code>. All integration tests are also
+                annotated with <code class="code">@Category(IntegrationTests.class)</code>. </p><p> Integration tests can be run in two modes: using a mini cluster, or against an
+                actual distributed cluster. Maven failsafe is used to run the tests using the mini
+                cluster. IntegrationTestsDriver class is used for executing the tests against a
+                distributed cluster. Integration tests SHOULD NOT assume that they are running
+                against a mini cluster, and SHOULD NOT use private API's to access cluster state. To
+                interact with the distributed or mini cluster uniformly,
+                    <code class="code">IntegrationTestingUtility</code>, and <code class="code">HBaseCluster</code> classes,
+                and public client API's can be used. </p><p> On a distributed cluster, integration tests that use ChaosMonkey or otherwise
+                manipulate services thru cluster manager (e.g. restart regionservers) use SSH to do
+                it. To run these, test process should be able to run commands on remote end, so ssh
+                should be configured accordingly (for example, if HBase runs under hbase user in
+                your cluster, you can set up passwordless ssh for that user and run the test also
+                under it). To facilitate that, <code class="code">hbase.it.clustermanager.ssh.user</code>,
+                    <code class="code">hbase.it.clustermanager.ssh.opts</code> and
+                    <code class="code">hbase.it.clustermanager.ssh.cmd</code> configuration settings can be used.
+                "User" is the remote user that cluster manager should use to perform ssh commands.
+                "Opts" contains additional options that are passed to SSH (for example, "-i
+                /tmp/my-key"). Finally, if you have some custom environment setup, "cmd" is the
+                override format for the entire tunnel (ssh) command. The default string is
+                    {<code class="code">/usr/bin/ssh %1$s %2$s%3$s%4$s "%5$s"</code>} and is a good starting
+                point. This is a standard Java format string with 5 arguments that is used to
+                execute the remote command. The argument 1 (%1$s) is SSH options set the via opts
+                setting or via environment variable, 2 is SSH user name, 3 is "@" if username is set
+                or "" otherwise, 4 is the target host name, and 5 is the logical command to execute
+                (that may include single quotes, so don't use them). For example, if you run the
+                tests under non-hbase user and want to ssh as that user and change to hbase on
+                remote machine, you can use {<code class="code">/usr/bin/ssh %1$s %2$s%3$s%4$s "su hbase - -c
+                    \"%5$s\""</code>}. That way, to kill RS (for example) integration tests may run
+                    {<code class="code">/usr/bin/ssh some-hostname "su hbase - -c \"ps aux | ... | kill
+                    ...\""</code>}. The command is logged in the test logs, so you can verify it is
+                correct for your environment. </p><div class="section" title="1.9.5.1.&nbsp;Running integration tests against mini cluster"><div class="titlepage"><div><div><h4 class="title"><a name="maven.build.commands.integration.tests.mini"></a>1.9.5.1.&nbsp;Running integration tests against mini cluster</h4></div></div></div><p>HBase 0.92 added a <code class="varname">verify</code> maven target. Invoking it, for
+                    example by doing <code class="code">mvn verify</code>, will run all the phases up to and
+                    including the verify phase via the maven <a class="link" href="http://maven.apache.org/plugins/maven-failsafe-plugin/" target="_top">failsafe
+                        plugin</a>, running all the above mentioned HBase unit tests as well as
+                    tests that are in the HBase integration test group. After you have completed
+                        <span class="command"><strong>mvn install -DskipTests</strong></span> You can run just the integration
+                    tests by invoking:</p><pre class="programlisting">
+cd hbase-it
+mvn verify</pre><p>If you just want to run the integration tests in top-level, you need to run
+                    two commands. First: <span class="command"><strong>mvn failsafe:integration-test</strong></span> This
+                    actually runs ALL the integration tests. </p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>This command will always output <code class="code">BUILD SUCCESS</code> even if there
+                        are test failures. </p></div><p>At this point, you could grep the output by hand looking for failed tests.
+                    However, maven will do this for us; just use: <span class="command"><strong>mvn
+                        failsafe:verify</strong></span> The above command basically looks at all the test
+                    results (so don't remove the 'target' directory) for test failures and reports
+                    the results.</p><div class="section" title="1.9.5.1.1.&nbsp;Running a subset of Integration tests"><div class="titlepage"><div><div><h5 class="title"><a name="maven.build.commands.integration.tests2"></a>1.9.5.1.1.&nbsp;Running a subset of Integration tests</h5></div></div></div><p>This is very similar to how you specify running a subset of unit tests
+                        (see above), but use the property <code class="code">it.test</code> instead of
+                            <code class="code">test</code>. To just run
+                            <code class="classname">IntegrationTestClassXYZ.java</code>, use: <span class="command"><strong>mvn
+                            failsafe:integration-test -Dit.test=IntegrationTestClassXYZ</strong></span>
+                        The next thing you might want to do is run groups of integration tests, say
+                        all integration tests that are named IntegrationTestClassX*.java:
+                            <span class="command"><strong>mvn failsafe:integration-test -Dit.test=*ClassX*</strong></span> This
+                        runs everything that is an integration test that matches *ClassX*. This
+                        means anything matching: "**/IntegrationTest*ClassX*". You can also run
+                        multiple groups of integration tests using comma-delimited lists (similar to
+                        unit tests). Using a list of matches still supports full regex matching for
+                        each of the groups.This would look something like: <span class="command"><strong>mvn
+                            failsafe:integration-test -Dit.test=*ClassX*, *ClassY</strong></span>
+                    </p></div></div><div class="section" title="1.9.5.2.&nbsp;Running integration tests against distributed cluster"><div class="titlepage"><div><div><h4 class="title"><a name="maven.build.commands.integration.tests.distributed"></a>1.9.5.2.&nbsp;Running integration tests against distributed cluster</h4></div></div></div><p> If you have an already-setup HBase cluster, you can launch the integration
+                    tests by invoking the class <code class="code">IntegrationTestsDriver</code>. You may have to
+                    run test-compile first. The configuration will be picked by the bin/hbase
+                    script. </p><pre class="programlisting">mvn test-compile</pre><p> Then
+                    launch the tests with:</p><pre class="programlisting">bin/hbase [--config config_dir] org.apache.hadoop.hbase.IntegrationTestsDriver</pre><p>Pass <code class="code">-h</code> to get usage on this sweet tool. Running the
+                    IntegrationTestsDriver without any argument will launch tests found under
+                        <code class="code">hbase-it/src/test</code>, having
+                        <code class="code">@Category(IntegrationTests.class)</code> annotation, and a name
+                    starting with <code class="code">IntegrationTests</code>. See the usage, by passing -h, to
+                    see how to filter test classes. You can pass a regex which is checked against
+                    the full class name; so, part of class name can be used. IntegrationTestsDriver
+                    uses Junit to run the tests. Currently there is no support for running
+                    integration tests against a distributed cluster using maven (see <a class="link" href="https://issues.apache.org/jira/browse/HBASE-6201" target="_top">HBASE-6201</a>). </p><p> The tests interact with the distributed cluster by using the methods in the
+                        <code class="code">DistributedHBaseCluster</code> (implementing
+                    <code class="code">HBaseCluster</code>) class, which in turn uses a pluggable
+                        <code class="code">ClusterManager</code>. Concrete implementations provide actual
+                    functionality for carrying out deployment-specific and environment-dependent
+                    tasks (SSH, etc). The default <code class="code">ClusterManager</code> is
+                        <code class="code">HBaseClusterManager</code>, which uses SSH to remotely execute
+                    start/stop/kill/signal commands, and assumes some posix commands (ps, etc). Also
+                    assumes the user running the test has enough "power" to start/stop servers on
+                    the remote machines. By default, it picks up <code class="code">HBASE_SSH_OPTS, HBASE_HOME,
+                        HBASE_CONF_DIR</code> from the env, and uses
+                        <code class="code">bin/hbase-daemon.sh</code> to carry out the actions. Currently tarball
+                    deployments, deployments which uses hbase-daemons.sh, and <a class="link" href="http://incubator.apache.org/ambari/" target="_top">Apache Ambari</a>
+                    deployments are supported. /etc/init.d/ scripts are not supported for now, but
+                    it can be easily added. For other deployment options, a ClusterManager can be
+                    implemented and plugged in. </p></div><div class="section" title="1.9.5.3.&nbsp;Destructive integration / system tests"><div class="titlepage"><div><div><h4 class="title"><a name="maven.build.commands.integration.tests.destructive"></a>1.9.5.3.&nbsp;Destructive integration / system tests</h4></div></div></div><p> In 0.96, a tool named <code class="code">ChaosMonkey</code> has been introduced. It is
+                    modeled after the <a class="link" href="http://techblog.netflix.com/2012/07/chaos-monkey-released-into-wild.html" target="_top">same-named tool by Netflix</a>. Some of the tests use ChaosMonkey to
+                    simulate faults in the running cluster in the way of killing random servers,
+                    disconnecting servers, etc. ChaosMonkey can also be used as a stand-alone tool
+                    to run a (misbehaving) policy while you are running other tests. </p><p> ChaosMonkey defines Action's and Policy's. Actions are sequences of events.
+                    We have at least the following actions:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Restart active master (sleep 5 sec)</p></li><li class="listitem"><p>Restart random regionserver (sleep 5 sec)</p></li><li class="listitem"><p>Restart random regionserver (sleep 60 sec)</p></li><li class="listitem"><p>Restart META regionserver (sleep 5 sec)</p></li><li class="listitem"><p>Restart ROOT regionserver (sleep 5 sec)</p></li><li class="listitem"><p>Batch restart of 50% of regionservers (sleep 5 sec)</p></li><li class="listitem"><p>Rolling restart of 100% of regionservers (sleep 5 sec)</p></li></ul></div><p> Policies on the other hand are responsible for executing the actions based on
+                    a strategy. The default policy is to execute a random action every minute based
+                    on predefined action weights. ChaosMonkey executes predefined named policies
+                    until it is stopped. More than one policy can be active at any time. </p><p> To run ChaosMonkey as a standalone tool deploy your HBase cluster as usual.
+                    ChaosMonkey uses the configuration from the bin/hbase script, thus no extra
+                    configuration needs to be done. You can invoke the ChaosMonkey by
+                    running:</p><pre class="programlisting">bin/hbase org.apache.hadoop.hbase.util.ChaosMonkey</pre><p> This will output smt like: </p><pre class="screen">
+12/11/19 23:21:57 INFO util.ChaosMonkey: Using ChaosMonkey Policy: class org.apache.hadoop.hbase.util.ChaosMonkey$PeriodicRandomActionPolicy, period:60000
+12/11/19 23:21:57 INFO util.ChaosMonkey: Sleeping for 26953 to add jitter
+12/11/19 23:22:24 INFO util.ChaosMonkey: Performing action: Restart active master
+12/11/19 23:22:24 INFO util.ChaosMonkey: Killing master:master.example.com,60000,1353367210440
+12/11/19 23:22:24 INFO hbase.HBaseCluster: Aborting Master: master.example.com,60000,1353367210440
+12/11/19 23:22:24 INFO hbase.ClusterManager: Executing remote command: ps aux | grep master | grep -v grep | tr -s ' ' | cut -d ' ' -f2 | xargs kill -s SIGKILL , hostname:master.example.com
+12/11/19 23:22:25 INFO hbase.ClusterManager: Executed remote command, exit code:0 , output:
+12/11/19 23:22:25 INFO hbase.HBaseCluster: Waiting service:master to stop: master.example.com,60000,1353367210440
+12/11/19 23:22:25 INFO hbase.ClusterManager: Executing remote command: ps aux | grep master | grep -v grep | tr -s ' ' | cut -d ' ' -f2 , hostname:master.example.com
+12/11/19 23:22:25 INFO hbase.ClusterManager: Executed remote command, exit code:0 , output:
+12/11/19 23:22:25 INFO util.ChaosMonkey: Killed master server:master.example.com,60000,1353367210440
+12/11/19 23:22:25 INFO util.ChaosMonkey: Sleeping for:5000
+12/11/19 23:22:30 INFO util.ChaosMonkey: Starting master:master.example.com
+12/11/19 23:22:30 INFO hbase.HBaseCluster: Starting Master on: master.example.com
+12/11/19 23:22:30 INFO hbase.ClusterManager: Executing remote command: /homes/enis/code/hbase-0.94/bin/../bin/hbase-daemon.sh --config /homes/enis/code/hbase-0.94/bin/../conf start master , hostname:master.example.com
+12/11/19 23:22:31 INFO hbase.ClusterManager: Executed remote command, exit code:0 , output:starting master, logging to /homes/enis/code/hbase-0.94/bin/../logs/hbase-enis-master-master.example.com.out
+....
+12/11/19 23:22:33 INFO util.ChaosMonkey: Started master: master.example.com,60000,1353367210440
+12/11/19 23:22:33 INFO util.ChaosMonkey: Sleeping for:51321
+12/11/19 23:23:24 INFO util.ChaosMonkey: Performing action: Restart random region server
+12/11/19 23:23:24 INFO util.ChaosMonkey: Killing region server:rs3.example.com,60020,1353367027826
+12/11/19 23:23:24 INFO hbase.HBaseCluster: Aborting RS: rs3.example.com,60020,1353367027826
+12/11/19 23:23:24 INFO hbase.ClusterManager: Executing remote command: ps aux | grep regionserver | grep -v grep | tr -s ' ' | cut -d ' ' -f2 | xargs kill -s SIGKILL , hostname:rs3.example.com
+12/11/19 23:23:25 INFO hbase.ClusterManager: Executed remote command, exit code:0 , output:
+12/11/19 23:23:25 INFO hbase.HBaseCluster: Waiting service:regionserver to stop: rs3.example.com,60020,1353367027826
+12/11/19 23:23:25 INFO hbase.ClusterManager: Executing remote command: ps aux | grep regionserver | grep -v grep | tr -s ' ' | cut -d ' ' -f2 , hostname:rs3.example.com
+12/11/19 23:23:25 INFO hbase.ClusterManager: Executed remote command, exit code:0 , output:
+12/11/19 23:23:25 INFO util.ChaosMonkey: Killed region server:rs3.example.com,60020,1353367027826. Reported num of rs:6
+12/11/19 23:23:25 INFO util.ChaosMonkey: Sleeping for:60000
+12/11/19 23:24:25 INFO util.ChaosMonkey: Starting region server:rs3.example.com
+12/11/19 23:24:25 INFO hbase.HBaseCluster: Starting RS on: rs3.example.com
+12/11/19 23:24:25 INFO hbase.ClusterManager: Executing remote command: /homes/enis/code/hbase-0.94/bin/../bin/hbase-daemon.sh --config /homes/enis/code/hbase-0.94/bin/../conf start regionserver , hostname:rs3.example.com
+12/11/19 23:24:26 INFO hbase.ClusterManager: Executed remote command, exit code:0 , output:starting regionserver, logging to /homes/enis/code/hbase-0.94/bin/../logs/hbase-enis-regionserver-rs3.example.com.out
+
+12/11/19 23:24:27 INFO util.ChaosMonkey: Started region server:rs3.example.com,60020,1353367027826. Reported num of rs:6
+</pre><p> As you can see from the log, ChaosMonkey started the default
+                    PeriodicRandomActionPolicy, which is configured with all the available actions,
+                    and ran RestartActiveMaster and RestartRandomRs actions. ChaosMonkey tool, if
+                    run from command line, will keep on running until the process is killed. </p></div><div class="section" title="1.9.5.4.&nbsp;Passing individual Chaos Monkey per-test Settings/Properties"><div class="titlepage"><div><div><h4 class="title"><a name="chaos.monkey.properties"></a>1.9.5.4.&nbsp;Passing individual Chaos Monkey per-test Settings/Properties</h4></div></div></div><p> Since HBase version 1.0.0 (<a class="link" href="https://issues.apache.org/jira/browse/HBASE-11348" target="_top">HBASE-11348</a>), the chaos monkeys is used to run integration tests can
+                    be configured per test run. Users can create a java properties file and and pass
+                    this to the chaos monkey with timing configurations. The properties file needs
+                    to be in the HBase classpath. The various properties that can be configured and
+                    their default values can be found listed in the
+                        <code class="classname">org.apache.hadoop.hbase.chaos.factories.MonkeyConstants</code>
+                    class. If any chaos monkey configuration is missing from the property file, then
+                    the default values are assumed. For example:</p><pre class="programlisting">
+$<strong class="userinput"><code>bin/hbase org.apache.hadoop.hbase.IntegrationTestIngest -m slowDeterministic -monkeyProps monkey.properties</code></strong>
+    </pre><p>The above command will start the integration tests and chaos monkey passing
+                    the properties file <code class="filename">monkey.properties</code>. Here is an example
+                    chaos monkey file:</p><pre class="programlisting">
+sdm.action1.period=120000
+sdm.action2.period=40000
+move.regions.sleep.time=80000
+move.regions.max.time=1000000
+move.regions.sleep.time=80000
+batch.restart.rs.ratio=0.4f
+    </pre></div></div></div><div class="section" title="1.10.&nbsp;Developer Guidelines"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="developing"></a>1.10.&nbsp;Developer Guidelines</h2></div></div></div><div class="section" title="1.10.1.&nbsp;Codelines"><div class="titlepage"><div><div><h3 class="title"><a name="codelines"></a>1.10.1.&nbsp;Codelines</h3></div></div></div><p>Most development is done on the master branch, which is named
+              <code class="literal">master</code> in the Git repository. Previously, HBase used Subversion, in
+              which the master branch was called <code class="literal">TRUNK</code>. Branches exist for minor
+              releases, and important features and bug fixes are often back-ported.</p></div><div class="section" title="1.10.2.&nbsp;Release Managers"><div class="titlepage"><div><div><h3 class="title"><a name="d8376e1627"></a>1.10.2.&nbsp;Release Managers</h3></div></div></div><p>Each maintained release branch has a release manager, who volunteers to coordinate
+                new features and bug fixes are backported to that release. The release managers are
+                    <a class="link" href="https://hbase.apache.org/team-list.html" target="_top">committers</a>. If
+                you would like your feature or bug fix to be included in a given release,
+                communicate with that release manager. If this list goes out of date or you can't
+                reach the listed person, reach out to someone else on the list.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>End-of-life releases are not included in this list.</p></div><div class="table"><a name="d8376e1638"></a><p class="title"><b>Table&nbsp;1.1.&nbsp;Release Managers</b></p><div class="table-contents"><table summary="Release Managers" border="1"><colgroup><col><col></colgroup><thead><tr><th>Release</th><th>Release Manager</th></tr></thead><tbody><tr><td><p>0.98</p></td><td><p><a class="link" href="https://issues.apache.org/jira/secure/ViewProfile.jspa?name=apurtell" target="_top">Andrew Purtell</a></p></td></tr><tr><td><p>1.0</p></td><td><p><a class="link" href="https://issues.apache.org/jira/secure/ViewProfile.jspa?name=enis" target="_top">Enis Soztutar</a></p></td></tr></tbody></table></div></div><br class="table-break"></div><div class="section" title="1.10.3.&nbsp;Code Standards"><div class="titlepage"><div><div><h3 class="title"><a name="code.standards"></a>1.10.3.&nbsp;Code Standards</h3></div></div></div><p>See <a class="xref" href="#eclipse.code.formatting" title="1.3.1.1.&nbsp;Code Formatting">Section&nbsp;1.3.1.1, &#8220;Code Formatting&#8221;</a> and <a class="xref" href="#common.patch.feedback" title="1.10.3.2.&nbsp;Code Formatting Conventions">Section&nbsp;1.10.3.2, &#8220;Code Formatting Conventions&#8221;</a>. </p><div class="section" title="1.10.3.1.&nbsp;Interface Classifications"><div class="titlepage"><div><div><h4 class="title"><a name="d8376e1674"></a>1.10.3.1.&nbsp;Interface Classifications</h4></div></div></div><p> Interfaces are classified both by audience and by stability level. These
+                    labels appear at the head of a class. The conventions followed by HBase are
+                    inherited by its parent project, Hadoop. </p><p>The following interface classifications are commonly used: </p><div class="variablelist" title="@InterfaceAudience"><p class="title"><b>@InterfaceAudience</b></p><dl><dt><span class="term"><code class="code">@InterfaceAudience.Public</code></span></dt><dd><p>APIs for users and HBase applications. These APIs will be
+                                deprecated through major versions of HBase.</p></dd><dt><span class="term"><code class="code">@InterfaceAudience.Private</code></span></dt><dd><p>APIs for HBase internals developers. No guarantees on
+                                compatibility or availability in future versions. Private interfaces
+                                do not need an <code class="code">@InterfaceStability</code>
+                                classification.</p></dd><dt><span class="term"><code class="code">@InterfaceAudience.LimitedPrivate(HBaseInterfaceAudience.COPROC)</code></span></dt><dd><p>APIs for HBase coprocessor writers. As of HBase
+                                0.92/0.94/0.96/0.98 this api is still unstable. No guarantees on
+                                compatibility with future versions.</p></dd><dt><span class="term">No <code class="code">@InterfaceAudience</code> Classification</span></dt><dd><p>Packages without an <code class="code">@InterfaceAudience</code> label are
+                                considered private. Mark your new packages if publicly
+                                accessible.</p></dd></dl></div><div class="note" title="Excluding Non-Public Interfaces from API Documentation" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Excluding Non-Public Interfaces from API Documentation</h3><p> Only interfaces classified <code class="code">@InterfaceAudience.Public</code> should
+                        be included in API documentation (Javadoc). Committers must add new package
+                        excludes <code class="code">ExcludePackageNames</code> section of the
+                            <code class="filename">pom.xml</code> for new packages which do not contain
+                        public classes. </p></div><div class="variablelist" title="@InterfaceStability"><p class="title"><b>@InterfaceStability</b></p><p><code class="code">@InterfaceStability</code> is important for packages marked
+                            <code class="code">@InterfaceAudience.Public</code>.</p><dl><dt><span class="term"><code class="code">@InterfaceStability.Stable</code></span></dt><dd><p>Public packages marked as stable cannot be changed without a
+                                deprecation path or a very good reason.</p></dd><dt><span class="term"><code class="code">@InterfaceStability.Unstable</code></span></dt><dd><p>Public packages marked as unstable can be changed without a
+                                deprecation path.</p></dd><dt><span class="term"><code class="code">@InterfaceStability.Evolving</code></span></dt><dd><p>Public packages marked as evolving may be changed, but it is
+                                discouraged.</p></dd><dt><span class="term">No <code class="code">@InterfaceStability</code> Label</span></dt><dd><p>Public classes with no <code class="code">@InterfaceStability</code> label are
+                                discouraged, and should be considered implicitly unstable.</p></dd></dl></div><p> If you are unclear about how to mark packages, ask on the development list.
+                </p></div><div class="section" title="1.10.3.2.&nbsp;Code Formatting Conventions"><div class="titlepage"><div><div><h4 class="title"><a name="common.patch.feedback"></a>1.10.3.2.&nbsp;Code Formatting Conventions</h4></div></div></div><p>Please adhere to the following guidelines so that your patches can be reviewed
+                    more quickly. These guidelines have been developed based upon common feedback on
+                    patches from new contributors.</p><p> See the <a class="link" href="http://www.oracle.com/technetwork/java/index-135089.html" target="_top">Code
+                    Conventions for the Java Programming Language</a> for more information on
+                    coding conventions in Java.</p><div class="section" title="1.10.3.2.1.&nbsp;Space Invaders"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.space.invaders"></a>1.10.3.2.1.&nbsp;Space Invaders</h5></div></div></div><p>Do not use extra spaces around brackets. Use the second style, rather than
+                        the first.</p><pre class="programlisting">
+if ( foo.equals( bar ) ) {     // don't do this
+</pre><pre class="programlisting">
+if (foo.equals(bar)) {
+</pre><pre class="programlisting">
+foo = barArray[ i ];     // don't do this
+</pre><pre class="programlisting">
+foo = barArray[i];
+</pre></div><div class="section" title="1.10.3.2.2.&nbsp;Auto Generated Code"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.autogen"></a>1.10.3.2.2.&nbsp;Auto Generated Code</h5></div></div></div><p>Auto-generated code in Eclipse often uses bad variable names such as
+                        <code class="literal">arg0</code>. Use more informative variable names. Use code
+                        like the second example here.</p><pre class="programlisting">
+ public void readFields(DataInput arg0) throws IOException {    // don't do this
+   foo = arg0.readUTF();                                       // don't do this
+</pre><pre class="programlisting">
+ public void readFields(DataInput di) throws IOException {
+   foo = di.readUTF();
+</pre></div><div class="section" title="1.10.3.2.3.&nbsp;Long Lines"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.longlines"></a>1.10.3.2.3.&nbsp;Long Lines</h5></div></div></div><p> Keep lines less than 100 characters. You can configure your IDE to do
+                        this automatically.</p><pre class="programlisting">
+Bar bar = foo.veryLongMethodWithManyArguments(argument1, argument2, argument3, argument4, argument5, argument6, argument7, argument8, argument9);  // don't do this
+</pre><pre class="programlisting">
+Bar bar = foo.veryLongMethodWithManyArguments(
+ argument1, argument2, argument3,argument4, argument5, argument6, argument7, argument8, argument9);
+</pre></div><div class="section" title="1.10.3.2.4.&nbsp;Trailing Spaces"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.trailingspaces"></a>1.10.3.2.4.&nbsp;Trailing Spaces</h5></div></div></div><p> Trailing spaces are a common problem. Be sure there is a line break after
+                        the end of your code, and avoid lines with nothing but whitespace. This
+                        makes diffs more meaningful. You can configure your IDE to help with
+                        this.</p><pre class="programlisting">
+Bar bar = foo.getBar();     &lt;--- imagine there is an extra space(s) after the semicolon.
+</pre></div><div class="section" title="1.10.3.2.5.&nbsp;API Documentation (Javadoc)"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.javadoc"></a>1.10.3.2.5.&nbsp;API Documentation (Javadoc)</h5></div></div></div><p>This is also a very common feedback item. Don't forget Javadoc!</p><p>Javadoc warnings are checked during precommit. If the precommit tool gives
+                        you a '-1', please fix the javadoc issue. Your patch won't be committed if
+                        it adds such warnings. </p></div><div class="section" title="1.10.3.2.6.&nbsp;Findbugs"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.findbugs"></a>1.10.3.2.6.&nbsp;Findbugs</h5></div></div></div><p>
+                        <code class="code">Findbugs</code> is used to detect common bugs pattern. It is checked
+                        during the precommit build by Apache's Jenkins. If errors are found, please
+                        fix them. You can run findbugs locally with <span class="command"><strong>mvn
+                            findbugs:findbugs</strong></span>, which will generate the
+                        <code class="code">findbugs</code> files locally. Sometimes, you may have to write
+                        code smarter than <code class="code">findbugs</code>. You can annotate your code to tell
+                        <code class="code">findbugs</code> you know what you're doing, by annotating your
+                        class with the following annotation:</p><pre class="programlisting">@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+value="HE_EQUALS_USE_HASHCODE",
+justification="I know what I'm doing")</pre><p> It is important to use the Apache-licensed version of the annotations.
+                    </p></div><div class="section" title="1.10.3.2.7.&nbsp;Javadoc - Useless Defaults"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.javadoc.defaults"></a>1.10.3.2.7.&nbsp;Javadoc - Useless Defaults</h5></div></div></div><p>Don't just leave the @param arguments the way your IDE generated
+                        them.:</p><pre class="programlisting">
+  /**
+   *
+   * @param bar             &lt;---- don't do this!!!!
+   * @return                &lt;---- or this!!!!
+   */
+  public Foo getFoo(Bar bar);
+</pre><p>Either add something descriptive to the @<code class="code">param</code> and
+                        @<code class="code">return</code> lines, or just remove them. The preference is to
+                        add something descriptive and useful.</p></div><div class="section" title="1.10.3.2.8.&nbsp;One Thing At A Time, Folks"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.onething"></a>1.10.3.2.8.&nbsp;One Thing At A Time, Folks</h5></div></div></div><p>If you submit a patch for one thing, don't do auto-reformatting or
+                        unrelated reformatting of code on a completely different area of code. </p><p>Likewise, don't add unrelated cleanup or refactorings outside the scope of
+                        your Jira. </p></div><div class="section" title="1.10.3.2.9.&nbsp;Ambigious Unit Tests"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.tests"></a>1.10.3.2.9.&nbsp;Ambigious Unit Tests</h5></div></div></div><p>Make sure that you're clear about what you are testing in your unit tests
+                        and why. </p></div><div class="section" title="1.10.3.2.10.&nbsp;Implementing Writable"><div class="titlepage"><div><div><h5 class="title"><a name="common.patch.feedback.writable"></a>1.10.3.2.10.&nbsp;Implementing Writable</h5></div></div></div><div class="note" title="Applies pre-0.96 only" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Applies pre-0.96 only</h3><p>In 0.96, HBase moved to protocol buffers (protobufs). The below
+                            section on Writables applies to 0.94.x and previous, not to 0.96 and
+                            beyond. </p></div><p>Every class returned by RegionServers must implement the
+                        <code class="code">Writable</code> interface. If you are creating a new class that
+                        needs to implement this interface, do not forget the default constructor.
+                    </p></div></div></div><div class="section" title="1.10.4.&nbsp;Invariants"><div class="titlepage"><div><div><h3 class="title"><a name="design.invariants"></a>1.10.4.&nbsp;Invariants</h3></div></div></div><p>We don't have many but what we have we list below.  All are subject to challenge of
+           course but until then, please hold to the rules of the road.
+           </p><div class="section" title="1.10.4.1.&nbsp;No permanent state in ZooKeeper"><div class="titlepage"><div><div><h4 class="title"><a name="design.invariants.zk.data"></a>1.10.4.1.&nbsp;No permanent state in ZooKeeper</h4></div></div></div><p>ZooKeeper state should transient (treat it like memory). If ZooKeeper state is
+                    deleted, hbase should be able to recover and essentially be in the same
+                    state.</p><div class="itemizedlist" title="Exceptions"><p class="title"><b>Exceptions</b></p><ul class="itemizedlist" type="disc"><li class="listitem"><p>There are currently a few exceptions that we need to fix around
+                            whether a table is enabled or disabled.</p></li><li class="listitem"><p>Replication data is currently stored only in ZooKeeper. Deleting
+                            ZooKeeper data related to replication may cause replication to be
+                            disabled. Do not delete the replication tree,
+                                <code class="filename">/hbase/replication/</code>.</p><div class="warning" title="Warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Warning</h3><p>Replication may be disrupted and data loss may occur if you delete
+                                the replication tree (<code class="filename">/hbase/replication/</code>) from
+                                ZooKeeper. Follow progress on this issue at <a class="link" href="https://issues.apache.org/jira/browse/HBASE-10295" target="_top">HBASE-10295</a>.</p></div></li></ul></div></div></div><div class="section" title="1.10.5.&nbsp;Running In-Situ"><div class="titlepage"><div><div><h3 class="title"><a name="run.insitu"></a>1.10.5.&nbsp;Running In-Situ</h3></div></div></div><p>If you are developing Apache HBase, frequently it is useful to test your changes against a more-real cluster than what you find in unit tests. In this case, HBase can be run directly from the source in local-mode.
+           All you need to do is run:
+           </p><pre class="programlisting">${HBASE_HOME}/bin/start-hbase.sh</pre><p>
+           This will spin up a full local-cluster, just as if you had packaged up HBase and installed it on your machine.
+           </p><p>Keep in mind that you will need to have installed HBase into your local maven repository for the in-situ cluster to work properly. That is, you will need to run:</p><pre class="programlisting">mvn clean install -DskipTests</pre><p>to ensure that maven can find the correct classpath and dependencies. Generally, the above command
+           is just a good thing to try running first, if maven is acting oddly.</p></div><div class="section" title="1.10.6.&nbsp;Adding Metrics"><div class="titlepage"><div><div><h3 class="title"><a name="add.metrics"></a>1.10.6.&nbsp;Adding Metrics</h3></div></div></div><p>
+                  After adding a new feature a developer might want to add metrics.  HBase exposes
+                  metrics using the Hadoop Metrics 2 system, so adding a new metric involves
+                  exposing that metric to the hadoop system.  Unfortunately the API of metrics2
+                  changed from hadoop 1 to hadoop 2.  In order to get around this a set of
+                  interfaces and implementations have to be loaded at runtime.  To get an in-depth
+                  look at the reasoning and structure of these classes you can read the blog post
+                  located <a class="link" href="https://blogs.apache.org/hbase/entry/migration_to_the_new_metrics" target="_top">here</a>.
+                  To add a metric to an existing MBean follow the short guide below:
+              </p><div class="section" title="1.10.6.1.&nbsp;Add Metric name and Function to Hadoop Compat Interface."><div class="titlepage"><div><div><h4 class="title"><a name="d8376e1958"></a>1.10.6.1.&nbsp;Add Metric name and Function to Hadoop Compat Interface.</h4></div></div></div><p>
+                     Inside of the source interface the corresponds to where the metrics are
+                     generated (eg MetricsMasterSource for things coming from HMaster) create new
+                     static strings for metric name and description.  Then add a new method that
+                     will be called to add new reading.
+                  </p></div><div class="section" title="1.10.6.2.&nbsp;Add the Implementation to Both Hadoop 1 and Hadoop 2 Compat modules."><div class="titlepage"><div><div><h4 class="title"><a name="d8376e1963"></a>1.10.6.2.&nbsp;Add the Implementation to Both Hadoop 1 and Hadoop 2 Compat modules.</h4></div></div></div><p>
+                      Inside of the implementation of the source (eg. MetricsMasterSourceImpl
+                      in the above example) create a new histogram, counter, gauge, or stat in the
+                      init method.  Then in the method that was added to the interface wire up the
+                      parameter passed in to the histogram.
+                  </p><p>
+                      Now add tests that make sure the data is correctly exported to the metrics 2
+                      system. For this the MetricsAssertHelper is provided.
+                  </p></div></div><div class="section" title="1.10.7.&nbsp;Submitting Patches"><div class="titlepage"><div><div><h3 class="title"><a name="submitting.patches"></a>1.10.7.&nbsp;Submitting Patches</h3></div></div></div><p>HBase moved to GIT from SVN. Until we develop our own documentation for how to
+                contribute patches in our new GIT context, caveat the fact that we have a different
+                branching model and that we don't currently do the merge practice described in the
+                following, the <a class="link" href="http://accumulo.apache.org/git.html" target="_top">accumulo doc
+                    on how to contribute and develop</a> after our move to GIT is worth a read. </p><p>If you are new to submitting patches to open source or new to submitting patches
+                to Apache, start by reading the <a class="link" href="http://commons.apache.org/patches.html" target="_top">On Contributing
+                    Patches</a> page from <a class="link" href="http://commons.apache.org/" target="_top">Apache
+                    Commons Project</a>. It provides a nice overview that applies equally to the
+                Apache HBase Project.</p><div class="section" title="1.10.7.1.&nbsp;Create Patch"><div class="titlepage"><div><div><h4 class="title"><a name="submitting.patches.create"></a>1.10.7.1.&nbsp;Create Patch</h4></div></div></div><div class="itemizedlist" title="Patching Workflow"><p class="title"><b>Patching Workflow</b></p><ul class="itemizedlist" type="disc"><li class="listitem"><p><a name="patch.master.first"></a>Always patch against the master branch
+                            first, even if you want to patch in another branch. HBase committers
+                            always apply patches first to the master branch, and backport if
+                            necessary.</p></li><li class="listitem"><p>Submit one single patch for a fix. If necessary, squash local commits
+                            to merge local commits into a single one first. See this <a class="link" href="http://stackoverflow.com/questions/5308816/how-to-use-git-merge-squash" target="_top">Stack Overflow question</a> for more information about squashing
+                            commits.</p></li><li class="listitem"><p><a name="submitting.patches.naming"></a>The patch should have the JIRA ID in the name. If you are generating
+                            from a branch, include the target branch in the filename. A common
+                            naming scheme for patches is:</p><pre class="screen">HBASE-<em class="replaceable"><code>XXXX</code></em>.patch</pre><pre class="screen">HBASE-<em class="replaceable"><code>XXXX</code></em>-0.90.patch     # to denote that the patch is against branch 0.90</pre><pre class="screen">HBASE-<em class="replaceable"><code>XXXX</code></em>-v3.patch       # to denote that this is the third version of the patch</pre></li><li class="listitem"><p><a name="submitting.patches.jira"></a>To submit a patch, first create it using one of the methods in <a class="xref" href="#patching.methods" title="Methods to Create Patches">Methods to Create Patches</a>. Next, attach the patch to the JIRA
+                            (one patch for the whole fix), using the <span class="guimenu">More</span> &#8594; <span class="guimenuitem">Attach Files</span> dialog. Next, click the <span class="guibutton">Patch
+                                Available</span> button, which triggers the Hudson job which
+                            checks the patch for validity.</p><p>Please understand that not every patch may get committed, and that
+                            feedback will likely be provided on the patch.</p></li><li class="listitem"><p>If your patch is longer than a single screen, also attach a Review
+                            Board to the case. See <a class="xref" href="#reviewboard" title="1.10.7.4.&nbsp;ReviewBoard">Section&nbsp;1.10.7.4, &#8220;ReviewBoard&#8221;</a>.</p></li><li class="listitem"><p>If you need to revise your patch, leave the previous patch file(s)
+                            attached to the JIRA, and upload the new one, following the naming
+                            conventions in <a class="xref" href="#submitting.patches.create" title="1.10.7.1.&nbsp;Create Patch">Section&nbsp;1.10.7.1, &#8220;Create Patch&#8221;</a>. Cancel the
+                            Patch Available flag and then re-trigger it, by toggling the
+                                <span class="guibutton">Patch Available</span> button in JIRA. JIRA sorts
+                            attached files by the time they were attached, and has no problem with
+                            multiple attachments with the same name. However, at times it is easier
+                            to refer to different version of a patch if you add
+                                <code class="literal">-vX</code>, where the <em class="replaceable"><code>X</code></em> is
+                            the version (starting with 2).</p></li><li class="listitem"><p>If you need to submit your patch against multiple branches, rather
+                            than just master, name each version of the patch with the branch it is
+                            for, following the naming conventions in <a class="xref" href="#submitting.patches.create" title="1.10.7.1.&nbsp;Create Patch">Section&nbsp;1.10.7.1, &#8220;Create Patch&#8221;</a>.</p></li></ul></div><div class="variablelist" title="Methods to Create Patches"><a name="patching.methods"></a><p class="title"><b>Methods to Create Patches</b></p><dl><dt><span class="term">Eclipse</span></dt><dd><p>Select the <span class="guimenu">Team</span> &#8594; <span class="guimenuitem">Create Patch</span> menu item.</p></dd><dt><span class="term">Git</span></dt><dd><p><code class="code">git format-patch</code> is preferred because it preserves
+                                commit messages. Use <code class="code">git squash</code> first, to combine
+                                smaller commits into a single larger one.</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><pre class="screen">git format-patch --no-prefix origin/master --stdout &gt; HBASE-XXXX.patch</pre></li><li class="listitem"><pre class="screen">git diff --no-prefix origin/master &gt; HBASE-XXXX.patch</pre></li></ul></div></dd><dt><span class="term">Subversion</span></dt><dd><pre class="screen">svn diff &gt; HBASE-XXXX.patch</pre></dd></dl></div><p>Make sure you review <a class="xref" href="#eclipse.code.formatting" title="1.3.1.1.&nbsp;Code Formatting">Section&nbsp;1.3.1.1, &#8220;Code Formatting&#8221;</a> and <a class="xref" href="#common.patch.feedback" title="1.10.3.2.&nbsp;Code Formatting Conventions">Section&nbsp;1.10.3.2, &#8220;Code Formatting Conventions&#8221;</a> for code style. </p></div><div class="section" title="1.10.7.2.&nbsp;Unit Tests"><div class="titlepage"><div><div><h4 class="title"><a name="submitting.patches.tests"></a>1.10.7.2.&nbsp;Unit Tests</h4></div></div></div><p>Yes, please. Please try to include unit tests with every code patch (and
+                    especially new classes and large changes). Make sure unit tests pass locally
+                    before submitting the patch.</p><p>Also, see <a class="xref" href="#">???</a>.</p><p>If you are creating a new unit test class, notice how other unit test classes
+                    have classification/sizing annotations at the top and a static method on the
+                    end. Be sure to include these in any new unit test files you generate. See <a class="xref" href="#hbase.tests" title="1.9.&nbsp;Tests">Section&nbsp;1.9, &#8220;Tests&#8221;</a> for more on how the annotations work. </p></div><div class="section" title="1.10.7.3.&nbsp;Integration Tests"><div class="titlepage"><div><div><h4 class="title"><a name="d8376e2117"></a>1.10.7.3.&nbsp;Integration Tests</h4></div></div></div><p>Significant new features should provide an integration test in addition to
+                    unit tests, suitable for exercising the new feature at different points in its
+                    configuration space.</p></div><div class="section" title="1.10.7.4.&nbsp;ReviewBoard"><div class="titlepage"><div><div><h4 class="title"><a name="reviewboard"></a>1.10.7.4.&nbsp;ReviewBoard</h4></div></div></div><p>Patches larger than one screen, or patches that will be tricky to review,
+                    should go through <a class="link" href="http://reviews.apache.org" target="_top">ReviewBoard</a>. </p><div class="procedure" title="Procedure&nbsp;1.3.&nbsp;Use ReviewBoard"><a name="d8376e2131"></a><p class="title"><b>Procedure&nbsp;1.3.&nbsp;Use ReviewBoard</b></p><ol class="procedure" type="1"><li class="step" title="Step 1"><p>Register for an account if you don't already have one. It does not use
+                            the credentials from <a class="link" href="http://issues.apache.org" target="_top">issues.apache.org</a>. Log in.</p></li><li class="step" title="Step 2"><p>Click <span class="guilabel">New Review Request</span>. </p></li><li class="step" title="Step 3"><p>Choose the <code class="literal">hbase-git</code> repository. Click Choose File
+                            to select the diff and optionally a parent diff. Click <span class="guibutton">Create
+                                Review Request</span>.</p></li><li class="step" title="Step 4"><p>Fill in the fields as required. At the minimum, fill in the
+                                <span class="guilabel">Summary</span> and choose <code class="literal">hbase</code> as
+                            the <span class="guilabel">Review Group</span>. If you fill in the
+                                <span class="guilabel">Bugs</span> field, the review board links back to the
+                            relevant JIRA. The more fields you fill in, the better. Click
+                                <span class="guibutton">Publish</span> to make your review request public.
+                            An email will be sent to everyone in the <code class="literal">hbase</code> group,
+                            to review the patch.</p></li><li class="step" title="Step 5"><p>Back in your JIRA, click <span class="guimenu">More</span> &#8594; <span class="guisubmenu">Link</span> &#8594; <span class="guimenuitem">Web Link</span>, and paste in the URL of your ReviewBoard request. This
+                            attaches the ReviewBoard to the JIRA, for easy access.</p></li><li class="step" title="Step 6"><p>To cancel the request, click <span class="guimenu">Close</span> &#8594; <span class="guimenuitem">Discarded</span>.</p></li></ol></div><p>For more information on how to use ReviewBoard, see <a class="link" href="http://www.reviewboard.org/docs/manual/1.5/" target="_top">the ReviewBoard
+                        documentation</a>. </p></div><div class="section" title="1.10.7.5.&nbsp;Guide for HBase Committers"><div class="titlepage"><div><div><h4 class="title"><a name="d8376e2201"></a>1.10.7.5.&nbsp;Guide for HBase Committers</h4></div></div></div><div class="section" title="1.10.7.5.1.&nbsp;New committers"><div class="titlepage"><div><div><h5 class="title"><a name="d8376e2204"></a>1.10.7.5.1.&nbsp;New committers</h5></div></div></div><p>New committers are encouraged to first read Apache's generic committer
+                        documentation: </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><a class="link" href="http://www.apache.org/dev/new-committers-guide.html" target="_top">Apache New Committer Guide</a>
+                            </p></li><li class="listitem"><p><a class="link" href="http://www.apache.org/dev/committers.html" target="_top">Apache Committer FAQ</a>
+                            </p></li></ul></div></div><div class="section" title="1.10.7.5.2.&nbsp;Review"><div class="titlepage"><div><div><h5 class="title"><a name="d8376e2220"></a>1.10.7.5.2.&nbsp;Review</h5></div></div></div><p>HBase committers should, as often as possible, attempt to review patches
+                        submitted by others. Ideally every submitted patch will get reviewed by a
+                        committer <span class="emphasis"><em>within a few days</em></span>. If a committer reviews a
+                        patch they have not authored, and believe it to be of sufficient quality,
+                        then they can commit the patch, otherwise the patch should be cancelled with
+                        a clear explanation for why it was rejected. </p><p>The list of submitted patches is in the <a class="link" href="https://issues.apache.org/jira/secure/IssueNavigator.jspa?mode=hide&amp;requestId=12312392" target="_top">HBase Review Queue</a>, which is ordered by time of last
+                        modification. Committers should scan the list from top to bottom, looking
+                        for patches that they feel qualified to review and possibly commit. </p><p>For non-trivial changes, it is required to get another committer to review
+                        your own patches before commit. Use the <span class="guibutton">Submit Patch</span>
+                        button in JIRA, just like other contributors, and then wait for a
+                            <code class="literal">+1</code> response from another committer before committing.
+                    </p></div><div class="section" title="1.10.7.5.3.&nbsp;Reject"><div class="titlepage"><div><div><h5 class="title"><a name="d8376e2241"></a>1.10.7.5.3.&nbsp;Reject</h5></div></div></div><p>Patches which do not adhere to the guidelines in <a class="link" href="https://wiki.apache.org/hadoop/Hbase/HowToCommit/hadoop/Hbase/HowToContribute#" target="_top">HowToContribute</a> and to the <a class="link" href="https://wiki.apache.org/hadoop/Hbase/HowToCommit/hadoop/CodeReviewChecklist#" target="_top">code review checklist</a> should be rejected. Committers should
+                        always be polite to contributors and try to instruct and encourage them to
+                        contribute better patches. If a committer wishes to improve an unacceptable
+                        patch, then it should first be rejected, and a new patch should be attached
+                        by the committer for review. </p></div><div class="section" title="1.10.7.5.4.&nbsp;Commit"><div class="titlepage"><div><div><h5 class="title"><a name="committing.patches"></a>1.10.7.5.4.&nbsp;Commit</h5></div></div></div><p>Committers commit patches to the Apache HBase GIT repository. </p><div class="note" title="Before you commit!!!!" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Before you commit!!!!</h3><p>Make sure your local configuration is correct, especially your
+                            identity and email. Examine the output of the <span class="command"><strong>$ git config
+                                --list</strong></span> command and be sure it is correct. See this GitHub
+                            article, <a class="link" href="https://help.github.com/articles/set-up-git" target="_top">Set Up Git</a> if you need pointers. </p></div><p>When you commit a patch, please: </p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Include the Jira issue id in the commit message, along with a
+                                short description of the change and the name of the contributor if
+                                it is not you. Be sure to get the issue id right, as this causes
+                                Jira to link to the change in Subversion (use the issue's
+                                "All" tab to see these). </p></li><li class="listitem"><p>Resolve the issue as fixed, thanking the contributor. Always set
+                                the "Fix Version" at this point, but please only set a
+                                single fix version, the earliest release in which the change will
+                                appear. </p></li></ol></div><div class="section" title="1.10.7.5.4.1.&nbsp;Commit Message Format"><div class="titlepage"><div><div><h6 class="title"><a name="d8376e2277"></a>1.10.7.5.4.1.&nbsp;Commit Message Format</h6></div></div></div><p>The commit message should contain the JIRA ID and a description of
+                            what the patch does. The preferred commit message format is:</p><pre class="screen">&lt;jira-id&gt; &lt;jira-title&gt; (&lt;contributor-name-if-not-commit-author&gt;)</pre><pre class="screen">HBASE-12345 Fix All The Things (jane@example.com)</pre><p>If the contributor used <span class="command"><strong>git format-patch</strong></span> to
+                            generate the patch, their commit message is in their patch and you can
+                            use that, but be sure the JIRA ID is at the front of the commit message,
+                            even if the contributor left it out.</p></div><div class="section" title="1.10.7.5.4.2.&nbsp;Add Amending-Author when a conflict cherrypick backporting"><div class="titlepage"><div><div><h6 class="title"><a name="committer.amending.author"></a>1.10.7.5.4.2.&nbsp;Add Amending-Author when a conflict cherrypick backporting</h6></div></div></div><p> We've established the practice of committing to trunk and then cherry
+                            picking back to branches whenever possible. When there is a minor
+                            conflict we can fix it up and just proceed with the commit. The
+                            resulting commit retains the original author. When the amending author
+                            is different from the original committer, add notice of this at the end
+                            of the commit message as: <code class="varname">Amending-Author: Author
+                                &lt;committer&amp;apache&gt;</code> See discussion at <a class="link" href="http://search-hadoop.com/m/DHED4wHGYS" target="_top">HBase, mail # dev
+                                - [DISCUSSION] Best practice when amending commits cherry picked
+                                from master to branch</a>. </p></div><div class="section" title="1.10.7.5.4.3.&nbsp;Committers are responsible for making sure commits do not break the build or tests"><div class="titlepage"><div><div><h6 class="title"><a name="committer.tests"></a>1.10.7.5.4.3.&nbsp;Committers are responsible for making sure commits do not break the
+                            build or tests</h6></div></div></div><p> If a committer commits a patch, it is their responsibility to make
+                            sure it passes the test suite. It is helpful if contributors keep an eye
+                            out that their patch does not break the hbase build and/or tests, but
+                            ultimately, a contributor cannot be expected to be aware of all the
+                            particular vagaries and interconnections that occur in a project like
+                            HBase. A committer should. </p></div><div class="section" title="1.10.7.5.4.4.&nbsp;Patching Etiquette"><div class="titlepage"><div><div><h6 class="title"><a name="git.patch.flow"></a>1.10.7.5.4.4.&nbsp;Patching Etiquette</h6></div></div></div><p>In the thread <a class="link" href="http://search-hadoop.com/m/DHED4EiwOz" target="_top">HBase, mail # dev - ANNOUNCEMENT: Git Migration In Progress (WAS =&gt;
+                                Re: Git Migration)</a>, it was agreed on the following patch flow </p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Develop and commit the patch against trunk/master
+                                        first.</p></li><li class="listitem"><p>Try to cherry-pick the patch when backporting if
+                                        possible.</p></li><li class="listitem"><p>If this does not work, manually commit the patch to the
+                                        branch.</p></li></ol></div><p>
+                        </p></div><div class="section" title="1.10.7.5.4.5.&nbsp;Merge Commits"><div class="titlepage"><div><div><h6 class="title"><a name="d8376e2326"></a>1.10.7.5.4.5.&nbsp;Merge Commits</h6></div></div></div><p>Avoid merge commits, as they create problems in the git
+                            history.</p></div><div class="section" title="1.10.7.5.4.6.&nbsp;Committing Documentation"><div class="titlepage"><div><div><h6 class="title"><a name="d8376e2331"></a>1.10.7.5.4.6.&nbsp;Committing Documentation</h6></div></div></div><p>See <a class="xref" href="#">???</a>.</p></div></div></div><div class="section" title="1.10.7.6.&nbsp;Dialog"><div class="titlepage"><div><div><h4 class="title"><a name="d8376e2338"></a>1.10.7.6.&nbsp;Dialog</h4></div></div></div><p>Committers should hang out in the #hbase room on irc.freenode.net for
+                    real-time discussions. However any substantive discussion (as with any off-list
+                    project-related discussion) should be re-iterated in Jira or on the developer
+                    list. </p></div><div class="section" title="1.10.7.7.&nbsp;Do not edit JIRA comments"><div class="titlepage"><div><div><h4 class="title"><a name="d8376e2343"></a>1.10.7.7.&nbsp;Do not edit JIRA comments</h4></div></div></div><p>Misspellings and/or bad grammar is preferable to the disruption a JIRA comment
+                    edit causes: See the discussion at <a class="link" href="http://search-hadoop.com/?q=%5BReopened%5D+%28HBASE-451%29+Remove+HTableDescriptor+from+HRegionInfo&amp;fc_project=HBase" target="_top">Re:(HBASE-451) Remove HTableDescriptor from HRegionInfo</a>
+                </p></div></div></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a></body></html>

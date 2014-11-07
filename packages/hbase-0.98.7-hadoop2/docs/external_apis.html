@@ -1,0 +1,28 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>Chapter&nbsp;1.&nbsp;Apache HBase External APIs</title><link rel="stylesheet" type="text/css" href="css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/external_apis.html';
+    </script><div class="chapter" title="Chapter&nbsp;1.&nbsp;Apache HBase External APIs"><div class="titlepage"><div><div><h2 class="title"><a name="external_apis"></a>Chapter&nbsp;1.&nbsp;Apache HBase External APIs</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#nonjava.jvm">1.1. Non-Java Languages Talking to the JVM</a></span></dt><dt><span class="section"><a href="#rest">1.2. REST</a></span></dt><dt><span class="section"><a href="#d8865e40">1.3. Thrift</a></span></dt><dt><span class="section"><a href="#c">1.4. C/C++ Apache HBase Client</a></span></dt></dl></div><p> This chapter will cover access to Apache HBase either through non-Java languages, or
+    through custom protocols. For information on using the native HBase APIs, refer to <a class="link" href="http://hbase.apache.org/apidocs/index.html" target="_top">User API Reference</a> and the new <a class="xref" href="#">???</a> chapter. </p><div class="section" title="1.1.&nbsp;Non-Java Languages Talking to the JVM"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="nonjava.jvm"></a>1.1.&nbsp;Non-Java Languages Talking to the JVM</h2></div></div></div><p>Currently the documentation on this topic in the
+      <a class="link" href="http://wiki.apache.org/hadoop/Hbase" target="_top">Apache HBase Wiki</a>.
+      See also the <a class="link" href="http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/thrift/package-summary.html#package_description" target="_top">Thrift API Javadoc</a>.
+    </p></div><div class="section" title="1.2.&nbsp;REST"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="rest"></a>1.2.&nbsp;REST</h2></div></div></div><p>Currently most of the documentation on REST exists in the
+        <a class="link" href="http://wiki.apache.org/hadoop/Hbase/Stargate" target="_top">Apache HBase Wiki on REST</a> (The REST gateway used to be
+        called 'Stargate').  There are also a nice set of blogs on <a class="link" href="http://blog.cloudera.com/blog/2013/03/how-to-use-the-apache-hbase-rest-interface-part-1/" target="_top">How-to: Use the Apache HBase REST Interface</a>
+        by Jesse Anderson.
+    </p><p>
+    To run your REST server under SSL, enable the following configs when you launch the REST server:
+</p><pre class="programlisting">hbase.rest.ssl.enabled
+hbase.rest.ssl.keystore.store
+hbase.rest.ssl.keystore.password
+hbase.rest.ssl.keystore.keypassword</pre><p>
+    </p></div><div class="section" title="1.3.&nbsp;Thrift"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d8865e40"></a>1.3.&nbsp;Thrift</h2></div></div></div><p>Documentation about Thrift has moved to <a class="xref" href="#">???</a>.</p></div><div class="section" title="1.4.&nbsp;C/C++ Apache HBase Client"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="c"></a>1.4.&nbsp;C/C++ Apache HBase Client</h2></div></div></div><p>FB's Chip Turner wrote a pure C/C++ client.  <a class="link" href="https://github.com/facebook/native-cpp-hbase-client" target="_top">Check it out</a>.
+    </p></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a></body></html>

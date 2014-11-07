@@ -1,0 +1,82 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>A.9.&nbsp;Docbook Common Issues</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="appendix_contributing_to_documentation.html" title="Appendix&nbsp;A.&nbsp;Contributing to Documentation"><link rel="prev" href="apas08.html" title="A.8.&nbsp;Adding a New Chapter to the HBase Reference Guide"><link rel="next" href="faq.html" title="Appendix&nbsp;B.&nbsp;FAQ"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">A.9.&nbsp;Docbook Common Issues</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="apas08.html">Prev</a>&nbsp;</td><th width="60%" align="center">Appendix&nbsp;A.&nbsp;Contributing to Documentation</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="faq.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/.html';
+    </script><div class="section" title="A.9.&nbsp;Docbook Common Issues"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2802e22348"></a>A.9.&nbsp;Docbook Common Issues</h2></div></div></div><p>The following Docbook issues come up often. Some of these are preferences, but others
+            can create mysterious build errors or other problems.</p><div class="qandaset" title="Frequently Asked Questions"><a name="d2802e22353"></a><dl><dt>A.9.1. <a href="apas09.html#d2802e22354">What can go where?</a></dt><dt>A.9.2. <a href="apas09.html#d2802e22364">Paragraphs and Admonitions</a></dt><dt>A.9.3. <a href="apas09.html#d2802e22373">Wrap textual &lt;listitem&gt; and &lt;entry&gt; contents in &lt;para&gt;
+                        elements.</a></dt><dt>A.9.4. <a href="apas09.html#d2802e22382">When to use &lt;command&gt;, &lt;code&gt;, &lt;programlisting&gt;,
+                        &lt;screen&gt;</a></dt><dt>A.9.5. <a href="apas09.html#d2802e22399">How to escape XML elements so that they show up as XML</a></dt><dt>A.9.6. <a href="apas09.html#d2802e22406">Tips and tricks for making screen output look good</a></dt><dt>A.9.7. <a href="apas09.html#d2802e22425">Isolate Changes for Easy Diff Review.</a></dt><dt>A.9.8. <a href="apas09.html#d2802e22432">Syntax Highlighting</a></dt></dl><table border="0" width="100%" summary="Q and A Set"><col align="left" width="1%"><col><tbody><tr class="question" title="A.9.1."><td align="left" valign="top"><a name="d2802e22354"></a><a name="d2802e22355"></a><p><b>A.9.1.</b></p></td><td align="left" valign="top"><p>What can go where?</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>There is often confusion about which child elements are valid in a given
+                        context. When in doubt, <a class="link" href="http://docbook.org/tdg/en/html/docbook.html" target="_top">Docbook: The
+                            Definitive Guide</a> is the best resource. It has an appendix which
+                        is indexed by element and contains all valid child and parent elements of
+                        any given element. If you edit Docbook often, a schema-aware XML editor
+                        makes things easier.</p></td></tr><tr class="question" title="A.9.2."><td align="left" valign="top"><a name="d2802e22364"></a><a name="d2802e22365"></a><p><b>A.9.2.</b></p></td><td align="left" valign="top"><p>Paragraphs and Admonitions</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>It is a common pattern, and it is technically valid, to put an admonition
+                        such as a &lt;note&gt; inside a &lt;para&gt; element. Because admonitions
+                        render as block-level elements (they take the whole width of the page), it
+                        is better to mark them up as siblings to the paragraphs around them, like
+                        this:</p><pre class="programlisting">&lt;para&gt;This is the paragraph.&lt;/para&gt;
+&lt;note&gt;
+    &lt;para&gt;This is an admonition which occurs after the paragraph.&lt;/para&gt;
+&lt;/note&gt;</pre></td></tr><tr class="question" title="A.9.3."><td align="left" valign="top"><a name="d2802e22373"></a><a name="d2802e22374"></a><p><b>A.9.3.</b></p></td><td align="left" valign="top"><p>Wrap textual &lt;listitem&gt; and &lt;entry&gt; contents in &lt;para&gt;
+                        elements.</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>Because the contents of a &lt;listitem&gt; (an element in an itemized,
+                        ordered, or variable list) or an &lt;entry&gt; (a cell in a table) can
+                        consist of things other than plain text, they need to be wrapped in some
+                        element. If they are plain text, they need to be inclosed in &lt;para&gt;
+                        tags. This is tedious but necessary for validity.</p><pre class="programlisting">&lt;itemizedlist&gt;
+    &lt;listitem&gt;
+        &lt;para&gt;This is a paragraph.&lt;/para&gt;
+    &lt;/listitem&gt;
+    &lt;listitem&gt;
+        &lt;screen&gt;This is screen output.&lt;/screen&gt;
+    &lt;/listitem&gt;
+&lt;/itemizedlist&gt;</pre></td></tr><tr class="question" title="A.9.4."><td align="left" valign="top"><a name="d2802e22382"></a><a name="d2802e22383"></a><p><b>A.9.4.</b></p></td><td align="left" valign="top"><p>When to use &lt;command&gt;, &lt;code&gt;, &lt;programlisting&gt;,
+                        &lt;screen&gt;</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>The first two are in-line tags, which can occur within the flow of
+                        paragraphs or titles. The second two are block elements.</p><p>Use &lt;command&gt; to mention a command such as <span class="command"><strong>hbase
+                            shell</strong></span> in the flow of a sentence. Use &lt;code&gt; for other
+                        inline text referring to code. Incidentally, use &lt;literal&gt; to specify
+                        literal strings that should be typed or entered exactly as shown. Within a
+                        &lt;screen&gt; listing, it can be helpful to use the &lt;userinput&gt; and
+                        &lt;computeroutput&gt; elements to mark up the text further.</p><p>Use &lt;screen&gt; to display input and output as the user would
+                            <span class="emphasis"><em>see</em></span> it on the screen, in a log file, etc. Use
+                        &lt;programlisting&gt; only for blocks of code that occur within a file,
+                        such as Java or XML code, or a Bash shell script.</p></td></tr><tr class="question" title="A.9.5."><td align="left" valign="top"><a name="d2802e22399"></a><a name="d2802e22400"></a><p><b>A.9.5.</b></p></td><td align="left" valign="top"><p>How to escape XML elements so that they show up as XML</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>For one-off instances or short in-line mentions, use the &amp;lt; and
+                        &amp;gt; encoded characters. For longer mentions, or blocks of code, enclose
+                        it with &amp;lt;![CDATA[]]&amp;gt;, which is much easier to maintain and
+                        parse in the source files..</p></td></tr><tr class="question" title="A.9.6."><td align="left" valign="top"><a name="d2802e22406"></a><a name="d2802e22407"></a><p><b>A.9.6.</b></p></td><td align="left" valign="top"><p>Tips and tricks for making screen output look good</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>Text within &lt;screen&gt; and &lt;programlisting&gt; elements is shown
+                        exactly as it appears in the source, including indentation, tabs, and line
+                        wrap.</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Indent the starting and closing XML elements, but do not indent
+                                the content. Also, to avoid having an extra blank line at the
+                                beginning of the programlisting output, do not put the CDATA
+                                element on its own line. For example:</p><pre class="programlisting">        &lt;programlisting&gt;
+case $1 in
+  --cleanZk|--cleanHdfs|--cleanAll)
+    matches="yes" ;;
+  *) ;;
+esac
+        &lt;/programlisting&gt;</pre></li><li class="listitem"><p>After pasting code into a programlisting, fix the indentation
+                                manually, using two <span class="emphasis"><em>spaces</em></span> per desired
+                                indentation. For screen output, be sure to include line breaks so
+                                that the text is no longer than 100 characters.</p></li></ul></div></td></tr><tr class="question" title="A.9.7."><td align="left" valign="top"><a name="d2802e22425"></a><a name="d2802e22426"></a><p><b>A.9.7.</b></p></td><td align="left" valign="top"><p>Isolate Changes for Easy Diff Review.</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>Be careful with pretty-printing or re-formatting an entire XML file, even
+                        if the formatting has degraded over time. If you need to reformat a file, do
+                        that in a separate JIRA where you do not change any content. Be careful
+                        because some XML editors do a bulk-reformat when you open a new file,
+                        especially if you use GUI mode in the editor.</p></td></tr><tr class="question" title="A.9.8."><td align="left" valign="top"><a name="d2802e22432"></a><a name="d2802e22433"></a><p><b>A.9.8.</b></p></td><td align="left" valign="top"><p>Syntax Highlighting</p></td></tr><tr class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>The HBase Reference Guide uses the <a class="link" href="http://sourceforge.net/projects/xslthl/files/xslthl/2.1.0/" target="_top">XSLT Syntax Highlighting</a> Maven module for syntax highlighting.
+                        To enable syntax highlighting for a given &lt;programlisting&gt; or
+                        &lt;screen&gt; (or possibly other elements), add the attribute
+                                <code class="literal">language=<em class="replaceable"><code>LANGUAGE_OF_CHOICE</code></em></code>
+                        to the element, as in the following example:</p><pre class="programlisting">
+&lt;programlisting language="xml"&gt;
+    &lt;foo&gt;bar&lt;/foo&gt;
+    &lt;bar&gt;foo&lt;/bar&gt;
+&lt;/programlisting&gt;</pre><p>Several syntax types are supported. The most interesting ones for the
+                        HBase Reference Guide are <code class="literal">java</code>, <code class="literal">xml</code>,
+                            <code class="literal">sql</code>, and <code class="literal">bourne</code> (for BASH shell
+                        output or Linux command-line examples).</p></td></tr></tbody></table></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="apas08.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="appendix_contributing_to_documentation.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="faq.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">A.8.&nbsp;Adding a New Chapter to the HBase Reference Guide&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Appendix&nbsp;B.&nbsp;FAQ</td></tr></table></div></body></html>

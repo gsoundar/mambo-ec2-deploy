@@ -1,0 +1,28 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>7.2.&nbsp;MapReduce Scan Caching</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="mapreduce.html" title="Chapter&nbsp;7.&nbsp;HBase and MapReduce"><link rel="prev" href="mapreduce.html" title="Chapter&nbsp;7.&nbsp;HBase and MapReduce"><link rel="next" href="ch07s03.html" title="7.3.&nbsp;Bundled HBase MapReduce Jobs"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">7.2.&nbsp;MapReduce Scan Caching</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="mapreduce.html">Prev</a>&nbsp;</td><th width="60%" align="center">Chapter&nbsp;7.&nbsp;HBase and MapReduce</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch07s03.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/.html';
+    </script><div class="section" title="7.2.&nbsp;MapReduce Scan Caching"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2802e7273"></a>7.2.&nbsp;MapReduce Scan Caching</h2></div></div></div><p>TableMapReduceUtil now restores the option to set scanner caching (the number of rows
+        which are cached before returning the result to the client) on the Scan object that is
+        passed in. This functionality was lost due to a bug in HBase 0.95 (<a class="link" href="https://issues.apache.org/jira/browse/HBASE-11558" target="_top">HBASE-11558</a>), which
+        is fixed for HBase 0.98.5 and 0.96.3. The priority order for choosing the scanner caching is
+        as follows:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Caching settings which are set on the scan object.</p></li><li class="listitem"><p>Caching settings which are specified via the configuration option
+              <code class="option">hbase.client.scanner.caching</code>, which can either be set manually in
+              <code class="filename">hbase-site.xml</code> or via the helper method
+              <code class="code">TableMapReduceUtil.setScannerCaching()</code>.</p></li><li class="listitem"><p>The default value <code class="code">HConstants.DEFAULT_HBASE_CLIENT_SCANNER_CACHING</code>, which is set to
+            <code class="literal">100</code>.</p></li></ol></div><p>Optimizing the caching settings is a balance between the time the client waits for a
+        result and the number of sets of results the client needs to receive. If the caching setting
+        is too large, the client could end up waiting for a long time or the request could even time
+        out. If the setting is too small, the scan needs to return results in several pieces.
+        If you think of the scan as a shovel, a bigger cache setting is analogous to a bigger
+        shovel, and a smaller cache setting is equivalent to more shoveling in order to fill the
+        bucket.</p><p>The list of priorities mentioned above allows you to set a reasonable default, and
+        override it for specific operations.</p><p>See the API documentation for <a class="link" href="https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/client/Scan.html" target="_top">Scan</a> for more details.</p></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="mapreduce.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="mapreduce.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch07s03.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;7.&nbsp;HBase and MapReduce&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;7.3.&nbsp;Bundled HBase MapReduce Jobs</td></tr></table></div></body></html>

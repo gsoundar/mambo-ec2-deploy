@@ -1,0 +1,69 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>E.2.&nbsp;Making use of Hadoop Native Libraries in HBase</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="compression.html" title="Appendix&nbsp;E.&nbsp;Compression and Data Block Encoding In HBase"><link rel="prev" href="compression.html" title="Appendix&nbsp;E.&nbsp;Compression and Data Block Encoding In HBase"><link rel="next" href="apes03.html" title="E.3.&nbsp;Compressor Configuration, Installation, and Use"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">E.2.&nbsp;Making use of Hadoop Native Libraries in HBase</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="compression.html">Prev</a>&nbsp;</td><th width="60%" align="center">Appendix&nbsp;E.&nbsp;Compression and Data Block Encoding In
+          HBase</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="apes03.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/hadoop.native.lib.html';
+    </script><div class="section" title="E.2.&nbsp;Making use of Hadoop Native Libraries in HBase"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="hadoop.native.lib"></a>E.2.&nbsp;Making use of Hadoop Native Libraries in HBase</h2></div></div></div><p>The Hadoop shared library has a bunch of facility including
+        compression libraries and fast crc'ing. To make this facility available
+        to HBase, do the following. HBase/Hadoop will fall back to use
+        alternatives if it cannot find the native library versions -- or
+        fail outright if you asking for an explicit compressor and there is
+      no alternative available.</p><p>If you see the following in your HBase logs, you know that HBase was unable
+      to locate the Hadoop native libraries:
+      </p><pre class="programlisting">2014-08-07 09:26:20,139 WARN  [main] util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable</pre><p>
+      If the libraries loaded successfully, the WARN message does not show.
+    </p><p>Lets presume your Hadoop shipped with a native library that
+      suits the platform you are running HBase on.  To check if the Hadoop
+      native library is available to HBase, run the following tool (available in 
+      Hadoop 2.1 and greater):
+      </p><pre class="programlisting">$ ./bin/hbase --config ~/conf_hbase org.apache.hadoop.util.NativeLibraryChecker
+2014-08-26 13:15:38,717 WARN  [main] util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Native library checking:
+hadoop: false
+zlib:   false
+snappy: false
+lz4:    false
+bzip2:  false
+2014-08-26 13:15:38,863 INFO  [main] util.ExitUtil: Exiting with status 1</pre><p>
+Above shows that the native hadoop library is not available in HBase context.
+    </p><p>To fix the above, either copy the Hadoop native libraries local or symlink to
+      them if the Hadoop and HBase stalls are adjacent in the filesystem. 
+      You could also point at their location by setting the <code class="varname">LD_LIBRARY_PATH</code> environment
+      variable.</p><p>Where the JVM looks to find native librarys is "system dependent"
+      (See <code class="classname">java.lang.System#loadLibrary(name)</code>). On linux, by default,
+      is going to look in <code class="filename">lib/native/PLATFORM</code> where <code class="varname">PLATFORM</code>
+      is the label for the platform your HBase is installed on.
+      On a local linux machine, it seems to be the concatenation of the java properties
+      <code class="varname">os.name</code> and <code class="varname">os.arch</code> followed by whether 32 or 64 bit.
+      HBase on startup prints out all of the java system properties so find the os.name and os.arch
+      in the log. For example:
+      </p><pre class="programlisting">....
+      2014-08-06 15:27:22,853 INFO  [main] zookeeper.ZooKeeper: Client environment:os.name=Linux
+      2014-08-06 15:27:22,853 INFO  [main] zookeeper.ZooKeeper: Client environment:os.arch=amd64
+      ...
+    </pre><p>
+     So in this case, the PLATFORM string is <code class="varname">Linux-amd64-64</code>.
+     Copying the Hadoop native libraries or symlinking at <code class="filename">lib/native/Linux-amd64-64</code>
+     will ensure they are found.  Check with the Hadoop <code class="filename">NativeLibraryChecker</code>. 
+    </p><p>Here is example of how to point at the Hadoop libs with <code class="varname">LD_LIBRARY_PATH</code>
+      environment variable:
+      </p><pre class="programlisting">$ LD_LIBRARY_PATH=~/hadoop-2.5.0-SNAPSHOT/lib/native ./bin/hbase --config ~/conf_hbase org.apache.hadoop.util.NativeLibraryChecker
+2014-08-26 13:42:49,332 INFO  [main] bzip2.Bzip2Factory: Successfully loaded &amp; initialized native-bzip2 library system-native
+2014-08-26 13:42:49,337 INFO  [main] zlib.ZlibFactory: Successfully loaded &amp; initialized native-zlib library
+Native library checking:
+hadoop: true /home/stack/hadoop-2.5.0-SNAPSHOT/lib/native/libhadoop.so.1.0.0
+zlib:   true /lib64/libz.so.1
+snappy: true /usr/lib64/libsnappy.so.1
+lz4:    true revision:99
+bzip2:  true /lib64/libbz2.so.1</pre><p>
+Set in <code class="filename">hbase-env.sh</code> the LD_LIBRARY_PATH environment variable when starting your HBase.
+    </p></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="compression.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="compression.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="apes03.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Appendix&nbsp;E.&nbsp;Compression and Data Block Encoding In
+          HBase&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;E.3.&nbsp;Compressor Configuration, Installation, and Use</td></tr></table></div></body></html>

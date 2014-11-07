@@ -1,0 +1,86 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>13.3.&nbsp;Building A Coprocessor</title><link rel="stylesheet" type="text/css" href="../css/freebsd_docbook.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"><link rel="home" href="book.html" title="The Apache HBase&#153; Reference Guide"><link rel="up" href="cp.html" title="Chapter&nbsp;13.&nbsp;Apache HBase Coprocessors"><link rel="prev" href="ch13s02.html" title="13.2.&nbsp;Examples"><link rel="next" href="ch13s04.html" title="13.4.&nbsp;Check the Status of a Coprocessor"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">13.3.&nbsp;Building A Coprocessor</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch13s02.html">Prev</a>&nbsp;</td><th width="60%" align="center">Chapter&nbsp;13.&nbsp;Apache HBase Coprocessors</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ch13s04.html">Next</a></td></tr></table><hr></div><script type="text/javascript">
+    var disqus_shortname = 'hbase'; // required: replace example with your forum shortname
+    var disqus_url = 'http://hbase.apache.org/book/.html';
+    </script><div class="section" title="13.3.&nbsp;Building A Coprocessor"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d2802e13706"></a>13.3.&nbsp;Building A Coprocessor</h2></div></div></div><p>Before you can build a processor, it must be developed, compiled, and packaged in a JAR
+      file. The next step is to configure the coprocessor framework to use your coprocessor. You can
+      load the coprocessor from your HBase configuration, so that the coprocessor starts with HBase,
+      or you can configure the coprocessor from the HBase shell, as a table attribute, so that it is
+      loaded dynamically when the table is opened or reopened.</p><div class="section" title="13.3.1.&nbsp;Load from Configuration"><div class="titlepage"><div><div><h3 class="title"><a name="d2802e13711"></a>13.3.1.&nbsp;Load from Configuration</h3></div></div></div><p> To configure a coprocessor to be loaded when HBase starts, modify the RegionServer's
+          <code class="filename">hbase-site.xml</code> and configure one of the following properties, based
+        on the type of observer you are configuring: </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><code class="code">hbase.coprocessor.region.classes</code>for RegionObservers and
+            Endpoints</p></li><li class="listitem"><p><code class="code">hbase.coprocessor.wal.classes</code>for WALObservers</p></li><li class="listitem"><p><code class="code">hbase.coprocessor.master.classes</code>for MasterObservers</p></li></ul></div><div class="example"><a name="d2802e13735"></a><p class="title"><b>Example&nbsp;13.1.&nbsp;Example RegionObserver Configuration</b></p><div class="example-contents"><p>In this example, one RegionObserver is configured for all the HBase tables.</p><pre class="screen">
+&lt;property&gt;
+    &lt;name&gt;hbase.coprocessor.region.classes&lt;/name&gt;
+    &lt;value&gt;org.apache.hadoop.hbase.coprocessor.AggregateImplementation&lt;/value&gt;
+ &lt;/property&gt;          
+        </pre></div></div><br class="example-break"><p> If multiple classes are specified for loading, the class names must be comma-separated.
+        The framework attempts to load all the configured classes using the default class loader.
+        Therefore, the jar file must reside on the server-side HBase classpath.</p><p>Coprocessors which are loaded in this way will be active on all regions of
+        all tables. These are the system coprocessor introduced earlier. The first listed
+        coprocessors will be assigned the priority <code class="literal">Coprocessor.Priority.SYSTEM</code>.
+        Each subsequent coprocessor in the list will have its priority value incremented by one
+        (which reduces its priority, because priorities have the natural sort order of Integers). </p><p>When calling out to registered observers, the framework executes their callbacks methods
+        in the sorted order of their priority. Ties are broken arbitrarily.</p></div><div class="section" title="13.3.2.&nbsp;Load from the HBase Shell"><div class="titlepage"><div><div><h3 class="title"><a name="d2802e13751"></a>13.3.2.&nbsp;Load from the HBase Shell</h3></div></div></div><p> You can load a coprocessor on a specific table via a table attribute. The following
+        example will load the <code class="systemitem">FooRegionObserver</code> observer when table
+          <code class="systemitem">t1</code> is read or re-read. </p><div class="example"><a name="d2802e13762"></a><p class="title"><b>Example&nbsp;13.2.&nbsp;Load a Coprocessor On a Table Using HBase Shell</b></p><div class="example-contents"><pre class="screen">
+hbase(main):005:0&gt;  <strong class="userinput"><code>alter 't1', METHOD =&gt; 'table_att', 
+  'coprocessor'=&gt;'hdfs:///foo.jar|com.foo.FooRegionObserver|1001|arg1=1,arg2=2'</code></strong>
+<code class="computeroutput">Updating all regions with the new schema...
+1/1 regions updated.
+Done.
+0 row(s) in 1.0730 seconds</code>
+
+hbase(main):006:0&gt; <strong class="userinput"><code>describe 't1'</code></strong>
+<code class="computeroutput">DESCRIPTION                                                        ENABLED                             
+ {NAME =&gt; 't1', coprocessor$1 =&gt; 'hdfs:///foo.jar|com.foo.FooRegio false                               
+ nObserver|1001|arg1=1,arg2=2', FAMILIES =&gt; [{NAME =&gt; 'c1', DATA_B                                     
+ LOCK_ENCODING =&gt; 'NONE', BLOOMFILTER =&gt; 'NONE', REPLICATION_SCOPE                                     
+  =&gt; '0', VERSIONS =&gt; '3', COMPRESSION =&gt; 'NONE', MIN_VERSIONS =&gt;                                      
+ '0', TTL =&gt; '2147483647', KEEP_DELETED_CELLS =&gt; 'false', BLOCKSIZ                                     
+ E =&gt; '65536', IN_MEMORY =&gt; 'false', ENCODE_ON_DISK =&gt; 'true', BLO                                     
+ CKCACHE =&gt; 'true'}, {NAME =&gt; 'f1', DATA_BLOCK_ENCODING =&gt; 'NONE',                                     
+  BLOOMFILTER =&gt; 'NONE', REPLICATION_SCOPE =&gt; '0', VERSIONS =&gt; '3'                                     
+ , COMPRESSION =&gt; 'NONE', MIN_VERSIONS =&gt; '0', TTL =&gt; '2147483647'                                     
+ , KEEP_DELETED_CELLS =&gt; 'false', BLOCKSIZE =&gt; '65536', IN_MEMORY                                      
+ =&gt; 'false', ENCODE_ON_DISK =&gt; 'true', BLOCKCACHE =&gt; 'true'}]}                                         
+1 row(s) in 0.0190 seconds</code>
+        </pre></div></div><br class="example-break"><p>The coprocessor framework will try to read the class information from the coprocessor
+        table attribute value. The value contains four pieces of information which are separated by
+        the <code class="literal">|</code> character.</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>File path: The jar file containing the coprocessor implementation must be in a
+            location where all region servers can read it. You could copy the file onto the local
+            disk on each region server, but it is recommended to store it in HDFS.</p></li><li class="listitem"><p>Class name: The full class name of the coprocessor.</p></li><li class="listitem"><p>Priority: An integer. The framework will determine the execution sequence of all
+            configured observers registered at the same hook using priorities. This field can be
+            left blank. In that case the framework will assign a default priority value.</p></li><li class="listitem"><p>Arguments: This field is passed to the coprocessor implementation.</p></li></ul></div><div class="example"><a name="d2802e13797"></a><p class="title"><b>Example&nbsp;13.3.&nbsp;Unload a Coprocessor From a Table Using HBase Shell</b></p><div class="example-contents"><pre class="screen">
+hbase(main):007:0&gt; <strong class="userinput"><code>alter 't1', METHOD =&gt; 'table_att_unset',</code></strong> 
+hbase(main):008:0*   <strong class="userinput"><code>NAME =&gt; 'coprocessor$1'</code></strong>
+<code class="computeroutput">Updating all regions with the new schema...
+1/1 regions updated.
+Done.
+0 row(s) in 1.1130 seconds</code>
+
+hbase(main):009:0&gt; <strong class="userinput"><code>describe 't1'</code></strong>
+<code class="computeroutput">DESCRIPTION                                                        ENABLED                             
+ {NAME =&gt; 't1', FAMILIES =&gt; [{NAME =&gt; 'c1', DATA_BLOCK_ENCODING =&gt; false                               
+  'NONE', BLOOMFILTER =&gt; 'NONE', REPLICATION_SCOPE =&gt; '0', VERSION                                     
+ S =&gt; '3', COMPRESSION =&gt; 'NONE', MIN_VERSIONS =&gt; '0', TTL =&gt; '214                                     
+ 7483647', KEEP_DELETED_CELLS =&gt; 'false', BLOCKSIZE =&gt; '65536', IN                                     
+ _MEMORY =&gt; 'false', ENCODE_ON_DISK =&gt; 'true', BLOCKCACHE =&gt; 'true                                     
+ '}, {NAME =&gt; 'f1', DATA_BLOCK_ENCODING =&gt; 'NONE', BLOOMFILTER =&gt;                                      
+ 'NONE', REPLICATION_SCOPE =&gt; '0', VERSIONS =&gt; '3', COMPRESSION =&gt;                                     
+  'NONE', MIN_VERSIONS =&gt; '0', TTL =&gt; '2147483647', KEEP_DELETED_C                                     
+ ELLS =&gt; 'false', BLOCKSIZE =&gt; '65536', IN_MEMORY =&gt; 'false', ENCO                                     
+ DE_ON_DISK =&gt; 'true', BLOCKCACHE =&gt; 'true'}]}                                                         
+1 row(s) in 0.0180 seconds          </code>
+        </pre></div></div><br class="example-break"><div class="warning" title="Warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Warning</h3><p>There is no guarantee that the framework will load a given coprocessor successfully.
+          For example, the shell command neither guarantees a jar file exists at a particular
+          location nor verifies whether the given class is actually contained in the jar file.
+        </p></div></div></div><div id="disqus_thread"></div><script type="text/javascript">
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch13s02.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="cp.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ch13s04.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">13.2.&nbsp;Examples&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="book.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;13.4.&nbsp;Check the Status of a Coprocessor</td></tr></table></div></body></html>
