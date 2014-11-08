@@ -12,10 +12,11 @@ mkdir /opt/mambo/mambo-ec2-deploy/hadoop/conf
 cp configuration/3node/hadoop/conf/* /opt/mambo/mambo-ec2-deploy/hadoop/conf
 
 # Setup keys
-cp configuration/3node/keys/id_rsa_mambo ~/.ssh/
-chmod 400 ~/.ssh/id_rsa_mambo
-chown ec2-user:ec2-user ~/.ssh/id_rsa_mambo
-cat configuration/3node/keys/id_rsa_mambo.pub >> ~/.ssh/authorized_keys
-cat configuration/3node/keys/ssh_conf >> ~/.ssh/config
-chown ec2-user:ec2-user ~/.ssh/config
+cp configuration/3node/keys/id_rsa_mambo /home/ec2-user/.ssh/
+chmod 400 /home/ec2-user/.ssh/id_rsa_mambo
+chown ec2-user:ec2-user /home/ec2-user/.ssh/id_rsa_mambo
+cat configuration/3node/keys/id_rsa_mambo.pub >> /home/ec2-user/.ssh/authorized_keys
+cat configuration/3node/keys/ssh_conf >> /home/ec2-user/.ssh/config
+chown ec2-user:ec2-user /home/ec2-user/.ssh/config
+chmod 400 /home/ec2-user/.ssh/config
 

@@ -331,8 +331,8 @@
 						"cd mambo-ec2-deploy\n",
 						"sh ./setup.sh\n",
             			"curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
-                                                           "\"Reason\" : \"The Hadoop slave1 is ready\",",
-                                                           "\"UniqueId\" : \"hadoop-slave1\",",
+                                                           "\"Reason\" : \"The Hadoop slave2 is ready\",",
+                                                           "\"UniqueId\" : \"hadoop-slave2\",",
                                                            "\"Data\" : \"Done\"}' ",
                   "\"", {"Ref" : "WaitForHadoopSlave2WaitHandle"},"\"\n" ]]}
                 },
