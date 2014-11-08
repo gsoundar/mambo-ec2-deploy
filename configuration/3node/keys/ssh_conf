@@ -1,3 +1,6 @@
 Host 10.0.0.*
     User ec2-user
-    IdentityFile ~/.ssh/mambo_id_rsa
+    IdentityFile ~/.ssh/id_rsa_mambo
+Host 10.0.0.*
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null
