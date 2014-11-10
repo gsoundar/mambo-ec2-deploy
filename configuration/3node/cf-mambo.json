@@ -325,7 +325,7 @@
         		"UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
             			"#!/bin/bash -ex","\n",
 						"yum -y install git\n",
-						"yum -y install java-1.7.0-openjdk-devel.x86_64",
+						"yum -y install java-1.7.0-openjdk-devel.x86_64\n",
 						"mkdir /opt/mambo\n",
 						"cd /opt/mambo\n",
 						"git clone https://github.com/gsoundar/mambo-ec2-deploy.git\n",
@@ -396,7 +396,7 @@
 						"mkdir /opt/mambo\n",
 						"cd /opt/mambo\n",
 						"git clone https://github.com/gsoundar/mambo-ec2-deploy.git\n",
-						"yum -y install java-1.7.0-openjdk-devel.x86_64",
+						"yum -y install java-1.7.0-openjdk-devel.x86_64\n",
 						"cd mambo-ec2-deploy\n",
 						"sh ./setup.sh\n",
             			"curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
@@ -461,7 +461,7 @@
         		"UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
             			"#!/bin/bash -ex","\n",
 						"yum -y install git\n",
-						"yum -y install java-1.7.0-openjdk-devel.x86_64",
+						"yum -y install java-1.7.0-openjdk-devel.x86_64\n",
 						"mkdir /opt/mambo\n",
 						"cd /opt/mambo\n",
 						"git clone https://github.com/gsoundar/mambo-ec2-deploy.git\n",
