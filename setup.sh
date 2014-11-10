@@ -31,4 +31,4 @@ chown ec2-user /mnt/hadoop-temp
 chown -R ec2-user /opt/mambo/mambo-ec2-deploy/hadoop/
 
 #env
-echo "export JAVA_HOME=/usr/lib/jvm/java-1.7.0/" > /etc/profile
+echo "export JAVA_HOME=/usr/lib/jvm/java-1.7.0/" >> /etc/profile
