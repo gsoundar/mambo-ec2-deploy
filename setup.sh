@@ -27,5 +27,5 @@ mkdir /mnt/hadoop-temp
 
 chown ec2-user /mnt/namenode
 chown ec2-user /mnt/datanode
-ec2-user /mnt/hadoop-temp
+chown ec2-user /mnt/hadoop-temp
 
