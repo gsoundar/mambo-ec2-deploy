@@ -20,3 +20,12 @@ cat configuration/3node/keys/ssh_conf >> /home/ec2-user/.ssh/config
 chown ec2-user:ec2-user /home/ec2-user/.ssh/config
 chmod 400 /home/ec2-user/.ssh/config
 
+# set directories and change permissions
+mkdir /mnt/namenode
+mkdir /mnt/datanode
+mkdir /mnt/hadoop-temp
+
+chown ec2-user /mnt/namenode
+chown ec2-user /mnt/datanode
+ec2-user /mnt/hadoop-temp
+
