@@ -28,12 +28,12 @@ mkdir /mnt/datanode
 mkdir /mnt/hadoop-temp
 mkdir /mnt/mamboroot
 
-chown ec2-user /mnt/namenode
-chown ec2-user /mnt/datanode
-chown ec2-user /mnt/hadoop-temp
-chown ec2-user /mnt/mamboroot
-chown -R ec2-user /opt/mambo/mambo-ec2-deploy/hadoop/
+chown ec2-user:ec2-user /mnt/namenode
+chown ec2-user:ec2-user /mnt/datanode
+chown ec2-user:ec2-user /mnt/hadoop-temp
+chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/hadoop/
 
+mount -t nfs 10.0.0.61:/mnt/data /mnt/mamboroot
 
 #env
 echo "export JAVA_HOME=/usr/lib/jvm/java-1.7.0/" >> /etc/profile
