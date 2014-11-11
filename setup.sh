@@ -3,14 +3,12 @@
 HADOOP_PACKAGE=hadoop-2.4.1
 HBASE_PACKAGE=hbase-0.98.7-hadoop2
 HADOOP_NFS_CONN=hadoop-nfsv3-connector
-MVN_PACKAGE=apache-maven-3.0.5
 
 
 # Setup the Hadoop packages
 cp -rf packages/${HADOOP_PACKAGE} hadoop
 cp -rf packages/${HBASE_PACKAGE} hbase
-cp -rf packages/${MVN_PACKAGE} /usr/local
-cp -rf packages/${HADOOP_NFS_CONN} hadoop-nfsv3-connector
+cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar hadoop/share/hadoop/common/lib/
 # Copy the configuration files
 mkdir /opt/mambo/mambo-ec2-deploy/hadoop/conf
 cp configuration/3node/hadoop/conf/* /opt/mambo/mambo-ec2-deploy/hadoop/conf
@@ -36,5 +34,4 @@ chown -R ec2-user /opt/mambo/mambo-ec2-deploy/hadoop/
 
 #env
 echo "export JAVA_HOME=/usr/lib/jvm/java-1.7.0/" >> /etc/profile
-echo "export PATH=/usr/local/${MVN_PACKAGE}/bin:$PATH" >> /etc/profile
 
