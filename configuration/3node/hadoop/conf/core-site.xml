@@ -11,6 +11,8 @@
    <name>fs.tachyon.impl</name>
    <value>tachyon.hadoop.TFS</value>
  </property>
+-->
+<!--nfs start-->
  <property>
    <name>fs.defaultFS</name>
    <value>nfs://atg-f-flamingo.gdl.englab.netapp.com:2049</value> 
@@ -19,13 +21,15 @@
    <name>fs.nfs.mountdir</name>
    <value>/mamboroot</value>
  </property>
--->
+ <!--nfs end-->
+<!--hdfs
  <property>
    <name>fs.defaultFS</name>
    <value>hdfs://10.0.0.10:54310</value> 
  </property>
+-->
  <!-- Authentication flavor to use. For flamingo, use AUTH_NONE. For pepe, use AUTH_SYS. -->
- <!-- NFS 
+ <!-- NFS --> 
  <property>
    <name>fs.nfs.impl</name>
    <value>org.apache.hadoop.fs.nfs.NFSFileSystem</value>
@@ -40,16 +44,16 @@
  </property>
  <property>
    <name>fs.nfs.username</name>
-   <value>jingxin</value>
+   <value>ec2-user</value>
  </property>
  <property>
    <name>fs.nfs.groupname</name>
-   <value>jingxin</value>
+   <value>ec2-user</value>
  </property>
  <property>
    <name>fs.nfs.prefetch</name>
    <value>true</value>
  </property>
--->
+ <!--NFS END-->
 </configuration>
 
