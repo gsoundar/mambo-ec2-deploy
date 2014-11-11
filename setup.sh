@@ -9,8 +9,8 @@ MVN_PACKAGE=apache-maven-3.0.5
 # Setup the Hadoop packages
 cp -rf packages/${HADOOP_PACKAGE} hadoop
 cp -rf packages/${HBASE_PACKAGE} hbase
-cp -rf package/${MVN_PACKAGE} /usr/local
-cp -rf package/${HADOOP_NFS_CONN} hadoop-nfsv3-connector
+cp -rf packages/${MVN_PACKAGE} /usr/local
+cp -rf packages/${HADOOP_NFS_CONN} hadoop-nfsv3-connector
 # Copy the configuration files
 mkdir /opt/mambo/mambo-ec2-deploy/hadoop/conf
 cp configuration/3node/hadoop/conf/* /opt/mambo/mambo-ec2-deploy/hadoop/conf
