@@ -40,7 +40,7 @@
  </property>
  <property>
    <name>fs.nfs.auth.flavor</name>
-   <value>AUTH_NONE</value>
+   <value>AUTH_SYS</value>
  </property>
  <property>
    <name>fs.nfs.username</name>
