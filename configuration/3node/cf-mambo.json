@@ -261,7 +261,7 @@
             			"mount /dev/xvdb /mnt/data","\n",
             			"service rpcbind start","\n",
             			"service nfs start","\n",
-            			"exportfs -o rw,sec=sys,fsid=0,insecure,no_subtree_check,sync :/mnt/data","\n",
+            			"exportfs -o rw,sec=sys,fsid=0,no_root_squash,insecure,no_subtree_check,sync :/mnt/data","\n",
             			"mkdir /mnt/test","\n",
             			"mount 10.0.0.61:/mnt/data /mnt/test","\n",
             			"curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
@@ -500,10 +500,14 @@
       		}
     	}
 	},
-	"Outputs" : {
+    "Outputs" : {
+	"MamboNFSHostname" : {
+      	    "Description" : "Hostname of Mambo NFS Server",
+      	    "Value" : { "Fn::Join" : ["", [{ "Fn::GetAtt" : [ "MamboNFSServer", "PublicIp" ]} ]]}
+    	},
     	"MamboHadoopMasterHostname" : {
-      		"Description" : "Hostname of Hadoop master",
-      		"Value" : { "Fn::Join" : ["", [{ "Fn::GetAtt" : [ "MamboHadoopMaster", "PublicIp" ]} ]]}
+      	    "Description" : "Hostname of Hadoop master",
+      	    "Value" : { "Fn::Join" : ["", [{ "Fn::GetAtt" : [ "MamboHadoopMaster", "PublicIp" ]} ]]}
     	}
-  	}
+    }
 }
