@@ -262,6 +262,7 @@
             			"service rpcbind start","\n",
             			"service nfs start","\n",
             			"exportfs -o rw,sec=sys,fsid=0,insecure,no_subtree_check,sync :/mnt/data","\n",
+						"chown ec2-user:ec2-user /mnt/data","\n",
             			"mkdir /mnt/test","\n",
             			"mount 10.0.0.61:/mnt/data /mnt/test","\n",
             			"curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
