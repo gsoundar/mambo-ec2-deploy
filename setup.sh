@@ -32,6 +32,7 @@ chown ec2-user:ec2-user /mnt/namenode
 chown ec2-user:ec2-user /mnt/datanode
 chown ec2-user:ec2-user /mnt/hadoop-temp
 chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/hadoop/
+chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/hbase/
 
 mount -t nfs 10.0.0.61:/mnt/data /mnt/mamboroot
 
