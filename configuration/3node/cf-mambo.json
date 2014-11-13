@@ -324,7 +324,7 @@
         		],
         		"UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
             			"#!/bin/bash -ex","\n",
-						"yum -y install git nfs-utils\n",
+						"yum -y install emacs git nfs-utils\n",
 						"yum -y install java-1.7.0-openjdk-devel\n",
 						"service rpcbind start\n",
 						"mkdir /opt/mambo\n",

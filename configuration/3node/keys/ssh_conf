@@ -4,3 +4,15 @@ Host 10.0.0.*
 Host 10.0.0.*
     StrictHostKeyChecking no
     UserKnownHostsFile=/dev/null
+Host localhost
+    User ec2-user
+    IdentityFile ~/.ssh/id_rsa_mambo
+Host localhost
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null
+Host 127.0.0.1
+    User ec2-user
+    IdentityFile ~/.ssh/id_rsa_mambo
+Host 127.0.0.1
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null
