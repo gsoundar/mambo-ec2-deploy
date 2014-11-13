@@ -33,6 +33,10 @@
     <name>hbase.zookeeper.property.dataDir</name>
     <value>/mnt/zookeeper</value>
   </property>
+    <property>
+    <name>hbase.zookeeper.quorum</name>
+    <value>10.0.0.10,10.0.0.11,10.0.0.12</value>
+  </property>
   <!--nfs start-->
   <property>
     <name>fs.defaultFS</name>
