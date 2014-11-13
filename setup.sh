@@ -12,6 +12,8 @@ cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar hadoop/share/h
 # Copy the configuration files
 mkdir /opt/mambo/mambo-ec2-deploy/hadoop/conf
 cp configuration/3node/hadoop/conf/* /opt/mambo/mambo-ec2-deploy/hadoop/conf
+mkdir /opt/mambo/mambo-ec2-deploy/hbase/conf
+cp configuration/3node/hbase/conf/* /opt/mambo/mambo-ec2-deploy/hbase/conf
 
 # Setup keys
 cp configuration/3node/keys/id_rsa_mambo /home/ec2-user/.ssh/
