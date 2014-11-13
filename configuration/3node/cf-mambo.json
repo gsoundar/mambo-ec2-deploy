@@ -430,77 +430,142 @@
         		"Timeout" : "600"
       		}
     	},
-    	"MamboHadoopMaster": {
+    	    "MamboHadoopMaster": {
       		"Type": "AWS::EC2::Instance",
       		"Properties": {
-        		"DisableApiTermination": "FALSE",
-        		"ImageId": "ami-b5a7ea85",
-        		"InstanceType": "m3.large",
-        		"KeyName": {"Ref" : "SSHKeyName"},
-        		"Tenancy": "default",
-        		"Monitoring": "false",
-        		"NetworkInterfaces": [
-          			{
-            			"DeleteOnTermination": "true",
-            			"Description": "Primary network interface",
-            			"DeviceIndex": 0,
-           	 			"SubnetId": {
-              				"Ref": "MamboSubnet"
-            			},
-            			"PrivateIpAddresses": [
+        	    "DisableApiTermination": "FALSE",
+        	    "ImageId": "ami-b5a7ea85",
+        	    "InstanceType": "m3.large",
+        	    "KeyName": {"Ref" : "SSHKeyName"},
+        	    "Tenancy": "default",
+        	    "Monitoring": "false",
+        	    "NetworkInterfaces": [
+          		{
+            		    "DeleteOnTermination": "true",
+            		    "Description": "Primary network interface",
+            		    "DeviceIndex": 0,
+           	 	    "SubnetId": {
+              			"Ref": "MamboSubnet"
+            		    },
+            		    "PrivateIpAddresses": [
               			{
-                			"PrivateIpAddress": "10.0.0.10",
-                			"Primary": "true"
+                		    "PrivateIpAddress": "10.0.0.10",
+                		    "Primary": "true"
               			}
-            			],
-            			"GroupSet": [
+            		    ],
+            		    "GroupSet": [
               			{
-                			"Ref": "MamboSecurityGroup"
+                		    "Ref": "MamboSecurityGroup"
               			}
-            			],
-            			"AssociatePublicIpAddress": "true"
-          			}
-        		],
-        		"UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
-            			"#!/bin/bash -ex","\n",
-						"yum -y install git nfs-utils\n",
-						"yum -y install java-1.7.0-openjdk-devel\n",
-						"service rpcbind start\n",
-						"mkdir /opt/mambo\n",
-						"cd /opt/mambo\n",
-						"git clone https://github.com/gsoundar/mambo-ec2-deploy.git\n",
-						"cd mambo-ec2-deploy\n",
-						"sh ./setup.sh\n",
-            			"curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
-                                                           "\"Reason\" : \"The Hadoop master is ready\",",
-                                                           "\"UniqueId\" : \"hadoop-master\",",
-                                                           "\"Data\" : \"Done\"}' ",
-                  "\"", {"Ref" : "WaitForHadoopMasterWaitHandle"},"\"\n" ]]}
-                },
-        		"Tags": [
-          			{
-           			"Key": "Name",
-            		"Value": "MamboHadoopMaster"
+            		    ],
+            		    "AssociatePublicIpAddress": "true"
           		}
-        		]
+        	    ],
+        	    "UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
+            		"#!/bin/bash -ex","\n",
+			"yum -y install git nfs-utils\n",
+			"yum -y install java-1.7.0-openjdk-devel\n",
+			"service rpcbind start\n",
+			"mkdir /opt/mambo\n",
+			"cd /opt/mambo\n",
+			"git clone https://github.com/gsoundar/mambo-ec2-deploy.git\n",
+			"cd mambo-ec2-deploy\n",
+			"sh ./setup.sh\n",
+            		"curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
+			"\"Reason\" : \"The Hadoop master is ready\",",
+			"\"UniqueId\" : \"hadoop-master\",",
+			"\"Data\" : \"Done\"}' ",
+			"\"", {"Ref" : "WaitForHadoopMasterWaitHandle"},"\"\n" ]]}
+				 },
+        	    "Tags": [
+          		{
+           		    "Key": "Name",
+            		    "Value": "MamboHadoopMaster"
+          		}
+        	    ]
       		},
-			"DependsOn":"WaitForHadoopSlave1Instance"
-    	},
-    	"WaitForHadoopMasterWaitHandle" : {
+		"DependsOn":"WaitForHadoopSlave1Instance"
+    	    },
+    	    "WaitForHadoopMasterWaitHandle" : {
       		"Type" : "AWS::CloudFormation::WaitConditionHandle",
       		"Properties" : {
-      			}
-    	},
-    	"WaitForHadoopMasterInstance" : {
+      		}
+    	    },
+    	    "WaitForHadoopMasterInstance" : {
       		"Type" : "AWS::CloudFormation::WaitCondition",
       		"DependsOn" : "MamboHadoopMaster",
       		"Properties" : {
-        		"Handle" : {"Ref" : "WaitForHadoopMasterWaitHandle"},
-        		"Timeout" : "600"
+        	    "Handle" : {"Ref" : "WaitForHadoopMasterWaitHandle"},
+        	    "Timeout" : "600"
       		}
-    	}
+    	    },
+	    "MamboHadoopConsole": {
+      		"Type": "AWS::EC2::Instance",
+      		"Properties": {
+        	    "DisableApiTermination": "FALSE",
+        	    "ImageId": "ami-3d50120d",
+        	    "InstanceType": "m3.large",
+        	    "KeyName": {"Ref" : "SSHKeyName"},
+        	    "Tenancy": "default",
+        	    "Monitoring": "false",
+        	    "NetworkInterfaces": [
+          		{
+            		    "DeleteOnTermination": "true",
+            		    "Description": "Primary network interface",
+            		    "DeviceIndex": 0,
+           	 	    "SubnetId": {
+              			"Ref": "MamboSubnet"
+            		    },
+            		    "PrivateIpAddresses": [
+              			{
+                		    "PrivateIpAddress": "10.0.0.5",
+                		    "Primary": "true"
+              			}
+            		    ],
+            		    "GroupSet": [
+              			{
+                		    "Ref": "MamboSecurityGroup"
+              			}
+            		    ],
+            		    "AssociatePublicIpAddress": "true"
+          		}
+        	    ],
+        	    "UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
+            		"#!/bin/bash -ex","\n",
+            		"curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
+                        "\"Reason\" : \"The Mambo console is ready\",",
+                        "\"UniqueId\" : \"vnc\",",
+                        "\"Data\" : \"Done\"}' ",
+			"\"", {"Ref" : "WaitForHadoopConsoleWaitHandle"},"\"\n" ]]}
+				 },
+        	    "Tags": [
+          		{
+           		    "Key": "Name",
+            		    "Value": "MamboHadoopConsole"
+          		}
+        	    ]
+      		},
+		"DependsOn":"WaitForHadoopMasterInstance"
+    	    },
+    	    "WaitForHadoopConsoleWaitHandle" : {
+      		"Type" : "AWS::CloudFormation::WaitConditionHandle",
+      		"Properties" : {
+      		}
+    	    },
+    	    "WaitForHadoopConsoleInstance" : {
+      		"Type" : "AWS::CloudFormation::WaitCondition",
+      		"DependsOn" : "MamboHadoopConsole",
+      		"Properties" : {
+        	    "Handle" : {"Ref" : "WaitForHadoopConsoleWaitHandle"},
+        	    "Timeout" : "600"
+      		}
+    	    }
 	},
     "Outputs" : {
+	"MamboHadoopConsoleHostname" : {
+      	    "Description" : "Hostname of Mambo VNC Server",
+      	    "Value" : { "Fn::Join" : ["", [{ "Fn::GetAtt" : [ "MamboHadoopConsole", "PublicIp" ]} ]]}
+    	},
 	"MamboNFSHostname" : {
       	    "Description" : "Hostname of Mambo NFS Server",
       	    "Value" : { "Fn::Join" : ["", [{ "Fn::GetAtt" : [ "MamboNFSServer", "PublicIp" ]} ]]}
