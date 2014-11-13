@@ -27,10 +27,12 @@ mkdir /mnt/namenode
 mkdir /mnt/datanode
 mkdir /mnt/hadoop-temp
 mkdir /mnt/mamboroot
+mkdir /mnt/zookeeper
 
 chown ec2-user:ec2-user /mnt/namenode
 chown ec2-user:ec2-user /mnt/datanode
 chown ec2-user:ec2-user /mnt/hadoop-temp
+chown ec2-user:ec2-user /mnt/zookeeper
 chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/hadoop/
 chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/hbase/
 
