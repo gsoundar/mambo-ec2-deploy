@@ -9,6 +9,9 @@ HADOOP_NFS_CONN=hadoop-nfsv3-connector
 cp -rf packages/${HADOOP_PACKAGE} hadoop
 cp -rf packages/${HBASE_PACKAGE} hbase
 cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar hadoop/share/hadoop/common/lib/
+cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar hbase/lib/
+cp -rf hadoop/share/hadoop/common/hadoop-nfs-2.4.1.jar hbase/lib/
+
 # Copy the configuration files
 mkdir /opt/mambo/mambo-ec2-deploy/hadoop/conf
 cp configuration/3node/hadoop/conf/* /opt/mambo/mambo-ec2-deploy/hadoop/conf
