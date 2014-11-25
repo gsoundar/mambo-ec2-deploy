@@ -221,7 +221,7 @@
       		"Properties": {
         		"DisableApiTermination": "FALSE",
         		"ImageId": "ami-b5a7ea85",
-        		"InstanceType": "c3.large",
+        		"InstanceType": "i2.4xlarge",
         		"KeyName": {"Ref" : "SSHKeyName"},
         		"Tenancy": "default",
         		"Monitoring": "false",
@@ -296,7 +296,7 @@
       		"Properties": {
         		"DisableApiTermination": "FALSE",
         		"ImageId": "ami-b5a7ea85",
-        		"InstanceType": "m3.large",
+        		"InstanceType": "c3.8xlarge",
         		"KeyName": {"Ref" : "SSHKeyName"},
         		"Tenancy": "default",
         		"Monitoring": "false",
@@ -365,7 +365,7 @@
       		"Properties": {
         		"DisableApiTermination": "FALSE",
         		"ImageId": "ami-b5a7ea85",
-        		"InstanceType": "m3.large",
+        		"InstanceType": "c3.8xlarge",
         		"KeyName": {"Ref" : "SSHKeyName"},
         		"Tenancy": "default",
         		"Monitoring": "false",
@@ -435,7 +435,7 @@
       		"Properties": {
         	    "DisableApiTermination": "FALSE",
         	    "ImageId": "ami-b5a7ea85",
-        	    "InstanceType": "m3.large",
+        	    "InstanceType": "c3.8xlarge",
         	    "KeyName": {"Ref" : "SSHKeyName"},
         	    "Tenancy": "default",
         	    "Monitoring": "false",

@@ -20,12 +20,12 @@
   </property>
   <property>
     <name>yarn.scheduler.minimum-allocation-mb</name>
-    <value>128</value>
+    <value>2048</value>
     <description>Minimum limit of memory to allocate to each container request at the Resource Manager.</description>
   </property>
   <property>
     <name>yarn.scheduler.maximum-allocation-mb</name>
-    <value>4096</value>
+    <value>6144</value>
     <description>Maximum limit of memory to allocate to each container request at the Resource Manager.</description>
   </property>
   <property>
@@ -40,12 +40,12 @@
   </property>
   <property>
     <name>yarn.nodemanager.resource.memory-mb</name>
-    <value>4096</value>
+    <value>16384</value>
     <description>Physical memory, in MB, to be made available to running containers</description>
   </property>
   <property>
     <name>yarn.nodemanager.resource.cpu-vcores</name>
-    <value>4</value>
+    <value>16</value>
     <description>Number of CPU cores that can be allocated for containers.</description>
   </property>
   <property>

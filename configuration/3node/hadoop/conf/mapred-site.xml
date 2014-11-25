@@ -11,7 +11,7 @@
   </property>
   <property>
     <name>yarn.app.mapreduce.am.command-opts</name>
-    <value>-Xmx768m</value>
+    <value>-Xmx3072m</value>
   </property>
   <property>
     <name>mapreduce.framework.name</name>
@@ -30,12 +30,12 @@
   </property>
   <property>
     <name>mapreduce.map.memory.mb</name>
-    <value>4096</value>
+    <value>2048</value>
     <description>Larger resource limit for maps.</description>
   </property>
   <property>
     <name>mapreduce.map.java.opts</name>
-    <value>-Xmx768m</value>
+    <value>-Xmx1638m</value>
     <description>Heap-size for child jvms of maps.</description>
   </property>
   <property>
@@ -45,7 +45,7 @@
   </property>
   <property>
     <name>mapreduce.reduce.java.opts</name>
-    <value>-Xmx768m</value>
+    <value>-Xmx3276m</value>
     <description>Heap-size for child jvms of reduces.</description>
   </property>
   <property>
