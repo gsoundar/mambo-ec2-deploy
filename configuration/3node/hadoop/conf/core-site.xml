@@ -32,7 +32,7 @@
  <!-- NFS --> 
  <property>
    <name>fs.nfs.impl</name>
-   <value>org.apache.hadoop.fs.nfs.NFSFileSystem</value>
+   <value>org.apache.hadoop.fs.nfs.NFSv3FileSystem</value>
  </property>
  <property>
    <name>fs.AbstractFileSystem.nfs.impl</name>
