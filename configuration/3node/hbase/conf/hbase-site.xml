@@ -39,10 +39,6 @@
   </property>
   <!--nfs start-->
   <property>
-    <name>fs.defaultFS</name>
-    <value>nfs://10.0.0.61:2049</value>
-  </property>
-  <property>
     <name>fs.nfs.mountdir</name>
     <value>/mnt/data</value>
   </property>
