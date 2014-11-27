@@ -43,7 +43,7 @@ chmod 400 /home/ec2-user/.ssh/config
 mkdir ${LOCAL_DIR}/namenode
 mkdir ${LOCAL_DIR}/datanode
 mkdir ${LOCAL_DIR}/hadoop-temp
-mkdir ${LOCAL_DIR}/mamboroot
+mkdir /mnt/mamboroot
 mkdir ${LOCAL_DIR}/zookeeper
 
 chown ec2-user:ec2-user ${LOCAL_DIR}/namenode
