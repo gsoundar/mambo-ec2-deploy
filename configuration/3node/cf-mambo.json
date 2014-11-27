@@ -221,7 +221,7 @@
       		"Properties": {
         	    "DisableApiTermination": "FALSE",
         	    "ImageId": "ami-b5a7ea85",
-        	    "InstanceType": "i2.4xlarge",
+        	    "InstanceType": "i2.8xlarge",
         	    "KeyName": {"Ref" : "SSHKeyName"},
         	    "Tenancy": "default",
         	    "Monitoring": "false",
@@ -250,22 +250,42 @@
         	    "BlockDeviceMappings": [
         		{
         		    "DeviceName": "/dev/xvdb",
-        		    "VirtualName": "ephemeral1" 
+        		    "VirtualName": "ephemeral0" 
         		},
 			{
         		    "DeviceName": "/dev/xvdc",
-        		    "VirtualName": "ephemeral2" 
+        		    "VirtualName": "ephemeral1" 
         		},
 			{
         		    "DeviceName": "/dev/xvdd",
+        		    "VirtualName": "ephemeral2" 
+        		},
+			{
+        		    "DeviceName": "/dev/xvde",
         		    "VirtualName": "ephemeral3" 
+        		},
+			{
+        		    "DeviceName": "/dev/xvdf",
+        		    "VirtualName": "ephemeral4" 
+        		},
+			{
+        		    "DeviceName": "/dev/xvdg",
+        		    "VirtualName": "ephemeral5" 
+        		},
+			{
+        		    "DeviceName": "/dev/xvdh",
+        		    "VirtualName": "ephemeral6" 
+        		},
+			{
+        		    "DeviceName": "/dev/xvdi",
+        		    "VirtualName": "ephemeral7" 
         		}
 			
         	    ],
         	    "UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
             		"#!/bin/bash -ex","\n",
             		"yum -y install emacs rpcbind nfs-utils","\n",
-			"mdadm --create /dev/md0 --level=0 /dev/xvdb /dev/xvdc /dev/xvdd",
+			"mdadm --create /dev/md0 --level=stripe --raid-devices=8 /dev/xvd[b-i]", "\n",
             		"mkfs.ext4 /dev/md0","\n",
             		"mkdir /mnt/data","\n",
             		"mount /dev/md0 /mnt/data","\n",
@@ -302,60 +322,74 @@
       		}
     	},
     	"MamboHadoopSlave2": {
-      		"Type": "AWS::EC2::Instance",
-      		"Properties": {
-        		"DisableApiTermination": "FALSE",
-        		"ImageId": "ami-b5a7ea85",
-        		"InstanceType": "c3.8xlarge",
-        		"KeyName": {"Ref" : "SSHKeyName"},
-        		"Tenancy": "default",
-        		"Monitoring": "false",
-        		"NetworkInterfaces": [
-          			{
-            			"DeleteOnTermination": "true",
-            			"Description": "Primary network interface",
-            			"DeviceIndex": 0,
-           	 			"SubnetId": {
-              				"Ref": "MamboSubnet"
-            			},
-            			"PrivateIpAddresses": [
-              			{
-                			"PrivateIpAddress": "10.0.0.12",
-                			"Primary": "true"
-              			}
-            			],
-            			"GroupSet": [
-              			{
-                			"Ref": "MamboSecurityGroup"
-              			}
-            			],
-            			"AssociatePublicIpAddress": "true"
-          			}
-        		],
-        		"UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
-            			"#!/bin/bash -ex","\n",
-						"yum -y install emacs git nfs-utils\n",
-						"yum -y install java-1.7.0-openjdk-devel\n",
-						"service rpcbind start\n",
-						"mkdir /opt/mambo\n",
-						"cd /opt/mambo\n",
-						"git clone https://github.com/gsoundar/mambo-ec2-deploy.git\n",
-						"cd mambo-ec2-deploy\n",
-						"sh ./setup.sh\n",
-            			"curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
-                                                           "\"Reason\" : \"The Hadoop slave2 is ready\",",
-                                                           "\"UniqueId\" : \"hadoop-slave2\",",
-                                                           "\"Data\" : \"Done\"}' ",
-                  "\"", {"Ref" : "WaitForHadoopSlave2WaitHandle"},"\"\n" ]]}
-                },
-        		"Tags": [
-          			{
-           			"Key": "Name",
+      	    "Type": "AWS::EC2::Instance",
+      	    "Properties": {
+        	"DisableApiTermination": "FALSE",
+        	"ImageId": "ami-b5a7ea85",
+        	"InstanceType": "c3.8xlarge",
+        	"KeyName": {"Ref" : "SSHKeyName"},
+        	"Tenancy": "default",
+        	"Monitoring": "false",
+        	"NetworkInterfaces": [
+          	    {
+            		"DeleteOnTermination": "true",
+            		"Description": "Primary network interface",
+            		"DeviceIndex": 0,
+           	 	"SubnetId": {
+              		    "Ref": "MamboSubnet"
+            		},
+            		"PrivateIpAddresses": [
+              		    {
+                		"PrivateIpAddress": "10.0.0.12",
+                		"Primary": "true"
+              		    }
+            		],
+            		"GroupSet": [
+              		    {
+                		"Ref": "MamboSecurityGroup"
+              		    }
+            		],
+            		"AssociatePublicIpAddress": "true"
+          	    }
+        	],
+		"BlockDeviceMappings": [
+        	    {
+        		"DeviceName": "/dev/xvdb",
+        		"VirtualName": "ephemeral0" 
+        	    },
+		    {
+        		"DeviceName": "/dev/xvdc",
+        		"VirtualName": "ephemeral1" 
+        	    },
+		],
+        	"UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
+            	    "#!/bin/bash -ex","\n",
+		    "yum -y install emacs git nfs-utils\n",
+		    "yum -y install java-1.7.0-openjdk-devel\n",
+		    "mdadm --create /dev/md0 --level=stripe --raid-devices=2 /dev/xvd[b-c]", "\n",
+            	    "mkfs.ext4 /dev/md0","\n",
+            	    "mkdir /mnt/local","\n",
+            	    "mount /dev/md0 /mnt/local","\n",
+		    "service rpcbind start\n",
+		    "mkdir /opt/mambo\n",
+		    "cd /opt/mambo\n",
+		    "git clone https://github.com/gsoundar/mambo-ec2-deploy.git\n",
+		    "cd mambo-ec2-deploy\n",
+		    "sh ./setup.sh\n",
+            	    "curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
+                    "\"Reason\" : \"The Hadoop slave2 is ready\",",
+                    "\"UniqueId\" : \"hadoop-slave2\",",
+                    "\"Data\" : \"Done\"}' ",
+                    "\"", {"Ref" : "WaitForHadoopSlave2WaitHandle"},"\"\n" ]]}
+			     },
+        	"Tags": [
+          	    {
+           		"Key": "Name",
             		"Value": "MamboHadoopSlave2"
-          		}
-        		]
-      		},
-			"DependsOn":"WaitForNFSInstance"
+          	    }
+        	]
+      	    },
+	    "DependsOn":"WaitForNFSInstance"
     	},
     	"WaitForHadoopSlave2WaitHandle" : {
       		"Type" : "AWS::CloudFormation::WaitConditionHandle",
@@ -371,75 +405,89 @@
       		}
     	},
     	"MamboHadoopSlave1": {
-      		"Type": "AWS::EC2::Instance",
-      		"Properties": {
-        		"DisableApiTermination": "FALSE",
-        		"ImageId": "ami-b5a7ea85",
-        		"InstanceType": "c3.8xlarge",
-        		"KeyName": {"Ref" : "SSHKeyName"},
-        		"Tenancy": "default",
-        		"Monitoring": "false",
-        		"NetworkInterfaces": [
-          			{
-            			"DeleteOnTermination": "true",
-            			"Description": "Primary network interface",
-            			"DeviceIndex": 0,
-           	 			"SubnetId": {
-              				"Ref": "MamboSubnet"
-            			},
-            			"PrivateIpAddresses": [
-              			{
-                			"PrivateIpAddress": "10.0.0.11",
-                			"Primary": "true"
-              			}
-            			],
-            			"GroupSet": [
-              			{
-                			"Ref": "MamboSecurityGroup"
-              			}
-            			],
-            			"AssociatePublicIpAddress": "true"
-          			}
-        		],
-        		"UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
-            			"#!/bin/bash -ex","\n",
-						"yum -y install git nfs-utils\n",
-						"yum -y install java-1.7.0-openjdk-devel\n",
-						"service rpcbind start\n",
-						"mkdir /opt/mambo\n",
-						"cd /opt/mambo\n",
-						"git clone https://github.com/gsoundar/mambo-ec2-deploy.git\n",
-						"yum -y install java-1.7.0-openjdk-devel.x86_64\n",
-						"cd mambo-ec2-deploy\n",
-						"sh ./setup.sh\n",
-            			"curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
-                                                           "\"Reason\" : \"The Hadoop slave1 is ready\",",
-                                                           "\"UniqueId\" : \"hadoop-slave1\",",
-                                                           "\"Data\" : \"Done\"}' ",
-                  "\"", {"Ref" : "WaitForHadoopSlave1WaitHandle"},"\"\n" ]]}
-                },
-        		"Tags": [
-          			{
-           			"Key": "Name",
+      	    "Type": "AWS::EC2::Instance",
+      	    "Properties": {
+        	"DisableApiTermination": "FALSE",
+        	"ImageId": "ami-b5a7ea85",
+        	"InstanceType": "c3.8xlarge",
+        	"KeyName": {"Ref" : "SSHKeyName"},
+        	"Tenancy": "default",
+        	"Monitoring": "false",
+        	"NetworkInterfaces": [
+          	    {
+            		"DeleteOnTermination": "true",
+            		"Description": "Primary network interface",
+            		"DeviceIndex": 0,
+           	 	"SubnetId": {
+              		    "Ref": "MamboSubnet"
+            		},
+            		"PrivateIpAddresses": [
+              		    {
+                		"PrivateIpAddress": "10.0.0.11",
+                		"Primary": "true"
+              		    }
+            		],
+            		"GroupSet": [
+              		    {
+                		"Ref": "MamboSecurityGroup"
+              		    }
+            		],
+            		"AssociatePublicIpAddress": "true"
+          	    }
+        	],
+		"BlockDeviceMappings": [
+        	    {
+        		"DeviceName": "/dev/xvdb",
+        		"VirtualName": "ephemeral0" 
+        	    },
+		    {
+        		"DeviceName": "/dev/xvdc",
+        		"VirtualName": "ephemeral1" 
+        	    },
+		]
+        	"UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
+            	    "#!/bin/bash -ex","\n",
+		    "yum -y install emacs git nfs-utils\n",
+		    "yum -y install java-1.7.0-openjdk-devel\n",
+		    "mdadm --create /dev/md0 --level=stripe --raid-devices=2 /dev/xvd[b-c]", "\n",
+            	    "mkfs.ext4 /dev/md0","\n",
+            	    "mkdir /mnt/local","\n",
+            	    "mount /dev/md0 /mnt/local","\n",
+		    "service rpcbind start\n",
+		    "mkdir /opt/mambo\n",
+		    "cd /opt/mambo\n",
+		    "git clone https://github.com/gsoundar/mambo-ec2-deploy.git\n",
+		    "yum -y install java-1.7.0-openjdk-devel.x86_64\n",
+		    "cd mambo-ec2-deploy\n",
+		    "sh ./setup.sh\n",
+            	    "curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
+                    "\"Reason\" : \"The Hadoop slave1 is ready\",",
+                    "\"UniqueId\" : \"hadoop-slave1\",",
+                    "\"Data\" : \"Done\"}' ",
+                    "\"", {"Ref" : "WaitForHadoopSlave1WaitHandle"},"\"\n" ]]}
+			     },
+        	"Tags": [
+          	    {
+           		"Key": "Name",
             		"Value": "MamboHadoopSlave1"
-          		}
-        		]
-      		},
-			"DependsOn":"WaitForHadoopSlave2Instance"
+          	    }
+        	]
+      	    },
+	    "DependsOn":"WaitForHadoopSlave2Instance"
     	},
-    	"WaitForHadoopSlave1WaitHandle" : {
+    	    "WaitForHadoopSlave1WaitHandle" : {
       		"Type" : "AWS::CloudFormation::WaitConditionHandle",
       		"Properties" : {
-      			}
-    	},
-    	"WaitForHadoopSlave1Instance" : {
+      		}
+    	    },
+    	    "WaitForHadoopSlave1Instance" : {
       		"Type" : "AWS::CloudFormation::WaitCondition",
       		"DependsOn" : "MamboHadoopSlave1",
       		"Properties" : {
-        		"Handle" : {"Ref" : "WaitForHadoopSlave1WaitHandle"},
-        		"Timeout" : "600"
+        	    "Handle" : {"Ref" : "WaitForHadoopSlave1WaitHandle"},
+        	    "Timeout" : "600"
       		}
-    	},
+    	    },
     	    "MamboHadoopMaster": {
       		"Type": "AWS::EC2::Instance",
       		"Properties": {
@@ -471,10 +519,24 @@
             		    "AssociatePublicIpAddress": "true"
           		}
         	    ],
+		    "BlockDeviceMappings": [
+        		{
+        		    "DeviceName": "/dev/xvdb",
+        		    "VirtualName": "ephemeral0" 
+        		},
+			{
+        		    "DeviceName": "/dev/xvdc",
+        		    "VirtualName": "ephemeral1" 
+        		},
+		    ]
         	    "UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
             		"#!/bin/bash -ex","\n",
-			"yum -y install git nfs-utils\n",
+			"yum -y install emacs git nfs-utils\n",
 			"yum -y install java-1.7.0-openjdk-devel\n",
+			"mdadm --create /dev/md0 --level=stripe --raid-devices=2 /dev/xvd[b-c]", "\n",
+            		"mkfs.ext4 /dev/md0","\n",
+            		"mkdir /mnt/local","\n",
+            		"mount /dev/md0 /mnt/local","\n",
 			"service rpcbind start\n",
 			"mkdir /opt/mambo\n",
 			"cd /opt/mambo\n",

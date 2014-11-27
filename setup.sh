@@ -3,6 +3,7 @@
 HADOOP_PACKAGE=hadoop-2.4.1
 HBASE_PACKAGE=hbase-0.98.7-hadoop2
 HADOOP_NFS_CONN=hadoop-nfsv3-connector
+LOCAL_DIR=/mnt/local
 CONF_NAME="3node"
 
 # Setup the Hadoop packages
@@ -39,16 +40,16 @@ chown ec2-user:ec2-user /home/ec2-user/.ssh/config
 chmod 400 /home/ec2-user/.ssh/config
 
 # set directories and change permissions
-mkdir /mnt/namenode
-mkdir /mnt/datanode
-mkdir /mnt/hadoop-temp
-mkdir /mnt/mamboroot
-mkdir /mnt/zookeeper
+mkdir ${LOCAL_DIR}/namenode
+mkdir ${LOCAL_DIR}/datanode
+mkdir ${LOCAL_DIR}/hadoop-temp
+mkdir ${LOCAL_DIR}/mamboroot
+mkdir ${LOCAL_DIR}/zookeeper
 
-chown ec2-user:ec2-user /mnt/namenode
-chown ec2-user:ec2-user /mnt/datanode
-chown ec2-user:ec2-user /mnt/hadoop-temp
-chown ec2-user:ec2-user /mnt/zookeeper
+chown ec2-user:ec2-user ${LOCAL_DIR}/namenode
+chown ec2-user:ec2-user ${LOCAL_DIR}/datanode
+chown ec2-user:ec2-user ${LOCAL_DIR}/hadoop-temp
+chown ec2-user:ec2-user ${LOCAL_DIR}/zookeeper
 chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/hadoop/
 chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/hbase/
 
