@@ -360,7 +360,7 @@
 		    {
         		"DeviceName": "/dev/xvdc",
         		"VirtualName": "ephemeral1" 
-        	    },
+        	    }
 		],
         	"UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
             	    "#!/bin/bash -ex","\n",
@@ -443,8 +443,8 @@
 		    {
         		"DeviceName": "/dev/xvdc",
         		"VirtualName": "ephemeral1" 
-        	    },
-		]
+        	    }
+		],
         	"UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
             	    "#!/bin/bash -ex","\n",
 		    "yum -y install emacs git nfs-utils\n",
@@ -527,8 +527,8 @@
 			{
         		    "DeviceName": "/dev/xvdc",
         		    "VirtualName": "ephemeral1" 
-        		},
-		    ]
+        		}
+		    ],
         	    "UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
             		"#!/bin/bash -ex","\n",
 			"yum -y install emacs git nfs-utils\n",
