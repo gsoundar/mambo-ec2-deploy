@@ -39,10 +39,6 @@
   </property>
   <!--nfs start-->
   <property>
-    <name>fs.defaultFS</name>
-    <value>nfs://10.0.0.61:2049</value>
-  </property>
-  <property>
     <name>fs.nfs.mountdir</name>
     <value>/mnt/data</value>
   </property>
@@ -51,7 +47,7 @@
   <!-- NFS -->
   <property>
     <name>fs.nfs.impl</name>
-    <value>org.apache.hadoop.fs.nfs.NFSFileSystem</value>
+    <value>org.apache.hadoop.fs.nfs.NFSv3FileSystem</value>
   </property>
   <property>
     <name>fs.AbstractFileSystem.nfs.impl</name>

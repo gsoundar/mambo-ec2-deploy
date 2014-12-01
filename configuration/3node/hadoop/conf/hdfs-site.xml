@@ -15,11 +15,11 @@
  </property>
 <property>
   <name>dfs.namenode.name.dir</name>
-  <value>file:/mnt/namenode</value>
+  <value>file:/mnt/local/namenode</value>
 </property>
 <property>
   <name>dfs.datanode.data.dir</name>
-  <value>file:/mnt/datanode</value>
+  <value>file:/mnt/local/datanode</value>
 </property>
 <!--
 <property>

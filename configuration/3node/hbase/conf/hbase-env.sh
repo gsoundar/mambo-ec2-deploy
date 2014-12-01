@@ -32,13 +32,13 @@ export JAVA_HOME=/usr/lib/jvm/java-1.7.0
 # export HBASE_CLASSPATH=
 
 # The maximum amount of heap to use, in MB. Default is 1000.
-# export HBASE_HEAPSIZE=1000
+export HBASE_HEAPSIZE=4096
 
 # Extra Java runtime options.
 # Below are what we set by default.  May only work with SUN JVM.
 # For more on why as well as other possible settings,
 # see http://wiki.apache.org/hadoop/PerformanceTuning
-export HBASE_OPTS="-XX:+UseConcMarkSweepGC"
+export HBASE_OPTS="-XX:+UseConcMarkSweepGC -ea"
 
 # Uncomment one of the below three options to enable java garbage collection logging for the server-side processes.
 
