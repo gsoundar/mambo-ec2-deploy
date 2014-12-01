@@ -3,12 +3,14 @@
 HADOOP_PACKAGE=hadoop-2.4.1
 HBASE_PACKAGE=hbase-0.98.7-hadoop2
 HADOOP_NFS_CONN=hadoop-nfsv3-connector
+TACHYON_PACKAGE=tachyon-0.5.0
 LOCAL_DIR=/mnt/local
 CONF_NAME="3node"
 
 # Setup the Hadoop packages
 cp -rf packages/${HADOOP_PACKAGE} hadoop
 cp -rf packages/${HBASE_PACKAGE} hbase
+cp -rf packages/${TACHYON_PACKAGE} tachyon
 cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar hadoop/share/hadoop/common/lib/
 cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar hbase/lib/
 cp -rf hadoop/share/hadoop/common/hadoop-nfs-2.4.1.jar hbase/lib/
@@ -29,6 +31,7 @@ mkdir /opt/mambo/mambo-ec2-deploy/hadoop/conf
 cp configuration/${CONF_NAME}/hadoop/conf/* /opt/mambo/mambo-ec2-deploy/hadoop/conf
 mkdir /opt/mambo/mambo-ec2-deploy/hbase/conf
 cp configuration/${CONF_NAME}/hbase/conf/* /opt/mambo/mambo-ec2-deploy/hbase/conf
+cp configuration/${CONF_NAME}/tachyon/conf/* /opt/mambo/mambo-ec2-deploy/tachyon/conf
 
 # Setup keys
 cp configuration/${CONF_NAME}/keys/id_rsa_mambo /home/ec2-user/.ssh/
