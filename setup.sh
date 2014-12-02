@@ -13,6 +13,7 @@ cp -rf packages/${HBASE_PACKAGE} hbase
 cp -rf packages/${TACHYON_PACKAGE} tachyon
 cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar hadoop/share/hadoop/common/lib/
 cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar hbase/lib/
+mkdir tachyon/lib
 cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar tachyon/lib/
 cp -rf packages/${TACHYON_PACKAGE}/client/target/tachyon-client-0.5.0-jar-with-dependencies.jar hadoop/share/hadoop/common/lib/
 
@@ -61,6 +62,7 @@ chown ec2-user:ec2-user ${LOCAL_DIR}/hadoop-temp
 chown ec2-user:ec2-user ${LOCAL_DIR}/zookeeper
 chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/hadoop/
 chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/hbase/
+chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/tachyon/
 
 mount -t nfs 10.0.0.61:/mnt/data /mnt/mamboroot
 

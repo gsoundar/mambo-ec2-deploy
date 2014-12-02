@@ -32,7 +32,7 @@ export JAVA="$JAVA_HOME/bin/java"
 export TACHYON_MASTER_ADDRESS=10.0.0.10
 
 export TACHYON_UNDERFS_ADDRESS=nfs://10.0.0.61:2049
-export TACHYON_UNDERFS_NFS_MOUNT_DIR=/mnt/data
+export TACHYON_UNDERFS_NFS_MOUNT_DIR=/mnt/mamboroot
 export TACHYON_WORKER_MEMORY_SIZE=36GB
 export TACHYON_UNDERFS_NFS_IMPL=org.apache.hadoop.fs.nfs.NFSFileSystem
 export TACHYON_ABSFS_NFS_IMPL=org.apache.hadoop.fs.nfs.NFSv3AbstractFilesystem
