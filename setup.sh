@@ -20,7 +20,7 @@ cp -rf packages/${TACHYON_PACKAGE}/client/target/tachyon-client-0.5.0-jar-with-d
 cp -rf hadoop/share/hadoop/common/hadoop-nfs-2.4.1.jar hbase/lib/
 
 cp -rf hadoop/share/hadoop/common/hadoop-nfs-2.4.1.jar tachyon/lib/
-cp -rf hadoop/share/hadoop/common/netty-3.6.2.Final.jar tachyon/lib/
+cp -rf hadoop/share/hadoop/common/lib/netty-3.6.2.Final.jar tachyon/lib/
 
 # Configure the OS
 # Increase the file and process limits
