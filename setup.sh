@@ -2,24 +2,32 @@
 
 HADOOP_PACKAGE=hadoop-2.4.1
 HBASE_PACKAGE=hbase-0.98.7-hadoop2
+SPARK_PACKAGE=spark-1.1.1-bin-hadoop2.4
 HADOOP_NFS_CONN=hadoop-nfsv3-connector
 TACHYON_PACKAGE=tachyon-0.5.0
 LOCAL_DIR=/mnt/local
 CONF_NAME="3node"
 
+# Download packages
+# Spark is too big to store on Github directly
+curl http://d3kbcqa49mib13.cloudfront.net/spark-1.1.1-bin-hadoop2.4.tgz > /opt/mambo/mambo-ec2-deploy/packages/${SPARK_PACKAGE}.tgz
+tar -C /opt/mambo/mambo-ec2-deploy/packages/ -xzf /opt/mambo/mambo-ec2-deploy/packages/${SPARK_PACKAGE}.tgz 
+
 # Setup the Hadoop packages
 cp -rf packages/${HADOOP_PACKAGE} hadoop
 cp -rf packages/${HBASE_PACKAGE} hbase
 cp -rf packages/${TACHYON_PACKAGE} tachyon
+cp -rf packages/${SPARK_PACKAGE} spark
+
 cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar hadoop/share/hadoop/common/lib/
 cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar hbase/lib/
 mkdir tachyon/lib
 cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar tachyon/lib/
+cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar spark/lib/
 cp -rf packages/${TACHYON_PACKAGE}/client/target/tachyon-client-0.5.0-jar-with-dependencies.jar hadoop/share/hadoop/common/lib/
-
 cp -rf hadoop/share/hadoop/common/hadoop-nfs-2.4.1.jar hbase/lib/
-
 cp -rf hadoop/share/hadoop/common/hadoop-nfs-2.4.1.jar tachyon/lib/
+cp -rf hadoop/share/hadoop/common/hadoop-nfs-2.4.1.jar spark/lib/
 cp -rf hadoop/share/hadoop/common/lib/netty-3.6.2.Final.jar tachyon/lib/
 
 # Configure the OS
@@ -39,6 +47,7 @@ cp configuration/${CONF_NAME}/hadoop/conf/* /opt/mambo/mambo-ec2-deploy/hadoop/c
 mkdir /opt/mambo/mambo-ec2-deploy/hbase/conf
 cp configuration/${CONF_NAME}/hbase/conf/* /opt/mambo/mambo-ec2-deploy/hbase/conf
 cp configuration/${CONF_NAME}/tachyon/conf/* /opt/mambo/mambo-ec2-deploy/tachyon/conf
+cp configuration/${CONF_NAME}/spark/conf/* /opt/mambo/mambo-ec2-deploy/spark/conf
 
 # Setup keys
 cp configuration/${CONF_NAME}/keys/id_rsa_mambo /home/ec2-user/.ssh/
@@ -50,19 +59,24 @@ chown ec2-user:ec2-user /home/ec2-user/.ssh/config
 chmod 400 /home/ec2-user/.ssh/config
 
 # set directories and change permissions
+mkdir /mnt/mamboroot
 mkdir ${LOCAL_DIR}/namenode
 mkdir ${LOCAL_DIR}/datanode
 mkdir ${LOCAL_DIR}/hadoop-temp
-mkdir /mnt/mamboroot
 mkdir ${LOCAL_DIR}/zookeeper
+mkdir ${LOCAL_DIR}/spark
+mkdir ${LOCAL_DIR}/spark-worker
 
 chown ec2-user:ec2-user ${LOCAL_DIR}/namenode
 chown ec2-user:ec2-user ${LOCAL_DIR}/datanode
 chown ec2-user:ec2-user ${LOCAL_DIR}/hadoop-temp
 chown ec2-user:ec2-user ${LOCAL_DIR}/zookeeper
+chown ec2-user:ec2-user ${LOCAL_DIR}/spark
+chown ec2-user:ec2-user ${LOCAL_DIR}/spark-worker
 chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/hadoop/
 chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/hbase/
 chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/tachyon/
+chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/spark/
 
 mount -t nfs 10.0.0.61:/mnt/data /mnt/mamboroot
 
