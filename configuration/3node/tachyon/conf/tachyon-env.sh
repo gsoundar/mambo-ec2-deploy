@@ -34,11 +34,11 @@ export TACHYON_MASTER_ADDRESS=10.0.0.10
 export TACHYON_UNDERFS_ADDRESS=nfs://10.0.0.61:2049
 export TACHYON_UNDERFS_NFS_MOUNT_DIR=/mnt/data
 export TACHYON_WORKER_MEMORY_SIZE=36GB
-export TACHYON_UNDERFS_NFS_IMPL=org.apache.hadoop.fs.nfs.NFSFileSystem
+export TACHYON_UNDERFS_NFS_IMPL=org.apache.hadoop.fs.nfs.NFSv3FileSystem
 export TACHYON_ABSFS_NFS_IMPL=org.apache.hadoop.fs.nfs.NFSv3AbstractFilesystem
 export TACHYON_NFS_AUTH_FLAVOR=AUTH_SYS
-export TACHYON_NFS_USERNAME=jingxin
-export TACHYON_NFS_GROUPNAME=jingxin
+export TACHYON_NFS_USERNAME=ec2-user
+export TACHYON_NFS_GROUPNAME=ec2-user
 export TACHYON_NFS_PREFETCH=true
 
 CONF_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
