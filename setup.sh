@@ -13,7 +13,13 @@ cp -rf packages/${HBASE_PACKAGE} hbase
 cp -rf packages/${TACHYON_PACKAGE} tachyon
 cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar hadoop/share/hadoop/common/lib/
 cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar hbase/lib/
+cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar tachyon/lib/
+cp -rf packages/${TACHYON_PACKAGE}/client/target/tachyon-client-0.5.0-jar-with-dependencies.jar hadoop/share/hadoop/common/lib/
+
 cp -rf hadoop/share/hadoop/common/hadoop-nfs-2.4.1.jar hbase/lib/
+
+cp -rf hadoop/share/hadoop/common/hadoop-nfs-2.4.1.jar tachyon/lib/
+cp -rf hadoop/share/hadoop/common/netty-3.6.2.Final.jar tachyon/lib/
 
 # Configure the OS
 # Increase the file and process limits

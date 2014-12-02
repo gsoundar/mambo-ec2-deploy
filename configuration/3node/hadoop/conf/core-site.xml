@@ -6,12 +6,15 @@
    <value>/mnt/local/hadoop-temp/</value>
    <description>A base for other temporary directories.</description>
  </property>
-<!--tachyon
+<!--tachyon-->
  <property>
    <name>fs.tachyon.impl</name>
    <value>tachyon.hadoop.TFS</value>
  </property>
--->
+ <property>
+  <name>tachyon.home</name>
+  <value>/mnt/ramdisk</value>
+ </property>
 <!--nfs start-->
  <property>
    <name>fs.defaultFS</name>
