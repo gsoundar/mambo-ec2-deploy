@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+ <property>
+   <name>hadoop.tmp.dir</name>
+   <value>/mnt/local/hadoop-temp/</value>
+   <description>A base for other temporary directories.</description>
+ </property>
+ <property>
+   <name>fs.tachyon.impl</name>
+   <value>tachyon.hadoop.TFS</value>
+ </property>
+ <!--
+ <property>
+   <name>fs.defaultFS</name>
+   <value>nfs://atg-f-flamingo-d1.gdl.englab.netapp.com:2049</value> 
+ </property>
+ <property>
+   <name>fs.nfs.mountdir</name>
+   <value>/mambodata</value>
+ </property>
+ !-->
+
+ <property>
+   <name>fs.defaultFS</name>
+   <value>hdfs://10.0.0.10:54310</value> 
+ </property>
+
+ <!-- Authentication flavor to use. For flamingo, use AUTH_NONE. For pepe, use AUTH_SYS. -->
+ <!-- NFS
+ <property>
+   <name>fs.nfs.impl</name>
+   <value>org.apache.hadoop.fs.nfs.NFSFileSystem</value>
+ </property>
+ <property>
+   <name>fs.AbstractFileSystem.nfs.impl</name>
+   <value>org.apache.hadoop.fs.nfs.NFSv3AbstractFilesystem</value>
+ </property>
+ <property>
+   <name>fs.nfs.auth.flavor</name>
+   <value>AUTH_NONE</value>
+ </property>
+ <property>
+   <name>fs.nfs.username</name>
+   <value>jingxin</value>
+ </property>
+ <property>
+   <name>fs.nfs.groupname</name>
+   <value>jingxin</value>
+ </property>
+ <property>
+   <name>fs.nfs.prefetch</name>
+   <value>true</value>
+ </property>
+-->
+</configuration>
