@@ -78,7 +78,9 @@ chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/hbase/
 chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/tachyon/
 chown -R ec2-user:ec2-user /opt/mambo/mambo-ec2-deploy/spark/
 
+# start the file systems
 mount -t nfs 10.0.0.61:/mnt/data /mnt/mamboroot
+/opt/mambo/mambo-ec2-deploy/hadoop/bin/hdfs --config  /opt/mambo/mambo-ec2-deploy/hadoop/conf/ namenode -format mambo
 
 #env
 echo "export JAVA_HOME=/usr/lib/jvm/java-1.7.0/" >> /etc/profile
