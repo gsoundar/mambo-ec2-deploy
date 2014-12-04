@@ -3,7 +3,7 @@
 <configuration>
   <property>
     <name>yarn.scheduler.capacity.maximum-am-resource-percent</name>
-    <value>0.1</value>
+    <value>50</value>
   </property>
   <property>
     <name>yarn.scheduler.capacity.root.queues</name>

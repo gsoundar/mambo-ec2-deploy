@@ -285,6 +285,10 @@
         	    "UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
             		"#!/bin/bash -ex","\n",
             		"yum -y install emacs rpcbind nfs-utils","\n",
+			"echo \"* hard nofile 65535\" >> /etc/security/limits.conf","\n",
+			"echo \"* soft nofile 65535\" >> /etc/security/limits.conf","\n",
+			"echo \"* hard nproc 65535\" >> /etc/security/limits.conf","\n",
+			"echo \"* soft nproc 65535\" >> /etc/security/limits.conf","\n",
 			"mdadm --create /dev/md0 --level=stripe --raid-devices=8 /dev/xvd[b-i]", "\n",
             		"mkfs.ext4 /dev/md0","\n",
             		"mkdir /mnt/data","\n",
