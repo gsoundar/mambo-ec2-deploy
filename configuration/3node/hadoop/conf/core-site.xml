@@ -16,21 +16,21 @@
   <value>/mnt/ramdisk</value>
  </property>
  <!--nfs start-->
- <!--
  <property>
    <name>fs.defaultFS</name>
    <value>nfs://10.0.0.61:2049</value> 
    </property>
- -->
  <property>
    <name>fs.nfs.mountdir</name>
    <value>/mnt/data</value>
  </property>
  <!--nfs end-->
+ <!--
  <property>
    <name>fs.defaultFS</name>
    <value>hdfs://10.0.0.10:54310</value> 
  </property>
+ -->
  <!-- Authentication flavor to use. For flamingo, use AUTH_NONE. For pepe, use AUTH_SYS. -->
  <!-- NFS --> 
  <property>
