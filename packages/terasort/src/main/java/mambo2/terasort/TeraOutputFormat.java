@@ -43,7 +43,6 @@ import java.util.Random;
 public class TeraOutputFormat extends FileOutputFormat<Text,Text> {
   static final String FINAL_SYNC_ATTRIBUTE = "mapreduce.terasort.final.sync";
   
-  static final String OUTPUT_CONFIG_FILE = "/root/outputdir.xml";
   static final String OUTPUT_DIRS = "teragen.output.dir";
   
   private OutputCommitter committer = null;
@@ -106,6 +105,7 @@ public class TeraOutputFormat extends FileOutputFormat<Text,Text> {
   }
 
   public static Path getOutputPath(JobContext job, Integer taskid) {
+      
 	  String name = job.getConfiguration().get(FileOutputFormat.OUTDIR);
 	  /*File outputConfigFile = new File(OUTPUT_CONFIG_FILE);
 	  if (outputConfigFile.exists() && taskid != null) {
@@ -119,10 +119,14 @@ public class TeraOutputFormat extends FileOutputFormat<Text,Text> {
 	      }
 	      name = outputdirs[taskid % outputdirs.length];
 	  }*/
-	  String pathStrings = "/nfsdrivervolume/tera1;/nfsdrivervolume02/tera2";
-	  outputdirs = pathStrings.split(";");
-	  if (taskid != null)
+	  
+	  if (taskid != null) {
+	      if(outputdirs == null) {
+	          outputdirs = job.getConfiguration().get(TeraOutputFormat.OUTPUT_DIRS).split(";");
+	      }
 	      name = outputdirs[taskid % outputdirs.length];
+	  }
+	      
 	  return name == null ? null:new Path(name);
   }
 

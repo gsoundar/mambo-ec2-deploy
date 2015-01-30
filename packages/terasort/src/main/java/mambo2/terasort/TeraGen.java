@@ -20,6 +20,7 @@ package mambo2.terasort;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -290,12 +291,23 @@ public class TeraGen extends Configured implements Tool {
       return 2;
     }
     setNumberOfRows(job, parseHumanLong(args[0]));
-    Path outputDir = new Path(args[1]);
-    if (outputDir.getFileSystem(getConf()).exists(outputDir)) {
-      throw new IOException("Output directory " + outputDir + 
-                            " already exists.");
+
+    File outputConfigFile = new File(args[1]);
+    if (!outputConfigFile.exists()) {
+      throw new IOException("Output directory config file " + outputConfigFile.getPath() + 
+                            " does not exists.");
     }
-    FileOutputFormat.setOutputPath(job, outputDir);
+    
+    Configuration outputconf = new Configuration();
+    Path outputConfigFilePath = new Path(outputConfigFile.getPath());
+    outputconf.addResource(outputConfigFilePath);
+    String pathStrings = outputconf.get(TeraOutputFormat.OUTPUT_DIRS);
+    job.getConfiguration().set(TeraOutputFormat.OUTPUT_DIRS, pathStrings);
+
+    FileOutputFormat.setOutputPath(job, new Path(pathStrings.split(";")[0]));
+    
+    
+    
     job.setJobName("TeraGen");
     job.setJarByClass(TeraGen.class);
     job.setMapperClass(SortGenMapper.class);
