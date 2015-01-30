@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-package org.apache.hadoop.examples.terasort;
+package mambo2.terasort;
 
+import java.io.File;
 import java.io.IOException;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -33,12 +35,19 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.security.TokenCache;
 
+import java.util.Random;
+
 /**
  * An output format that writes the key and value appended together.
  */
 public class TeraOutputFormat extends FileOutputFormat<Text,Text> {
   static final String FINAL_SYNC_ATTRIBUTE = "mapreduce.terasort.final.sync";
+  
+  static final String OUTPUT_CONFIG_FILE = "/root/outputdir.xml";
+  static final String OUTPUT_DIRS = "teragen.output.dir";
+  
   private OutputCommitter committer = null;
+  static String[] outputdirs = null;
 
   /**
    * Set the requirement for a final sync before the stream is closed.
@@ -82,7 +91,7 @@ public class TeraOutputFormat extends FileOutputFormat<Text,Text> {
   public void checkOutputSpecs(JobContext job
                               ) throws InvalidJobConfException, IOException {
     // Ensure that the output directory is set
-    Path outDir = getOutputPath(job);
+    Path outDir = getOutputPath(job, null);
     if (outDir == null) {
       throw new InvalidJobConfException("Output directory not set in JobConf.");
     }
@@ -91,22 +100,64 @@ public class TeraOutputFormat extends FileOutputFormat<Text,Text> {
     TokenCache.obtainTokensForNamenodes(job.getCredentials(),
         new Path[] { outDir }, job.getConfiguration());
   }
+  
+  public static String[] getAllOutputPaths() {
+      return outputdirs;
+  }
+
+  public static Path getOutputPath(JobContext job, Integer taskid) {
+	  String name = job.getConfiguration().get(FileOutputFormat.OUTDIR);
+	  /*File outputConfigFile = new File(OUTPUT_CONFIG_FILE);
+	  if (outputConfigFile.exists() && taskid != null) {
+	      if (outputdirs == null) {
+    	      Configuration outputconf = new Configuration();
+    	      Path outputConfigFilePath = new Path(outputConfigFile.getPath());
+    	      outputconf.addResource(outputConfigFilePath);
+    	      String pathStrings = outputconf.get(OUTPUT_DIRS);
+    	      outputdirs = pathStrings.split(";");
+
+	      }
+	      name = outputdirs[taskid % outputdirs.length];
+	  }*/
+	  String pathStrings = "/nfsdrivervolume/tera1;/nfsdrivervolume02/tera2";
+	  outputdirs = pathStrings.split(";");
+	  if (taskid != null)
+	      name = outputdirs[taskid % outputdirs.length];
+	  return name == null ? null:new Path(name);
+  }
 
   public RecordWriter<Text,Text> getRecordWriter(TaskAttemptContext job
                                                  ) throws IOException {
-    Path file = getDefaultWorkFile(job, "");
+	
+    Path file = getDefaultWorkFile(job,"");
     FileSystem fs = file.getFileSystem(job.getConfiguration());
-     FSDataOutputStream fileOut = fs.create(file);
+    FSDataOutputStream fileOut = fs.create(file);
     return new TeraRecordWriter(fileOut, job);
   }
   
-  public OutputCommitter getOutputCommitter(TaskAttemptContext context) 
+  /*public OutputCommitter getOutputCommitter(TaskAttemptContext context) 
       throws IOException {
     if (committer == null) {
-      Path output = getOutputPath(context);
+      int partition = context.getTaskAttemptID().getTaskID().getId();
+      Integer dir_num = partition % 10;
+      System.out.println("mambo multout: " + getOutputPath(context).toString() + "/" + dir_num.toString());
+      Path output = new Path(getOutputPath(context).toString() + "/" + dir_num.toString());
       committer = new FileOutputCommitter(output, context);
     }
+    FileOutputCommitter c = (FileOutputCommitter)committer;
+    System.out.println("mambo multout return committer: " + c.getWorkPath().toString());
     return committer;
-  }
+  }*/
+  
+  public OutputCommitter getOutputCommitter(TaskAttemptContext context) 
+          throws IOException {
+        if (committer == null) {
+          Path output = getOutputPath(context, context.getTaskAttemptID().getTaskID().getId());
+          System.out.println("mambo committer: " + output.toString());
+          committer = new MultipleFileOutputCommitter(output, context);
+        }
+        
+        return committer;
+      }
 
 }

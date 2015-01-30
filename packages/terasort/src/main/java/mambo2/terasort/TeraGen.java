@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.hadoop.examples.terasort;
+package mambo2.terasort;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -71,6 +71,7 @@ public class TeraGen extends Configured implements Tool {
   public static enum Counters {CHECKSUM}
 
   public static final String NUM_ROWS = "mapreduce.terasort.num-rows";
+  
   /**
    * An input format that assigns ranges of longs to each mapper.
    */
@@ -283,6 +284,7 @@ public class TeraGen extends Configured implements Tool {
   public int run(String[] args) 
       throws IOException, InterruptedException, ClassNotFoundException {
     Job job = Job.getInstance(getConf());
+    
     if (args.length != 2) {
       usage();
       return 2;
@@ -302,6 +304,7 @@ public class TeraGen extends Configured implements Tool {
     job.setOutputValueClass(Text.class);
     job.setInputFormatClass(RangeInputFormat.class);
     job.setOutputFormatClass(TeraOutputFormat.class);
+        
     return job.waitForCompletion(true) ? 0 : 1;
   }
 

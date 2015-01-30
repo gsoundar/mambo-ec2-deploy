@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.hadoop.examples.terasort;
+package mambo2.terasort;
 
 import java.io.IOException;
 import java.util.zip.Checksum;

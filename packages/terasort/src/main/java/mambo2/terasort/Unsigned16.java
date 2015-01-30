@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.hadoop.examples.terasort;
+package mambo2.terasort;
 
 import java.io.DataInput;
 import java.io.DataOutput;
