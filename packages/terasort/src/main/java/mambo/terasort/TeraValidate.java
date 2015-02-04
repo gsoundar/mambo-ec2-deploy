@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package mambo2.terasort;
+package mambo.terasort;
 
 import java.io.IOException;
 import java.util.zip.Checksum;

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package mambo2.terasort;
+package mambo.terasort;
 
 /**
  * This class implements a 128-bit linear congruential generator.

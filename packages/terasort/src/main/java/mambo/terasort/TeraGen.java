@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package mambo2.terasort;
+package mambo.terasort;
 
 import java.io.DataInput;
 import java.io.DataOutput;

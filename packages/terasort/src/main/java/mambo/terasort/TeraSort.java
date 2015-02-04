@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package mambo2.terasort;
+package mambo.terasort;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -281,14 +281,10 @@ public class TeraSort extends Configured implements Tool {
   public int run(String[] args) throws Exception {
     LOG.info("starting");
     Job job = Job.getInstance(getConf());
-    //Path inputDir = new Path(args[0]);
-    Path outputDir = new Path(args[1]);
-    boolean useSimplePartitioner = getUseSimplePartitioner(job);
-    //TeraInputFormat.setInputPaths(job, inputDir);
-    TeraInputFormat.addInputPath(job, new Path("/terasort/in1"));
-    TeraInputFormat.addInputPath(job, new Path("/terasort/in2"));
     
-    File outputConfigFile = new File(args[1]);
+    boolean useSimplePartitioner = getUseSimplePartitioner(job);
+    
+    File outputConfigFile = new File(args[0]);
     if (!outputConfigFile.exists()) {
       throw new IOException("Output directory config file " + outputConfigFile.getPath() + 
                             " does not exists.");
@@ -297,14 +293,17 @@ public class TeraSort extends Configured implements Tool {
     Configuration outputconf = new Configuration();
     Path outputConfigFilePath = new Path(outputConfigFile.getPath());
     outputconf.addResource(outputConfigFilePath);
-    String pathStrings = outputconf.get(TeraOutputFormat.OUTPUT_DIRS);
-    System.out.println("mambo terasort: path " + pathStrings);
-    job.getConfiguration().set(TeraOutputFormat.OUTPUT_DIRS, pathStrings);
-
-    FileOutputFormat.setOutputPath(job, new Path(pathStrings.split(";")[0]));
-    //FileOutputFormat.setOutputPath(job, new Path(pathStrings));
+    String inputPathsString = outputconf.get(TeraInputFormat.INPUT_DIRS);
+    String[] inputPaths = inputPathsString.split(";");
+    for (String inputPath : inputPaths) {
+    	TeraInputFormat.addInputPath(job, new Path(inputPath));
+    }
     
-    //FileOutputFormat.setOutputPath(job, outputDir);
+    String outputPathsString = outputconf.get(TeraOutputFormat.OUTPUT_DIRS);
+    job.getConfiguration().set(TeraOutputFormat.OUTPUT_DIRS, outputPathsString);
+
+    FileOutputFormat.setOutputPath(job, new Path(outputPathsString.split(";")[0]));
+
     job.setJobName("TeraSort");
     job.setJarByClass(TeraSort.class);
     job.setOutputKeyClass(Text.class);
@@ -315,7 +314,7 @@ public class TeraSort extends Configured implements Tool {
       job.setPartitionerClass(SimplePartitioner.class);
     } else {
       long start = System.currentTimeMillis();
-      Path partitionFile = new Path(pathStrings.split(";")[0], 
+      Path partitionFile = new Path(outputPathsString.split(";")[0], 
                                     TeraInputFormat.PARTITION_FILENAME);
       URI partitionUri = new URI(partitionFile.toString() +
                                  "#" + TeraInputFormat.PARTITION_FILENAME);

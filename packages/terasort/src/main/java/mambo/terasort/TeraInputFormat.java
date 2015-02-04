@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package mambo2.terasort;
+package mambo.terasort;
 
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -59,7 +59,7 @@ public class TeraInputFormat extends FileInputFormat<Text,Text> {
   static final int RECORD_LENGTH = KEY_LENGTH + VALUE_LENGTH;
   private static MRJobConfig lastContext = null;
   private static List<InputSplit> lastResult = null;
-  static final String OUTPUT_DIRS = "terasort.input.dirs";
+  static final String INPUT_DIRS = "terasort.input.dirs";
 
   static class TextSampler implements IndexedSortable {
     private ArrayList<Text> records = new ArrayList<Text>();
