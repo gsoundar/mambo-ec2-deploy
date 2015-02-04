@@ -43,7 +43,7 @@ import java.util.Random;
 public class TeraOutputFormat extends FileOutputFormat<Text,Text> {
   static final String FINAL_SYNC_ATTRIBUTE = "mapreduce.terasort.final.sync";
   
-  static final String OUTPUT_DIRS = "teragen.output.dir";
+  static final String OUTPUT_DIRS = "terasort.output.dirs";
   
   private OutputCommitter committer = null;
   static String[] outputdirs = null;

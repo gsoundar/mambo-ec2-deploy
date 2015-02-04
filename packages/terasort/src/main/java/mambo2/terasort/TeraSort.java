@@ -19,6 +19,7 @@
 package mambo2.terasort;
 
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
@@ -280,11 +281,30 @@ public class TeraSort extends Configured implements Tool {
   public int run(String[] args) throws Exception {
     LOG.info("starting");
     Job job = Job.getInstance(getConf());
-    Path inputDir = new Path(args[0]);
+    //Path inputDir = new Path(args[0]);
     Path outputDir = new Path(args[1]);
     boolean useSimplePartitioner = getUseSimplePartitioner(job);
-    TeraInputFormat.setInputPaths(job, inputDir);
-    FileOutputFormat.setOutputPath(job, outputDir);
+    //TeraInputFormat.setInputPaths(job, inputDir);
+    TeraInputFormat.addInputPath(job, new Path("/terasort/in1"));
+    TeraInputFormat.addInputPath(job, new Path("/terasort/in2"));
+    
+    File outputConfigFile = new File(args[1]);
+    if (!outputConfigFile.exists()) {
+      throw new IOException("Output directory config file " + outputConfigFile.getPath() + 
+                            " does not exists.");
+    }
+    
+    Configuration outputconf = new Configuration();
+    Path outputConfigFilePath = new Path(outputConfigFile.getPath());
+    outputconf.addResource(outputConfigFilePath);
+    String pathStrings = outputconf.get(TeraOutputFormat.OUTPUT_DIRS);
+    System.out.println("mambo terasort: path " + pathStrings);
+    job.getConfiguration().set(TeraOutputFormat.OUTPUT_DIRS, pathStrings);
+
+    FileOutputFormat.setOutputPath(job, new Path(pathStrings.split(";")[0]));
+    //FileOutputFormat.setOutputPath(job, new Path(pathStrings));
+    
+    //FileOutputFormat.setOutputPath(job, outputDir);
     job.setJobName("TeraSort");
     job.setJarByClass(TeraSort.class);
     job.setOutputKeyClass(Text.class);
@@ -295,7 +315,7 @@ public class TeraSort extends Configured implements Tool {
       job.setPartitionerClass(SimplePartitioner.class);
     } else {
       long start = System.currentTimeMillis();
-      Path partitionFile = new Path(outputDir, 
+      Path partitionFile = new Path(pathStrings.split(";")[0], 
                                     TeraInputFormat.PARTITION_FILENAME);
       URI partitionUri = new URI(partitionFile.toString() +
                                  "#" + TeraInputFormat.PARTITION_FILENAME);
