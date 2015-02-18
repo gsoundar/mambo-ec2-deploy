@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+/**
+*
+* Licensed to the Apache Software Foundation (ASF) under one
+* or more contributor license agreements.  See the NOTICE file
+* distributed with this work for additional information
+* regarding copyright ownership.  The ASF licenses this file
+* to you under the Apache License, Version 2.0 (the
+* "License"); you may not use this file except in compliance
+* with the License.  You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+-->
+<configuration>
+  <property>
+    <name>hbase.cluster.distributed</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>hbase.rootdir</name>
+    <value>nfs://10.0.0.61:2049/hbase</value>
+  </property>
+  <property>
+    <name>hbase.zookeeper.property.dataDir</name>
+    <value>/mnt/zookeeper</value>
+  </property>
+    <property>
+    <name>hbase.zookeeper.quorum</name>
+    <value>10.0.0.10,10.0.0.11,10.0.0.12</value>
+  </property>
+  <!--nfs start-->
+  <property>
+    <name>fs.nfs.mountdir</name>
+    <value>/mnt/data</value>
+  </property>
+  <!--nfs end-->
+  <!-- Authentication flavor to use. For flamingo, use AUTH_NONE. For pepe, use AUTH_SYS. -->
+  <!-- NFS -->
+  <property>
+    <name>fs.nfs.impl</name>
+    <value>org.apache.hadoop.fs.nfs.NFSv3FileSystem</value>
+  </property>
+  <property>
+    <name>fs.AbstractFileSystem.nfs.impl</name>
+    <value>org.apache.hadoop.fs.nfs.NFSv3AbstractFilesystem</value>
+  </property>
+  <property>
+    <name>fs.nfs.auth.flavor</name>
+    <value>AUTH_SYS</value>
+  </property>
+  <property>
+    <name>fs.nfs.username</name>
+    <value>ec2-user</value>
+  </property>
+  <property>
+    <name>fs.nfs.groupname</name>
+    <value>ec2-user</value>
+  </property>
+  <property>
+    <name>fs.nfs.prefetch</name>
+    <value>true</value>
+  </property>
+  <!--NFS END-->
+</configuration>

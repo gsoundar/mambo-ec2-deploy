@@ -1,0 +1,4 @@
+# A Spark Worker will be started on each of the machines listed below.
+10.0.0.10
+10.0.0.11
+10.0.0.12
