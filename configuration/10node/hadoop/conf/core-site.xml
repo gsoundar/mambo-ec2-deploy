@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+  <property>
+    <name>hadoop.tmp.dir</name>
+    <value>/mnt/local/hadoop-temp/</value>
+    <description>A base for other temporary directories.</description>
+  </property>
+  <!--tachyon-->
+  <property>
+    <name>fs.tachyon.impl</name>
+    <value>tachyon.hadoop.TFS</value>
+  </property>
+  <property>
+    <name>tachyon.home</name>
+    <value>/mnt/ramdisk</value>
+  </property>
+  <!--nfs start-->
+  <property>
+    <name>fs.defaultFS</name>
+    <value>nfs://10.0.0.61:2049</value> 
+  </property>
+  <property>
+    <name>fs.nfs.configuration</name>
+    <value>/opt/mambo/mambo-ec2-deploy/hadoop/conf/nfs-mapping.json</value> 
+  </property>
+  <!--nfs end-->
+  <!--
+      <property>
+      <name>fs.defaultFS</name>
+      <value>hdfs://10.0.0.10:54310</value> 
+      </property>
+  -->
+  <!-- Authentication flavor to use. For flamingo, use AUTH_NONE. For pepe, use AUTH_SYS. -->
+  <!-- NFS --> 
+  <property>
+    <name>fs.nfs.impl</name>
+    <value>org.apache.hadoop.fs.nfs.NFSv3FileSystem</value>
+  </property>
+  <property>
+    <name>fs.AbstractFileSystem.nfs.impl</name>
+    <value>org.apache.hadoop.fs.nfs.NFSv3AbstractFilesystem</value>
+  </property>
+  <!--NFS END-->
+</configuration>
+

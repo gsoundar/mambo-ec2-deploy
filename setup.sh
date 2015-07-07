@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
-HADOOP_PACKAGE=hadoop-2.4.1
+HADOOP_PACKAGE=hadoop-2.6.0
+HADOOP_VERSION=2.6.0
 HBASE_PACKAGE=hbase-0.98.7-hadoop2
 SPARK_PACKAGE=spark-1.1.1-bin-hadoop2.4
 HADOOP_NFS_CONN=hadoop-nfsv3-connector
 TACHYON_PACKAGE=tachyon-0.5.0
 LOCAL_DIR=/mnt/local
-CONF_NAME="3node"
+CONF_NAME="10node"
 
 # Download packages
 # Spark is too big to store on Github directly
@@ -25,9 +26,9 @@ mkdir tachyon/lib
 cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar tachyon/lib/
 cp -rf packages/${HADOOP_NFS_CONN}/hadoop-connector-nfsv3-1.0.jar spark/lib/
 cp -rf packages/${TACHYON_PACKAGE}/client/target/tachyon-client-0.5.0-jar-with-dependencies.jar hadoop/share/hadoop/common/lib/
-cp -rf hadoop/share/hadoop/common/hadoop-nfs-2.4.1.jar hbase/lib/
-cp -rf hadoop/share/hadoop/common/hadoop-nfs-2.4.1.jar tachyon/lib/
-cp -rf hadoop/share/hadoop/common/hadoop-nfs-2.4.1.jar spark/lib/
+cp -rf hadoop/share/hadoop/common/hadoop-nfs-${HADOOP_VERSION}.jar hbase/lib/
+cp -rf hadoop/share/hadoop/common/hadoop-nfs-${HADOOP_VERSION}.jar tachyon/lib/
+cp -rf hadoop/share/hadoop/common/hadoop-nfs-${HADOOP_VERSION}.jar spark/lib/
 cp -rf hadoop/share/hadoop/common/lib/netty-3.6.2.Final.jar tachyon/lib/
 
 # Configure the OS

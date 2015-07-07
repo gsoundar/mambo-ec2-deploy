@@ -1,0 +1,29 @@
+{
+    "spaces": [
+	{
+	    "name": "default",
+	    "uri": "nfs://10.0.0.61:2049/",
+	    "options": {
+		"nfsExportPath": "/mnt/data/",
+		"nfsReadSizeBits": 20,
+		"nfsWriteSizeBits": 20,
+		"nfsSplitSizeBits": 29,
+		"nfsAuthScheme": "AUTH_SYS",
+		"nfsUsername": "ec2-user",
+		"nfsGroupname": "ec2-user",
+		"nfsUid": 0,
+		"nfsGid": 0,
+		"nfsPort": 2049,
+		"nfsMountPort": -1,
+		"nfsRpcbindPort": 111
+	    },
+	    "endpoints": [
+		{
+		    "host": "nfs://10.0.0.61:2049",
+		    "path": "/"
+		}
+	    ]
+	}        
+    ]
+}
+
