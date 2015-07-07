@@ -18,6 +18,7 @@
 
 package mambo.terasort;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.zip.Checksum;
 
@@ -153,17 +154,36 @@ public class TeraValidate extends Configured implements Tool {
   }
 
   private static void usage() throws IOException {
-    System.err.println("teravalidate <out-dir> <report-dir>");
+    System.err.println("teravalidate <output config file>");
   }
 
   public int run(String[] args) throws Exception {
     Job job = Job.getInstance(getConf());
-    if (args.length != 2) {
+    if (args.length != 1) {
       usage();
       return 1;
     }
-    TeraInputFormat.setInputPaths(job, new Path(args[0]));
-    FileOutputFormat.setOutputPath(job, new Path(args[1]));
+    
+    File outputConfigFile = new File(args[0]);
+    if (!outputConfigFile.exists()) {
+      throw new IOException("Output directory config file " + outputConfigFile.getPath() + 
+                            " does not exists.");
+    }
+    
+    Configuration outputconf = new Configuration();
+    Path outputConfigFilePath = new Path(outputConfigFile.getPath());
+    outputconf.addResource(outputConfigFilePath);
+    String inputPathsString = outputconf.get(TeraInputFormat.INPUT_DIRS);
+    String[] inputPaths = inputPathsString.split(";");
+    for (String inputPath : inputPaths) {
+        TeraInputFormat.addInputPath(job, new Path(inputPath));
+    }
+    
+    String outputPathsString = outputconf.get(TeraOutputFormat.OUTPUT_DIRS);
+    job.getConfiguration().set(TeraOutputFormat.OUTPUT_DIRS, outputPathsString);
+
+    FileOutputFormat.setOutputPath(job, new Path(outputPathsString.split(";")[0]));
+    
     job.setJobName("TeraValidate");
     job.setJarByClass(TeraValidate.class);
     job.setMapperClass(ValidateMapper.class);
